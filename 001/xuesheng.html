@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <meta name="description" content="同海大学学生工作台 · 沈沁 · 学号24071225">
+ <title>学生账号</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ========== 样式部分 完全保留 ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', '微软雅黑', 'PingFang SC', system-ui, sans-serif; }
+    body { background-color: #f5f7fb; display: flex; flex-direction: column; min-height: 100vh; }
+    :root { --primary-blue: #1a3a5c; --accent-green: #1e4a3d; --border-light: #d0d7de; --shadow-sm: 0 2px 8px rgba(0,0,0,0.04); }
+    /* 状态栏加宽：上下内边距从0.5rem调整为1rem */
+    .top-bar { background: linear-gradient(145deg, var(--primary-blue) 0%, #1b5e8c 100%); color: white; padding: 1rem 4%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; font-size: 0.9rem; border-bottom: 3px solid #b7d9b1; }
+    .top-bar a { color: #e1f0fa; text-decoration: none; margin-right: 1.5rem; }
+    .user-links a { background: rgba(255,255,255,0.1); padding: 0.2rem 1rem; margin-left: 1rem; border-radius: 0; color: white; }
+    /* 让退出键在鼠标悬停时变红 */
+    .user-links:last-child a:hover {
+      background: rgba(220, 80, 60, 0.6);
+      border-color: rgba(255, 180, 170, 0.7);
+    }
+	.main-header { background: white; padding: 0.5rem 4%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #d4e3ed; }
+    .logo-area { display: flex; align-items: center; gap: 15px; }
+    .logo-icon { background: var(--primary-blue); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 700; border-radius: 0; }
+    .logo-text h1 { font-size: 1.8rem; font-weight: 700; color: var(--primary-blue); }
+    .logo-text .motto { color: #4a6479; font-size: 0.85rem; }
+    .nav-links { display: flex; gap: 1.8rem; font-weight: 600; }
+    .nav-links a { text-decoration: none; color: #1e3a5f; }
+    .nav-links a.active { border-bottom: 3px solid var(--accent-green); }
+    .welcome-bar { background: #e6edf4; padding: 0.8rem 4%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccdae5; }
+    .user-greeting { font-size: 1.1rem; font-weight: 500; color: var(--primary-blue); }
+    .date-badge { background: white; padding: 0.3rem 1.2rem; border: 1px solid #b7c9d6; border-radius: 0; }
+    .dashboard { padding: 1.8rem 4%; display: grid; grid-template-columns: 1.1fr 2.2fr; gap: 25px; }
+    .profile-card { background: white; border: 1px solid #e2e6ea; padding: 1.6rem 1.5rem; box-shadow: var(--shadow-sm); height: fit-content; }
+    .student-avatar { width: 90px; height: 90px; background: #2f6b55; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.8rem; font-weight: 600; margin-bottom: 15px; border-radius: 0; border: 3px solid #bdd3c2; }
+    .student-name { font-size: 1.7rem; font-weight: 700; color: var(--primary-blue); }
+    .student-dept { color: var(--accent-green); font-weight: 600; margin: 5px 0 15px; border-bottom: 1px dashed #b7c9d6; padding-bottom: 12px; }
+    .info-item { display: flex; margin-bottom: 10px; font-size: 0.95rem; }
+    .info-item i { width: 24px; color: var(--primary-blue); }
+    .quick-actions { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+    .quick-btn { background: #f2f7fb; border: 1px solid #d0dde8; padding: 0.7rem 1rem; text-decoration: none; color: #1e3a5f; font-weight: 500; border-radius: 0; transition: 0.15s; display: flex; align-items: center; gap: 12px; }
+    .quick-btn:hover { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+    .work-area { display: flex; flex-direction: column; gap: 25px; }
+    .card { background: white; border: 1px solid #e2e6ea; padding: 1.4rem 1.8rem; box-shadow: var(--shadow-sm); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-left: 5px solid var(--accent-green); padding-left: 15px; }
+    .card-header h3 { font-size: 1.4rem; font-weight: 650; color: var(--primary-blue); }
+    .more-link { color: var(--primary-blue); text-decoration: none; font-size: 0.9rem; }
+    .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .schedule-table th { background: #e6edf4; padding: 10px 5px; font-weight: 600; border: 1px solid #ccdae5; }
+    .schedule-table td { padding: 10px 5px; border: 1px solid #d9e2ec; text-align: center; }
+    .course-tag { background: #d4e4d0; padding: 2px 8px; display: inline-block; margin: 3px; font-size: 0.8rem; border-radius: 0; }
+    .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+    .grade-table { width: 100%; border-collapse: collapse; }
+    .grade-table td { padding: 8px 5px; border-bottom: 1px solid #e2e6ea; }
+    .todo-item { padding: 8px 0; border-bottom: 1px dashed #cfdbe5; display: flex; align-items: center; }
+    .todo-item i { width: 24px; color: var(--accent-green); }
+    .message-input-area { display: flex; gap: 10px; margin-bottom: 20px; }
+    .message-input { flex: 1; padding: 0.8rem 1rem; border: 1px solid #bcccd9; background: white; font-size: 0.95rem; border-radius: 0; resize: none; }
+    .message-btn { background: var(--primary-blue); color: white; border: none; padding: 0 1.5rem; font-weight: 600; cursor: default; border-radius: 0; border: 1px solid #0f2e47; transition: 0.15s; white-space: nowrap; opacity: 0.8; }
+    .message-list { list-style: none; max-height: 400px; overflow-y: auto; }
+    .message-item { padding: 10px 0; border-bottom: 1px solid #e9eef3; display: flex; align-items: flex-start; gap: 10px; transition: background 0.2s; }
+    #targetMessage { cursor: pointer; }
+    #targetMessage:hover { background: #e6f0fa; }
+    .message-avatar { width: 32px; height: 32px; background: #d4e4d0; color: var(--primary-blue); display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 0; flex-shrink: 0; }
+    .message-content { flex: 1; }
+    .message-author { font-weight: 600; color: var(--primary-blue); margin-right: 10px; }
+    .message-time { font-size: 0.75rem; color: #7a8a99; }
+    .message-text { margin-top: 4px; color: #1f3a4e; }
+    .reply-cards { margin-top: 10px; background: #eef3f8; padding: 10px; border: 1px solid #bcccd9; }
+    .reply-cards-title { font-size: 0.85rem; color: #1e3a5f; margin-bottom: 8px; font-weight: 600; }
+    .reply-error-msg { color: #c7423f; font-size: 0.8rem; margin-top: 5px; margin-bottom: 5px; padding-left: 5px; font-weight: 500; }
+    .reply-card-options { display: flex; flex-wrap: wrap; gap: 8px; }
+    .reply-card { background: white; border: 1px solid #9bb0c2; padding: 6px 14px; font-size: 0.9rem; color: var(--primary-blue); cursor: pointer; transition: all 0.15s; border-radius: 0; }
+    .reply-card:hover { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+    .reply-item { margin-top: 8px; padding-left: 42px; font-size: 0.9rem; color: #3a5e7a; border-left: 2px solid #bdd3c2; cursor: default; }
+    .clickable-message { cursor: pointer; }
+    .clickable-message:hover { background: #f5faff; }
+    /* 第六轮陈屿消息可点击样式 */
+    .message-item.jumpable-ending { cursor: pointer; text-decoration: underline dotted var(--primary-blue); }
+    .message-item.jumpable-ending:hover { background: #e6f0fa; }
+    footer { background: #0b2c40; color: #cfdfed; padding: 1.5rem 5%; margin-top: auto; text-align: center; font-size: 0.8rem; }
+    .card, .profile-card, .quick-btn, .course-tag, .date-badge, .message-btn, .message-input, .message-avatar, .reply-card, .reply-cards { border-radius: 0 !important; }
+	
+	.page-indicator {
+	  position: fixed;   /* 改为 fixed */
+	  bottom: 20px;
+	  right: 30px;
+	  /* 其他样式保持不变 */
+	  color: #a8a8a8;
+	  font-size: 14px;
+	  font-weight: 400;
+	  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+	  background: rgba(255, 255, 255, 0.2);
+	  backdrop-filter: blur(8px);
+	  -webkit-backdrop-filter: blur(8px);
+	  padding: 6px 18px;
+	  border-radius: 40px;
+	  border: 1px solid rgba(255, 255, 255, 0.25);
+	  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+	  letter-spacing: 1px;
+	  z-index: 50;
+	}
+	
+    @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } .two-column { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+	<!-- 右下角页码标识（毛玻璃效果） -->
+	<div class="page-indicator">19/19</div>
+  <!-- ========== 页面结构 ========== -->
+  <div class="top-bar">
+    <!-- 拆分为两个独立的 user-links，利用 flex 空间分布将退出键推至最右侧 -->
+    <div class="user-links">
+      <a href="#"><i class="fas fa-user-graduate"></i> 学生</a>
+    </div>
+    <div class="user-links">
+      <a href="jiaowuchu.html"><i class="fas fa-sign-out-alt"></i> 退出</a>
+    </div>
+  </div>
+  <div class="main-header">
+    <div class="logo-area"><div class="logo-icon">同</div><div class="logo-text"><h1>同海大学</h1><div class="motto">同天下 · 共海内</div></div></div>
+    <div class="nav-links"><<a href="#" class="active">工作台</a><a href="#">选课系统</a><a href="#">培养方案</a></div>
+  </div>
+  <div class="welcome-bar">
+    <div class="user-greeting"><i class="fas fa-hand-wave" style="margin-right: 10px;"></i>沈沁 · 学号 24071225 · 园林学院 风景园林专业 2024级硕士</div>
+    <div class="date-badge"><i class="far fa-calendar-alt"></i> 2025年12月18日 星期四 · 第16教学周</div>
+  </div>
+  <div class="dashboard">
+    <div class="profile-card">
+      <div class="student-name">沈沁</div><div class="student-dept">风景园林学 硕士二年级<br><span style="font-size:0.8rem;">导师：于晓丽 教授</span></div>
+      <div class="info-item"><i class="fas fa-id-card"></i> 学号：24071225</div><div class="info-item"><i class="fas fa-graduation-cap"></i> 入学年份：2024年9月</div><div class="info-item"><i class="fas fa-map-marker-alt"></i> 宿舍：青岚校区 研楼5#302</div><div class="info-item"><i class="fas fa-envelope"></i> shenqin@tonghai.edu.cn</div>
+      <div class="quick-actions"><a href="#" class="quick-btn"><i class="fas fa-calendar-alt"></i> 我的课表</a><a href="#" class="quick-btn"><i class="fas fa-chart-bar"></i> 成绩单</a><a href="#" class="quick-btn"><i class="fas fa-file-alt"></i> 培养计划</a><a href="#" class="quick-btn"><i class="fas fa-tasks"></i> 论文进度</a></div>
+      <div style="margin-top: 15px; background: #eef5f0; padding: 10px; border-left: 4px solid var(--accent-green);"><i class="fas fa-user-tie"></i> 导师：于晓丽 教授 · 研究方向：低碳景观与海绵城市<br><i class="fas fa-users"></i> 同门：博士生4人，硕士生7人</div>
+    </div>
+    <div class="work-area">
+      <div class="card"><div class="card-header"><h3><i class="fas fa-calendar-week"></i> 2025-2026学年秋季学期课表</h3><a href="#" class="more-link">打印课表 <i class="fas fa-arrow-right"></i></a></div><table class="schedule-table"><thead><tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr></thead><tbody><tr><td>1-2</td><td>生态园艺学<br><small>于晓丽·博远203</small></td><td>—</td><td>景观生态学<br><small>陈蔚·园林楼205</small></td><td>—</td><td>GIS应用<br><small>实验楼A</small></td></tr><tr><td>3-4</td><td>—</td><td>低碳景观规划<br><small>于晓丽·园林301</small></td><td>—</td><td>海绵城市设计<br><small>于晓丽·园林401</small></td><td>—</td></tr><tr><td>5-7</td><td>研究生组会<br><small>研究所</small></td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody></table><div style="margin-top:10px;"><i class="fas fa-chalkboard"></i> 备注：第17周《低碳景观规划》课程论文提交，第18周考试周。</div></div>
+      <div class="two-column">
+        <div class="card"><div class="card-header"><h3><i class="fas fa-star"></i> 已修课程成绩 (GPA 3.72)</h3><a href="#" class="more-link">全部成绩</a></div><table class="grade-table"><tr><td>生态园艺学</td><td>92</td><td>优</td></tr><tr><td>低碳景观规划</td><td>89</td><td>良</td></tr><tr><td>景观生态学</td><td>94</td><td>优</td></tr><tr><td>海绵城市设计</td><td>91</td><td>优</td></tr><tr><td>GIS空间分析</td><td>87</td><td>良</td></tr><tr><td>科研伦理与学术规范</td><td>通过</td><td>—</td></tr></table><div style="margin-top:12px;"><i class="fas fa-check-circle" style="color:var(--accent-green);"></i> 已修学分：24/32，学位课平均分89.6</div></div>
+        <div class="card"><div class="card-header"><h3><i class="fas fa-road"></i> 学业进度</h3><a href="#" class="more-link">详情</a></div><ul style="list-style:none;"><li class="todo-item"><i class="fas fa-check-circle" style="color:green;"></i> 课程学习阶段 (2024.09-2025.12) 已完成</li><li class="todo-item"><i class="fas fa-spinner"></i> 开题报告：预计2026年3月</li><li class="todo-item"><i class="fas fa-hourglass-half"></i> 论文实验：星湖社区碳汇监测 (进行中)</li><li class="todo-item"><i class="fas fa-flag-checkered"></i> 预计毕业：2027年6月</li></ul><div style="margin-top:15px; background:#fcf9f0; padding:10px; border-left:4px solid #b68b40;"><i class="fas fa-comment-dots"></i> 导师近期留言：沈沁，星湖项目数据本周五前发我邮箱。</div></div>
+      </div>
+      <div class="card"><div class="card-header"><h3><i class="fas fa-bell"></i> 教务通知 · 截止2025年底</h3></div><div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;"><div><div class="todo-item"><i class="fas fa-exclamation-triangle" style="color:#c7423f;"></i> <strong>【重要】</strong> 2025-2026学年春季选课 12月20日截止</div><div class="todo-item"><i class="far fa-file-pdf"></i> 提交开题报告初稿 (导师审核) 12月30日前</div><div class="todo-item"><i class="fas fa-credit-card"></i> 学费缴纳提醒：请于12月25日前完成</div></div><div><div class="todo-item"><i class="fas fa-award"></i> 全国大学生花园设计竞赛 报名中 (2026.01截止)</div><div class="todo-item"><i class="fas fa-calendar"></i> 2025年12月31日 图书馆闭馆时间调整</div><div class="todo-item"><i class="fas fa-flask"></i> 于晓丽教授课题组组会 每周一15:00 研究所</div></div></div><div style="margin-top:10px; color:#6c757d; font-size:0.85rem;"><i class="far fa-clock"></i> 信息更新至2025年12月18日 (数据截止2025年底)</div></div>
+     
+      <!-- 留言板区域 -->
+      <div class="card">
+        <div class="card-header"><h3><i class="fas fa-comment-dots"></i> 留言板 · 已设为仅自己可见</h3><a href="#" class="more-link">更多 <i class="fas fa-arrow-right"></i></a></div>
+        <div class="message-input-area"><textarea class="message-input" placeholder="写下你的留言… (如学习心得、问题求助)" rows="2" readonly disabled></textarea><button class="message-btn" disabled><i class="fas fa-paper-plane"></i> 发布</button></div>
+        <ul class="message-list" id="messageList">
+          <li class="message-item" id="targetMessage"><div class="message-avatar">沈</div><div class="message-content"><span class="message-author">沈沁</span><span class="message-time">2026-4-01 08:23</span><div class="message-text">终于找到你的帐号密码了，原来你也觉得我们很像。</div></div></li>
+          <li class="message-item"><div class="message-avatar">沈</div><div class="message-content"><span class="message-author">沈沁</span><span class="message-time">2025-02-27 19:09</span><div class="message-text">离职后，陈屿总拉着我跑东跑西，很累，但心里好像很开心。她好像世界上的另一个我。有人可以和我坐在一起听我倾诉，站在同一立场替我想办法，这种感觉原来是这样吗？也许这就是幸福，我好喜欢，突然觉得活下去没这么难了。</div></div></li>
+          <li class="message-item"><div class="message-avatar">沈</div><div class="message-content"><span class="message-author">沈沁</span><span class="message-time">2025-02-11 21:22</span><div class="message-text">昨天去复诊了，医生问我手腕上的伤口，我如是告诉了他。</div></div></li>
+          <li class="message-item"><div class="message-avatar">沈</div><div class="message-content"><span class="message-author">沈沁</span><span class="message-time">2025-01-20 20:49</span><div class="message-text">原来那位叫做陈屿的同事也喜欢小猫，她说有机会看看我家的年糕，希望有吧</div></div></li>
+          <li class="message-item"><div class="message-avatar">沈</div><div class="message-content"><span class="message-author">沈沁</span><span class="message-time">2025-01-02 14:30</span><div class="message-text">检查结果出来了，适应障碍伴有焦虑抑郁。</div></div></li>
+          <li class="message-item"><div class="message-avatar">沈</div><div class="message-content"><span class="message-author">沈沁</span><span class="message-time">2024-12-21 02:23</span><div class="message-text">我好累，每每闭上眼我总能想起没进展的课题，做不完的任务，一塌糊涂的人际关系。周毅问我怎么了，我想和他倾诉，可我总能看到他用着悲愤或是痛苦的表情质问我，凭什么是你。</div></div></li>
+          <li class="message-item"><div class="message-avatar">沈</div><div class="message-content"><span class="message-author">沈沁</span><span class="message-time">2024-11-12 21:23</span><div class="message-text">周毅喝醉了，他质问我为什么我能得到今天的一切，为什么我比他优秀这么多。难道今天的一切都是我自己造成的吗？</div></div></li>
+          <li class="message-item"><div class="message-avatar">沈</div><div class="message-content"><span class="message-author">沈沁</span><span class="message-time">2024-10-30 17:52</span><div class="message-text">好累啊，就算四只手四条腿也没办法完成这些任务吧。。没关系，沈沁，你可以的。</div></div></li>
+          <li class="message-item"><div class="message-avatar">沈</div><div class="message-content"><span class="message-author">沈沁</span><span class="message-time">2024-10-08 22:34</span><div class="message-text">已经连着一个星期这么晚才到家了，研究生好累啊。但是导师把这些任务交给我也是看重我吧。嗯，我一定能做好的。</div></div></li>
+          <li class="message-item"><div class="message-avatar">沈</div><div class="message-content"><span class="message-author">沈沁</span><span class="message-time">2024-9-17 14:23</span><div class="message-text">这里是个好地方，正好在找哪儿方便写日记，就这儿吧。</div></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <footer><i class="far fa-copyright"></i> 同海大学教务处 · 学生工作台 (沈沁 24071225) · 数据更新至2025年12月</footer>
+
+  <script>
+    (function() {
+      document.querySelectorAll('.quick-btn, .more-link').forEach(el => {
+        el.addEventListener('click', (e) => { if (el.getAttribute('href') === '#') e.preventDefault(); });
+      });
+
+      const targetMsg = document.getElementById('targetMessage');
+      
+      // ===== 结局跳转网址映射 =====
+      const outcomeUrls = {
+        '该死': 'jj1.html',
+        '不该死': 'jj2.html',
+        'who cares？': 'jj3.html'
+      };
+      
+      // ===== 对话数据定义 (轮次索引从0开始) =====
+      // 每轮陈屿的预设回复 (前四轮固定文本)
+      const chenyuMessages = [
+        '你是谁？为什么知道我的身份？',
+        '为了什么？既然你查到了这里，就知道阿沁的死不对劲。我这一年一直在找那部没电的喂食器的厂商，功夫不负有心人，我终于黑进了他们的云存储。你知道谁杀了沈沁吗？',
+        '对！就是他！该死的周毅！就因为他那点该死的自尊心！阿沁和他提出离婚，他就杀了阿沁！他忮忌阿沁！阿沁的病情刚刚好转，他就结束了她的生命！他不该死吗？'
+      ];
+      
+      // 选项组 (轮次0~3)
+      const replyOptionsGroups = [
+        ['真闹鬼了？', '你是陈屿。', '你为啥老是愚人节发消息？'],
+        ['我是牛云，告诉我你的支付贝账号，我给你打钱。', '因为我很聪明。', '你只需要告诉我你这样做是为了什么。'],
+        ['压榨她的于晓丽', '嫉妒她的周毅', '她自己'],
+        ['该死', '不该死', 'who cares？']
+      ];
+      
+      // 每轮正确选项 (轮次0~3)
+      const correctReplies = [
+        '你是陈屿。',
+        '你只需要告诉我你这样做是为了什么。',
+        '嫉妒她的周毅',
+        '该死'   // 第四轮正确选项仅用于语义，但不验证（第四轮不验证）
+      ];
+      
+      // 第四轮 (轮次3) 选择后的分支映射 & 陈屿回复
+      const responseMap = {
+        '该死': '不只是他，那个姓于的我也不会放过。。',
+        '不该死': '看来你也是个黑白不分的人。',
+        'who cares？': '我和年糕在乎。'
+      };
+      
+      // 分支配置 (第五轮, 轮次4)
+      const branchConfig = {
+        '该死': {
+          options: ['我觉得于晓丽更该死', '我觉得俩人一样该死', '我觉得周毅更该死'],
+          correct: '我觉得俩人一样该死',
+          nextChenyu: '我会让他们都付出代价。'   // 第六轮陈屿回复
+        },
+        '不该死': {
+          options: ['黑白不分我还五谷不勤呢。。', '他死了你给我结钱啊？', '死亡对他这种人来说太轻了。'],
+          correct: '死亡对他这种人来说太轻了。',
+          nextChenyu: '……让他身败名裂或许更好。我要毁掉他珍视的一切。'
+        },
+        'who cares？': {
+          options: ['我不想毁了我的信誉 今天我就当没见过你', '看看猫喵喵喵喵', '你再也不是没有猫的野人了'],
+          correct: '我不想毁了我的信誉 今天我就当没见过你',
+          nextChenyu: '谢谢。'
+        }
+      };
+      
+      // ===== 辅助函数：获取当前时间字符串 =====
+      function getCurrentTimeStr() {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      }
+      
+      // ===== 核心：使消息可回复 (基于轮次) =====
+      function makeReplyable(element) {
+        if (!element) return;
+        if (element.dataset.replyEnabled === 'true') return;
+        element.dataset.replyEnabled = 'true';
+        
+        // 获取当前消息轮次 (若没有则初始化)
+        let round = element.dataset.round !== undefined ? parseInt(element.dataset.round) : 0;
+        element.dataset.round = round;
+        
+        element.addEventListener('click', function(e) {
+          if (e.target.closest('.reply-cards')) return;
+          if (element.querySelector('.reply-cards')) return;
+          
+          const currentRound = parseInt(element.dataset.round);
+          
+          // 确定当前轮使用的选项组、正确选项、是否为分支、是否为第四轮(不验证)
+          let currentOptions, correctAnswer, isBranch = false, isFourthRound = false;
+          
+          // 检查是否有自定义分支配置 (存储在dataset中)
+          if (element.dataset.nextOptions) {
+            try {
+              currentOptions = JSON.parse(element.dataset.nextOptions);
+              correctAnswer = element.dataset.nextCorrect;
+              isBranch = true;
+            } catch (e) { console.warn('解析分支配置失败'); }
+          }
+          
+          if (!isBranch) {
+            // 使用预设数组，根据轮次取模 (但轮次应 < 4)
+            const idx = currentRound % replyOptionsGroups.length;
+            currentOptions = replyOptionsGroups[idx];
+            correctAnswer = correctReplies[idx];
+            isFourthRound = (idx === 3);  // 第四轮不验证
+          }
+          
+          // 构建回复卡片
+          const replyDiv = document.createElement('div');
+          replyDiv.className = 'reply-cards';
+          replyDiv.innerHTML = `
+            <div class="reply-card-options">
+              ${currentOptions.map(text => `<span class="reply-card" data-reply-text="${text}">${text}</span>`).join('')}
+            </div>
+            <div class="reply-error-msg" style="display:none;"></div>
+          `;
+          
+          const contentDiv = element.querySelector('.message-content');
+          contentDiv.appendChild(replyDiv);
+          const errorMsgDiv = replyDiv.querySelector('.reply-error-msg');
+          
+          replyDiv.querySelectorAll('.reply-card').forEach(card => {
+            card.addEventListener('click', function() {
+              const selectedText = this.dataset.replyText;
+              
+              // 验证逻辑：分支轮需要验证正确性；非分支且非第四轮也需要验证；第四轮不验证
+              let isValid = true;
+              if (isBranch) {
+                // 第五轮 (分支轮) 必须验证正确选项
+                if (selectedText !== correctAnswer) {
+                  isValid = false;
+                }
+              } else if (!isFourthRound) {
+                // 普通轮次 (0,1,2) 验证
+                if (selectedText !== correctAnswer) {
+                  isValid = false;
+                }
+              }
+              // 第四轮不验证，直接通过
+              
+              if (!isValid) {
+                errorMsgDiv.style.display = 'block';
+                errorMsgDiv.innerHTML = '<i class="fas fa-times-circle"></i> 选项错误，请重新选择';
+                return;
+              }
+              
+              errorMsgDiv.style.display = 'none';
+              
+              // 生成沈沁的回复条目
+              const replyItem = document.createElement('div');
+              replyItem.className = 'reply-item';
+              const timeStr = getCurrentTimeStr();
+              replyItem.innerHTML = `
+                <i class="fas fa-reply" style="margin-right:6px; opacity:0.7;"></i>
+                <strong>沈沁</strong> 回复于 ${timeStr}<br>
+                ${selectedText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+              `;
+              
+              // 移除沈沁回复上的跳转逻辑 —— 不再绑定跳转
+              
+              element.insertAdjacentElement('afterend', replyItem);
+              replyDiv.remove();
+              
+              // 确定下一轮陈屿的文本
+              let nextChenyuText = '';
+              let nextRound = currentRound + 1;
+              let nextBranchConfig = null;  // 用于存储可能的分支配置 (仅第四轮之后需要)
+              
+              if (isFourthRound) {
+                // 第四轮 (该死/不该死/whocares)
+                nextChenyuText = responseMap[selectedText] || '嗯……';
+                // 附加分支选项 (供下一轮使用)
+                const branch = branchConfig[selectedText];
+                if (branch) {
+                  nextBranchConfig = {
+                    options: branch.options,
+                    correct: branch.correct
+                  };
+                }
+              } else if (isBranch) {
+                // 第五轮 (分支轮) 正确选择后 → 第六轮陈屿消息
+                const fourthChoice = element.dataset.fourthChoice; // 我们在生成第四轮陈屿消息时存储了
+                const branch = branchConfig[fourthChoice];
+                nextChenyuText = branch ? branch.nextChenyu : '……';
+                // 第六轮不再有点击选项 (不再附加分支)
+              } else {
+                // 普通轮次 (0,1,2)
+                const idx = currentRound % chenyuMessages.length;
+                nextChenyuText = chenyuMessages[idx];
+              }
+              
+              // 延迟生成陈屿新消息
+              setTimeout(() => {
+                const newMsg = document.createElement('li');
+                newMsg.className = 'message-item clickable-message';
+                newMsg.setAttribute('data-reply-enabled', 'false');
+                newMsg.dataset.round = nextRound;
+                
+                // 如果是第四轮生成的陈屿消息，记录用户的选择 (用于第五轮分支)
+                if (isFourthRound) {
+                  newMsg.dataset.fourthChoice = selectedText;
+                  if (nextBranchConfig) {
+                    newMsg.dataset.nextOptions = JSON.stringify(nextBranchConfig.options);
+                    newMsg.dataset.nextCorrect = nextBranchConfig.correct;
+                  }
+                }
+                
+                // 如果是第六轮 (round=5)，设置为可点击并绑定跳转事件
+                if (nextRound === 5) {
+                  newMsg.dataset.final = 'true';
+                  // 为第六轮陈屿消息添加跳转功能
+                  newMsg.classList.add('jumpable-ending');
+                  newMsg.style.cursor = 'pointer';
+                  newMsg.title = '点击查看结局';
+                  
+                  // 从第四轮选择中获取结局网址
+                  const fourthChoice = element.dataset.fourthChoice || (isFourthRound ? selectedText : null);
+                  const targetUrl = outcomeUrls[fourthChoice] || '#';
+                  
+                  newMsg.addEventListener('click', function(ev) {
+                    // 防止触发其他点击事件（例如可能残留的回复逻辑）
+                    ev.stopPropagation();
+                    if (targetUrl && targetUrl !== '#') {
+                      window.open(targetUrl, '_blank');
+                    }
+                  });
+                }
+                
+                newMsg.innerHTML = `
+                  <div class="message-avatar">沈</div>
+                  <div class="message-content">
+                    <span class="message-author">沈沁</span>
+                    <span class="message-time">${timeStr}</span>
+                    <div class="message-text">${nextChenyuText}</div>
+                  </div>
+                `;
+                
+                replyItem.insertAdjacentElement('afterend', newMsg);
+                
+                // 如果不是第六轮，启用回复；第六轮不再启用原有回复功能（因为已经绑定了跳转，且不应再弹出选项）
+                if (nextRound !== 5) {
+                  makeReplyable(newMsg);
+                } else {
+                  // 第六轮移除点击生成选项的功能
+                  newMsg.classList.remove('clickable-message');
+                }
+              }, 1800);
+            });
+          });
+        });
+      }
+      
+      // 初始化第一条消息 (轮次0)
+      targetMsg.dataset.round = 0;
+      makeReplyable(targetMsg);
+    })();
+  </script>
+</body>
+</html>

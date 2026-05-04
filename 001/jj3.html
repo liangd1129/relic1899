@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>静心小筑 · 世界纷飞与我无关</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* 避免拖动文字，保持清爽 */
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1a2a3a 0%, #0f1a24 100%);
+            font-family: 'Segoe UI', 'Quicksand', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* ========= 背景文字层：世界纷飞与我无关 ========= */
+        .bg-slogan {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;      /* 让背景不干扰点击游戏 */
+            z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .bg-slogan .slogan-text {
+            font-size: clamp(3rem, 15vw, 8rem);
+            font-weight: 900;
+            color: rgba(220, 240, 255, 0.55);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-family: 'Segoe UI', 'Quicksand', system-ui, sans-serif;
+            white-space: nowrap;
+            transform: rotate(-5deg) scale(1.2);
+            text-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(1px);
+            transition: all 0.3s ease;
+            user-select: none;
+            pointer-events: none;
+            /* 优雅的书法感加一点倾斜 */
+            font-style: italic;
+        }
+		
+		.page-indicator {
+		  position: fixed;   /* 改为 fixed */
+		  bottom: 20px;
+		  right: 30px;
+		  /* 其他样式保持不变 */
+		  color: #a8a8a8;
+		  font-size: 14px;
+		  font-weight: 400;
+		  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+		  background: rgba(255, 255, 255, 0.2);
+		  backdrop-filter: blur(8px);
+		  -webkit-backdrop-filter: blur(8px);
+		  padding: 6px 18px;
+		  border-radius: 40px;
+		  border: 1px solid rgba(255, 255, 255, 0.25);
+		  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+		  letter-spacing: 1px;
+		  z-index: 50;
+		}
+		
+
+        /* 响应式换行：手机如果太宽则折行 */
+        @media (max-width: 640px) {
+            .bg-slogan .slogan-text {
+                white-space: normal;
+                text-align: center;
+                line-height: 1.2;
+                width: 100%;
+                padding: 0 20px;
+                font-size: clamp(2.5rem, 12vw, 5rem);
+                transform: rotate(-3deg);
+            }
+        }
+
+        /* ========= 主游戏卡片 (磨砂玻璃质感) ========= */
+        .game-card {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 680px;
+            background: rgba(25, 35, 45, 0.3);
+            backdrop-filter: blur(2px);
+            border-radius: 64px;
+            padding: 1.5rem 1.8rem 2rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 头部计分板 */
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 24px;
+            border-radius: 100px;
+            backdrop-filter: blur(4px);
+        }
+
+        .score-box, .timer-box {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 6px 20px;
+            border-radius: 60px;
+            color: #f5f9ff;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .score-box span:first-child, .timer-box span:first-child {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-right: 8px;
+        }
+
+        .score-value, .timer-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFE6B0, #FFB347);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .timer-value {
+            background: linear-gradient(135deg, #b3e5ff, #6bc9ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+        }
+
+        /* 游戏区域 (点击舞台) */
+        .play-area {
+            position: relative;
+            background: rgba(10, 18, 24, 0.6);
+            border-radius: 48px;
+            min-height: 420px;
+            height: auto;
+            aspect-ratio: 5 / 4;
+            width: 100%;
+            margin: 20px 0 20px;
+            border: 1px solid rgba(255,255,240,0.2);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+            cursor: crosshair;
+            transition: all 0.2s;
+        }
+
+        /* 可点击的目标精灵 */
+        .target {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at 30% 30%, #FFE5B4, #F9A826);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 0 3px rgba(255,235,160,0.8), inset 0 2px 4px rgba(255,255,200,0.9);
+            transition: all 0.08s linear;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            animation: gentle-float 2s infinite ease;
+            will-change: transform;
+            backdrop-filter: blur(2px);
+        }
+
+        /* 点击时的动画 */
+        .target:active {
+            transform: scale(0.92);
+            transition: 0.02s;
+        }
+
+        /* 游戏结束时的禁用样式 */
+        .target.inactive {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(0.3);
+            animation: none;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.2);
+        }
+
+        /* 飘浮小动画 */
+        @keyframes gentle-float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* 额外点缀: 点击时出现 +1 特效 */
+        .plus-one {
+            position: absolute;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #FFD966;
+            text-shadow: 0 0 6px #ff9900;
+            pointer-events: none;
+            z-index: 100;
+            animation: fadeUp 0.5s ease-out forwards;
+            font-family: monospace;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0px) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-35px) scale(1.2);
+            }
+        }
+
+        /* 游戏结束消息 */
+        .game-message {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 18px;
+            border-radius: 40px;
+            display: inline-block;
+            width: auto;
+            backdrop-filter: blur(8px);
+            color: #FFE5B4;
+        }
+
+        .reset-btn {
+            background: linear-gradient(120deg, #2c5364, #0f2027);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #f0f3f8;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 0 #0a1116;
+            margin-top: 12px;
+            font-family: inherit;
+            letter-spacing: 1px;
+            backdrop-filter: blur(4px);
+            width: fit-content;
+        }
+
+        .reset-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #0a1116;
+        }
+
+        .footer-control {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tips {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 14px;
+            border-radius: 60px;
+            color: #ccddee;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 550px) {
+            .game-card {
+                padding: 1rem 1.2rem 1.5rem;
+                border-radius: 40px;
+            }
+            .target {
+                width: 70px;
+                height: 70px;
+                font-size: 2.5rem;
+            }
+            .stats {
+                padding: 8px 18px;
+            }
+            .score-value, .timer-value {
+                font-size: 1.6rem;
+            }
+            .play-area {
+                aspect-ratio: 4 / 3;
+                min-height: 320px;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .target {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+        }
+		
+		/* 新增：固定在右下角的醒目结束按钮 (与结局一并存) */
+		.fixed-end-btn {
+		  position: fixed;
+		  bottom: 80px;           /* 可根据需要微调 */
+		  right: 30px;
+		  z-index: 100;
+		  
+		  display: inline-flex;
+		  align-items: center;
+		  justify-content: center;
+		  padding: 10px 24px;       /* 更紧凑的内边距 */
+		  background: #a52a2a;
+		  color: #ffffff;
+		  font-family: 'Times New Roman', Georgia, '宋体', serif;
+		  font-size: 1.2rem;        /* 字体稍小 */
+		  font-weight: 700;
+		  letter-spacing: 3px;
+		  text-decoration: none;
+		  border: 2.5px solid #e6c9a8;
+		  border-radius: 40px;
+		  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+		  backdrop-filter: blur(4px);
+		  -webkit-backdrop-filter: blur(4px);
+		  transition: all 0.25s ease;
+		}
+		
+		.fixed-end-btn i {
+		  margin-right: 10px;
+		  color: #f5dbb1;
+		  font-size: 1.2rem;       /* 图标也相应缩小 */
+		}
+		
+		/* 手机屏幕下进一步缩小 */
+		@media (max-width: 600px) {
+		  .fixed-end-btn {
+		    bottom: 90px;
+		    right: 20px;
+		    padding: 8px 18px;
+		    font-size: 1rem;
+		    letter-spacing: 2px;
+		  }
+		  .fixed-end-btn i {
+		    font-size: 1.1rem;
+		    margin-right: 8px;
+		  }
+		}
+		
+		.fixed-end-btn i {
+		  margin-right: 14px;
+		  color: #f5dbb1;
+		  font-size: 1.6rem;
+		  transition: transform 0.2s;
+		}
+		
+		.fixed-end-btn:hover {
+		  background: #1e3a4c;       /* 悬停变为深蓝，与导航栏呼应 */
+		  border-color: #d4a373;
+		  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+		  transform: translateY(-3px);
+		}
+		
+		.fixed-end-btn:hover i {
+		  transform: translateX(4px); /* 箭头轻微右移 */
+		  color: #ffffff;
+		}
+		
+		/* ========= 新增：左上角返回按钮（与整体毛玻璃风格契合） ========= */
+        .back-home-btn {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 200;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(30, 45, 55, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 245, 210, 0.45);
+            border-radius: 60px;
+            padding: 8px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f3efdf;
+            text-decoration: none;
+            letter-spacing: 1px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+            transition: all 0.25s ease;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        
+        .back-home-btn span {
+            font-size: 1.2rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .back-home-btn:hover {
+            background: rgba(45, 65, 80, 0.85);
+            border-color: rgba(255, 220, 150, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 22px rgba(0, 0, 0, 0.3);
+            color: #fff6e5;
+        }
+        
+        .back-home-btn:hover span {
+            transform: translateX(-4px);
+        }
+        
+        /* 手机适配，避免与左上角内容碰撞或过小 */
+        @media (max-width: 550px) {
+            .back-home-btn {
+                top: 16px;
+                left: 16px;
+                padding: 6px 16px;
+                font-size: 0.85rem;
+            }
+            .back-home-btn span {
+                font-size: 1rem;
+            }
+        }
+		
+    </style>
+</head>
+<body>
+
+<!-- ========= 新增返回按钮：符合整体风格，点击返回 xuesheng.html ========= -->
+<a href="xuesheng.html" class="back-home-btn" target="_self">
+    <span>←</span> 返回
+</a>
+
+<!-- 右下角页码标识（毛玻璃效果） -->
+<div class="page-indicator">结局三</div>
+
+<a href="weituo.html" class="fixed-end-btn" target="_self">
+	  <i class="fas fa-arrow-right"></i> 委托总结
+	</a>
+	
+<!-- 背景文字：世界纷飞与我无关 -->
+<div class="bg-slogan">
+    <div class="slogan-text">世界纷飞<br class="mobile-break">与我无关</div>
+</div>
+
+<!-- 游戏主卡片 -->
+<div class="game-card">
+    <div class="stats">
+        <div class="score-box">
+            <span>✨ 灵犀 · 得分</span>
+            <span class="score-value" id="scoreValue">0</span>
+        </div>
+        <div class="timer-box">
+            <span>⏳ 静心时光</span>
+            <span class="timer-value" id="timerValue">30</span><span style="font-size:1rem;">s</span>
+        </div>
+    </div>
+
+    <!-- 游戏区域 -->
+    <div class="play-area" id="playArea">
+        <div class="target" id="clickTarget">
+            🌙
+        </div>
+    </div>
+
+    <div class="footer-control">
+        <div class="game-message" id="gameMessage"></div>
+        <button class="reset-btn" id="resetGameBtn">🔄 重启 · 静心再续</button>
+        <div class="tips">💡 轻点月亮 | 每次点击+1分 & 月影飘移 | 限时30秒 · 心无旁骛</div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        // ---------- DOM 元素 ----------
+        const playArea = document.getElementById('playArea');
+        const target = document.getElementById('clickTarget');
+        const scoreSpan = document.getElementById('scoreValue');
+        const timerSpan = document.getElementById('timerValue');
+        const resetBtn = document.getElementById('resetGameBtn');
+        const gameMessageDiv = document.getElementById('gameMessage');
+
+        // ---------- 游戏状态 ----------
+        let currentScore = 0;
+        let timeLeft = 30;           // 剩余秒数
+        let gameActive = true;       // 游戏是否进行中（未结束）
+        let timerInterval = null;     // 计时器id
+        
+        // 存储区域尺寸缓存（实时获取即可，但避免反复读取消耗）
+        
+        // ---------- 辅助函数 ----------
+        // 显示短暂消息（游戏结束时可显示）
+        function setMessage(msg, isError = false) {
+            if(!gameMessageDiv) return;
+            gameMessageDiv.innerText = msg;
+            gameMessageDiv.style.opacity = '1';
+            if(!isError) {
+                gameMessageDiv.style.color = '#FFE5B4';
+            } else {
+                gameMessageDiv.style.color = '#ffaa88';
+            }
+            // 3秒后自动清除非结束消息，但游戏结束消息会保留到重置
+            if(!msg.includes('结束') && !msg.includes('Game Over')) {
+                setTimeout(() => {
+                    if(gameMessageDiv.innerText === msg) gameMessageDiv.innerText = '';
+                }, 2000);
+            }
+        }
+        
+        // 更新UI分数
+        function updateScoreUI() {
+            scoreSpan.innerText = currentScore;
+        }
+        
+        // 更新时间UI
+        function updateTimerUI() {
+            timerSpan.innerText = timeLeft;
+        }
+        
+        // 随机位置 (基于 playArea 和 target 实时宽高，保证完全在区域内)
+        function setRandomPosition() {
+            if(!playArea || !target) return;
+            // 获取区域尺寸
+            const areaRect = playArea.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+            // 注意：由于 target 是绝对定位，它的宽高可能因渲染变化，我们用 offsetWidth/Height 更稳
+            const targetW = target.offsetWidth;
+            const targetH = target.offsetHeight;
+            const areaW = playArea.clientWidth;
+            const areaH = playArea.clientHeight;
+            
+            if(areaW <= targetW || areaH <= targetH) {
+                // 极端情况，防止越界，尽量居中
+                target.style.left = '0px';
+                target.style.top = '0px';
+                return;
+            }
+            
+            // 随机范围：0 到 (区域宽 - 目标宽)
+            const maxLeft = areaW - targetW;
+            const maxTop = areaH - targetH;
+            const randLeft = Math.random() * maxLeft;
+            const randTop = Math.random() * maxTop;
+            target.style.left = randLeft + 'px';
+            target.style.top = randTop + 'px';
+        }
+        
+        // 边界自适应（窗口resize时确保目标不超出游戏区）
+        function adjustTargetWithinBounds() {
+            if(!gameActive) return; // 游戏结束时没必要强行调整，避免视觉跳跃，但重置时重新生成位置即可
+            if(!playArea || !target) return;
+            const areaW = playArea.clientWidth;
+            const areaH = playArea.clientHeight;
+            const targetW = target.offsetWidth;
+            const targetH = target.offsetHeight;
+            if(areaW <= 0 || areaH <= 0) return;
+            
+            let currentLeft = parseFloat(target.style.left);
+            let currentTop = parseFloat(target.style.top);
+            if(isNaN(currentLeft)) currentLeft = 0;
+            if(isNaN(currentTop)) currentTop = 0;
+            
+            const maxLeft = areaW - targetW;
+            const maxTop = areaH - targetH;
+            let needUpdate = false;
+            let newLeft = currentLeft;
+            let newTop = currentTop;
+            
+            if(currentLeft < 0) { newLeft = 0; needUpdate = true; }
+            if(currentLeft > maxLeft && maxLeft >= 0) { newLeft = maxLeft; needUpdate = true; }
+            if(currentTop < 0) { newTop = 0; needUpdate = true; }
+            if(currentTop > maxTop && maxTop >= 0) { newTop = maxTop; needUpdate = true; }
+            
+            // 如果区域过小导致目标超出且maxLeft为负值，则强制居中 (极端情况)
+            if(maxLeft < 0) {
+                newLeft = 0;
+                needUpdate = true;
+            }
+            if(maxTop < 0) {
+                newTop = 0;
+                needUpdate = true;
+            }
+            if(needUpdate) {
+                target.style.left = newLeft + 'px';
+                target.style.top = newTop + 'px';
+            }
+        }
+        
+        // 生成漂亮的 +1 特效 (在点击坐标处)
+        function showPlusOneEffect(clientX, clientY) {
+            const effectDiv = document.createElement('div');
+            effectDiv.className = 'plus-one';
+            effectDiv.innerText = '+1';
+            effectDiv.style.left = (clientX - 20) + 'px';
+            effectDiv.style.top = (clientY - 30) + 'px';
+            effectDiv.style.position = 'fixed';
+            document.body.appendChild(effectDiv);
+            setTimeout(() => {
+                if(effectDiv && effectDiv.remove) effectDiv.remove();
+            }, 500);
+        }
+        
+        // 加分核心逻辑
+        function addScoreAndMove(e) {
+            if(!gameActive) return;
+            // 防止快速点击时因目标移动后事件冒泡但是状态正确
+            // 增加分数
+            currentScore++;
+            updateScoreUI();
+            
+            // 获取点击坐标 用于飘字特效
+            let clickX = e.clientX;
+            let clickY = e.clientY;
+            // 如果是触摸事件兼容移动端
+            if(e.touches) {
+                clickX = e.touches[0].clientX;
+                clickY = e.touches[0].clientY;
+            }
+            showPlusOneEffect(clickX, clickY);
+            
+            // 加分后移动目标到新随机位置
+            setRandomPosition();
+            // 微加互动小动画：快速闪一下目标
+            target.style.transform = 'scale(0.96)';
+            setTimeout(() => {
+                if(target) target.style.transform = '';
+            }, 80);
+            
+            // 可以播放轻微的音感？无音频完全视觉，保持简单
+        }
+        
+        // 游戏结束逻辑
+        function endGame() {
+            if(!gameActive) return; // 已结束
+            gameActive = false;
+            if(timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            // 禁用目标点击样式
+            target.classList.add('inactive');
+            setMessage('✨ 时间静静流淌 · 游戏结束 ✨ 点击「重启」继续独处时光', false);
+            gameMessageDiv.style.opacity = '1';
+        }
+        
+        // 开始倒计时 (重置时调用)
+        function startCountdown() {
+            if(timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if(!gameActive) {
+                    // 如果游戏非活跃状态，但计时器还在，应该清除（安全保护）
+                    if(timerInterval) clearInterval(timerInterval);
+                    return;
+                }
+                if(timeLeft <= 1) {
+                    // 倒计时归零
+                    timeLeft = 0;
+                    updateTimerUI();
+                    endGame();
+                } else {
+                    timeLeft--;
+                    updateTimerUI();
+                }
+            }, 1000);
+        }
+        
+        // 完全重置游戏 (新的一局)
+        function resetGame() {
+            // 清除旧计时器
+            if(timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            // 重置数值
+            currentScore = 0;
+            timeLeft = 30;
+            gameActive = true;
+            
+            // 更新UI
+            updateScoreUI();
+            updateTimerUI();
+            // 移除禁用样式
+            target.classList.remove('inactive');
+            // 清空消息 (或者显示轻提示)
+            gameMessageDiv.innerText = '';
+            
+            // 重置目标位置 (随机)
+            setRandomPosition();
+            // 确保目标位置在边界内 (随机函数已经保证在边界内, 但双保险)
+            adjustTargetWithinBounds();
+            
+            // 确保目标可见无残留transform
+            target.style.transform = '';
+            
+            // 启动新的倒计时
+            startCountdown();
+            
+            // 额外加入一个小反馈: 短暂提示新游戏开始
+            setMessage('🌙 新的一轮 · 心无杂念，轻点灵月', false);
+            setTimeout(() => {
+                if(gameMessageDiv.innerText === '🌙 新的一轮 · 心无杂念，轻点灵月') gameMessageDiv.innerText = '';
+            }, 1500);
+        }
+        
+        // ---------- 事件绑定 ----------
+        // 目标点击事件 (鼠标 + 触摸)
+        function onTargetClick(e) {
+            e.stopPropagation();
+            if(!gameActive) return;
+            addScoreAndMove(e);
+        }
+        
+        target.addEventListener('click', onTargetClick);
+        // 移动端触摸需要加上 preventDefault 避免滚动时误触, 但不影响体验，添加touch事件
+        target.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if(!gameActive) return;
+            addScoreAndMove(e);
+        }, { passive: false });
+        
+        // 重置按钮
+        resetBtn.addEventListener('click', () => {
+            resetGame();
+        });
+        
+        // 窗口尺寸变化时调整目标位置，确保不超出边界（防止窗口旋转/缩放导致目标跑出区域）
+        window.addEventListener('resize', () => {
+            if(gameActive) {
+                // 游戏进行中，调整当前目标位置避免超出
+                adjustTargetWithinBounds();
+            } else {
+                // 如果游戏已结束但为了重置后位置正常，重置时已经重新生成随机位置。目前无需额外
+                // 但可以简单修正一下显示（无伤大雅）
+                if(target && !gameActive) {
+                    // 只是视觉修正不干扰点击禁用样式
+                    adjustTargetWithinBounds();
+                }
+            }
+        });
+        
+        // 额外监听页面加载完毕，初始化游戏 (确保区域完全渲染)
+        window.addEventListener('load', () => {
+            // 先确保目标初始位置在区域内
+            setTimeout(() => {
+                if(playArea && target) {
+                    setRandomPosition();
+                    adjustTargetWithinBounds();
+                }
+                resetGame();  // 正式启动
+            }, 20);
+        });
+        
+        // 防止游戏区域外的点击导致任何误判 (无)
+        // 优雅的处理: 如果游戏结束, 展示的结束样式足够清晰
+        // 另外万一移动端某些浏览器触摸长按菜单, 禁止菜单
+        target.addEventListener('contextmenu', (e) => e.preventDefault());
+    })();
+</script>
+</body>
+</html>

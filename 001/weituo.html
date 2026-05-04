@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+ <title>委托总结</title>
+  <style>
+    /* 重置 & 基础 —— 只为阅读而生 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f5f3f0;  /* 柔和的米灰色基底，护眼不刺眼 */
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', sans-serif;
+      line-height: 1.7;
+      color: #1e1e1e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      padding: 2rem 1rem;
+    }
+
+    /* 阅读卡片 —— 干净、宽敞、聚焦 */
+    .reading-card {
+      max-width: 780px;
+      width: 100%;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02);
+      padding: 2.4rem 2.2rem;
+      transition: box-shadow 0.2s ease;
+      border: 1px solid rgba(224, 220, 215, 0.3);
+    }
+
+    @media (max-width: 600px) {
+      main {
+        padding: 1.2rem 0.8rem;
+      }
+      .reading-card {
+        padding: 1.8rem 1.2rem;
+        border-radius: 22px;
+      }
+    }
+
+    /* 版式细节 —— 只为易读 */
+    .reading-card h1 {
+      font-size: 2.4rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+      color: #1a1a1a;
+      border-left: 5px solid #b38b6d;
+      padding-left: 1.2rem;
+    }
+
+    .reading-card .meta {
+      font-size: 0.95rem;
+      color: #6b625a;
+      margin-bottom: 2rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px dashed #d9d2ca;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .reading-card .meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .reading-card p {
+      margin-bottom: 1.4rem;
+      font-size: 1.12rem;
+      word-break: break-word;
+    }
+
+    .reading-card h2 {
+      font-size: 1.7rem;
+      font-weight: 550;
+      margin: 2rem 0 1rem;
+      color: #3a2e26;
+      letter-spacing: -0.005em;
+    }
+
+    .reading-card h3 {
+      font-size: 1.35rem;
+      font-weight: 540;
+      margin: 1.6rem 0 0.8rem;
+      color: #4e3f35;
+    }
+
+    .reading-card blockquote {
+      margin: 1.8rem 0;
+      padding: 1rem 1.5rem;
+      background: #faf8f6;
+      border-left: 6px solid #c6ad93;
+      border-radius: 0 14px 14px 0;
+      font-style: normal;
+      color: #3f362f;
+      font-size: 1.05rem;
+    }
+
+    .reading-card a {
+      color: #7a5d4a;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
+      text-decoration-color: #cfbcab;
+      transition: color 0.15s;
+    }
+
+    .reading-card a:hover {
+      color: #4f3727;
+      text-decoration-color: #8f6e58;
+    }
+
+    .divider-light {
+      margin: 2rem 0 1.2rem;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #ddd2c8, transparent);
+    }
+
+    /* 底部区域 */
+    .site-footer {
+      padding: 2rem 1.5rem 2.5rem;
+      text-align: center;
+      background: transparent;
+      border-top: 1px solid #e4dbd2;
+      margin-top: 0.5rem;
+    }
+
+    .footer-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    /* 跳转按钮 */
+    .jump-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #3a5e4c;
+      color: #fefcf9;
+      font-weight: 520;
+      font-size: 1.25rem;
+      padding: 0.9rem 2.6rem;
+      border-radius: 60px;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      box-shadow: 0 6px 14px rgba(58, 94, 76, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(4px);
+      line-height: 1.2;
+    }
+
+    .jump-btn:hover {
+      background: #284b3a;
+      box-shadow: 0 10px 20px rgba(40, 75, 58, 0.18);
+      transform: translateY(-1px);
+      color: white;
+      border-color: #6d927b;
+    }
+
+    .jump-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .icon-emoji {
+      font-size: 1.2em;
+      margin-right: 4px;
+    }
+
+    .hint-text {
+      font-size: 0.9rem;
+      color: #7a6e64;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(245, 240, 235, 0.5);
+      padding: 0.3rem 1.2rem;
+      border-radius: 30px;
+      backdrop-filter: blur(2px);
+    }
+
+    .footnote {
+      margin-top: 2.2rem;
+      font-size: 0.9rem;
+      color: #887d73;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <!-- 阅读卡片：故事全文 -->
+    <article class="reading-card">
+      <h1>001 愚人节的短信</h1>
+      <div class="meta">
+        <span>委托总结</span>
+      </div>
+      
+      <p>沈沁，五行缺水，名字是妈妈为了给她补上缺的水特意找大师算的。就像注定了一般，沈沁的一生与水，流动的或是静止的，紧紧绑在一起。</p>
+      
+      <p>直到学前班，沈沁都是最爱哭的那个孩子。到了小学，初中乃至高中，沈沁再也没有哭过，用她妈妈的话来说就是泪流干了，就不会哭了。</p>
+      
+      <p>后来，她考上了同海大学的园林设计专业。说不期待大学生活是假的，她从小没什么朋友，性格算得上孤僻，她希望大学能交到一个，哪怕只有一个朋友就好。</p>
+      
+      <p>也许是她的愿望终于被听到了，周毅出现了。</p>
+      
+      <p>周毅是她的同班同学。第一次聊天是因为小组作业，在沈沁鼓起勇气询问别人却被拒绝而尴尬得不知所措时，周毅站到她的身后。</p>
+      
+      <p>“同学，你是沈沁吧？要不你转个身和我一组？”</p>
+      
+      <p>沈沁一开始面对自来熟的周毅完全不知道该怎么做。什么时候肯定周毅的答案，什么时候指出周毅的错误，她一概不知。这也让他们的小组的进度落后太多。</p>
+      
+      <p>直到小组作业提交的两天前，周毅的电脑被水淋坏需要送修，保存的图纸也无法导出。沈沁第一次看到他焦头烂额的模样，她决定做些什么。那天他们在自习室坐了很久，沈沁带着自己的电脑按照记忆试着复原图纸，周毅不再沮丧，他眼中映照着神采飞扬的沈沁，也许连沈沁也不知道，这一刻周毅觉得，她就像童话故事里的救世主出现了。</p>
+      
+      <p>之后顺理成章，需要预约的图书馆里，吹着晚风的操场，景致一般的月牙湖旁都会出现她二人的身影。</p>
+      
+      <p>2023年，她们如愿考上本校本院的研究生，沈沁的导师甚至是世界一流。二人也在这年正式结婚，沈沁以为生活就会这样平稳地向前，可她错了。</p>
+      
+      <p>翌年，沈沁的导师逐渐露出真容。给花浇水只算得上小事，处理事务，安排行程，作品与论文的主作主创得是她，甚至要在她的公司里以最低的工资干着最累的活。沈沁开始认为这是正常的研究生生活，她试着和丈夫交流，寻一个安慰。可她没想到，人是会变的。</p>
+      
+      <p>不知何时开始，周毅开始忮忌她。凭什么她的导师是世界一流？凭什么她的资源项目这么好？凭什么她还不知道满足？凭什么？凭什么？</p>
+      
+      <p>恶意犹如猛兽，一步步吞噬了周毅那颗爱她的心，只留下一具空壳。周毅有时候会想，她死了才好，死了这些资源就是我的了。他早已忘记那个宛如童话故事的午后。</p>
+      
+      <p>沈沁面对这样压抑的环境患上了适应障碍伴焦虑抑郁。每到夜晚，情绪便如洪水一般涌来，压得她无法呼吸。她无数次在那样的夜晚想着结束生命。</p>
+      
+      <p>好在沈沁在公司遇到了陈屿，一个和她一样喜欢大海和小猫的女孩。</p>
+      
+      <p>陈屿没有周毅那股子自来熟，沈沁相处下来只觉得很舒服。自然的话题，贴切的关心，还有一起去航海公园的那天。那天她们聊了很多，小到学校表白墙上的热帖，大到自己未来的方向。她们忘记去看航海公园招牌的白鲸表演，而是在一张普通的长凳上畅聊。</p>
+      
+      <p>沈沁觉得活着好像不是这么糟糕了，她应该重新开始。</p>
+      
+      <p>在决定后，她和周毅说自己想要离婚，她觉得双方已经不适合一起生活。可迎接她的却是死亡。</p>
+      
+      <p>你凭什么和我提离婚？这是那时周毅脑中唯一的想法。他知道沈沁早就不想活了，伪装成她在浴缸自杀不就好了，自己再表现得悲痛欲绝，又能捞个好名声。</p>
+      
+      <p>沈沁在生命的最后哭了，流下她最后的一滴泪。她不是哭自己生命的结束，而是哭陈屿。陈屿知道自己的去世该有多难过，自己明明约了她一起去海边，这次要失约了。</p>
+      
+      <p>陈屿，我唯一的知心朋友，请你照顾好你自己和年糕。沈沁在心里想着，慢慢地闭上眼。</p>
+      
+      <!-- 细线收尾 -->
+      <div class="divider-light"></div>
+     
+    </article>
+  </main>
+
+  <!-- 页脚：跳转按钮（符合要求，在页面最下方） -->
+  <footer class="site-footer">
+    <div class="footer-action">
+      <!-- 跳转按钮：可替换为你需要的任何网址 -->
+      <a 
+        href="../index.html" 
+        class="jump-btn" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        title="点击跳转至外部网站 (示例链接)"
+      >
+        <span class="icon-emoji"></span> 
+        完成委托
+        <span style="margin-left: 6px; font-size: 1.2rem;">→</span>
+      </a>
+      
+     
+    </div>
+   
+  </footer>
+
+<script>
+  // 001 案件完成时，保存状态到 localStorage
+  document.addEventListener('DOMContentLoaded', function() {
+    const finishBtn = document.querySelector('.jump-btn');
+    if (finishBtn) {
+      finishBtn.addEventListener('click', function(e) {
+        // 阻止默认跳转，先保存状态再手动跳转
+        e.preventDefault();
+        
+        // 读取现有完成状态（默认三个案件都是 false）
+        let completed = JSON.parse(localStorage.getItem('caseCompleted')) || [false, false, false];
+        // 标记 001 案件（索引 0）为已完成
+        completed[0] = true;
+        localStorage.setItem('caseCompleted', JSON.stringify(completed));
+        
+        // 跳转到首页
+        window.location.href = '../index.html';
+      });
+    }
+  });
+</script>
+</body>
+</html>

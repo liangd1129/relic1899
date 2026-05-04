@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>于晓丽介绍</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e2f3d;
+            padding: 2rem 1rem;
+        }
+
+        @supports (font-variation-settings: normal) {
+            body { font-family: 'Inter Variable', sans-serif; }
+        }
+
+        .page-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0, 20, 30, 0.06);
+            overflow: hidden;
+            border: 1px solid #e9edf2;
+        }
+
+        .university-header {
+            padding: 1.2rem 2rem;
+            background: #ffffff;
+            border-bottom: 1px solid #dce4e8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .uni-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .uni-icon {
+            background-color: #0b3b2c;
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .uni-text {
+            font-weight: 600;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+            color: #0b3b2c;
+        }
+
+        .uni-text small {
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: #5e7479;
+            margin-left: 8px;
+        }
+
+        .college-tag {
+            margin-left: auto;
+            background: #eef3f0;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #0b3b2c;
+            border: 1px solid #cbdcd2;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 2.2fr;
+            gap: 0;
+            background: #fff;
+        }
+
+        .sidebar {
+            padding: 2rem 1.8rem;
+            background: #fbfdfc;
+            border-right: 1px solid #e2e9e5;
+        }
+
+        .avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .avatar-circle {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(145deg, #1d4e3d, #0e382b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            border: 4px solid #eaf1ed;
+            box-shadow: 0 6px 12px rgba(0, 40, 20, 0.08);
+        }
+
+        .avatar-circle i {
+            font-size: 5.2rem;
+            color: #f0f7e6;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .avatar-section h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #0a2e22;
+            letter-spacing: 1px;
+            margin-bottom: 0.2rem;
+        }
+
+        .avatar-section .en-name {
+            font-size: 1rem;
+            color: #5b7a6e;
+            margin-bottom: 0.8rem;
+            font-weight: 400;
+            border-bottom: 1px dashed #bcd0c4;
+            padding-bottom: 0.8rem;
+        }
+
+        .title-badge {
+            background: #0b3b2c;
+            color: white;
+            font-weight: 500;
+            padding: 0.25rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 1.4rem;
+            letter-spacing: 0.3px;
+        }
+
+        .info-list {
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+
+        .info-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            font-size: 0.98rem;
+            color: #1e3a2f;
+        }
+
+        .info-list li i {
+            width: 22px;
+            color: #0b3b2c;
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+
+        .info-list li strong {
+            font-weight: 600;
+            color: #0f3d2d;
+            min-width: 72px;
+            display: inline-block;
+        }
+
+        .info-list li span {
+            color: #2a4a3d;
+        }
+
+        .research-tags {
+            margin: 1.8rem 0 1.2rem;
+        }
+
+        .research-tags h4 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #3c6554;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: #e4efe8;
+            color: #0b3b2c;
+            padding: 0.25rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid #b9d2c4;
+        }
+
+        .academic-role {
+            margin-top: 2rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid #d0dfd7;
+        }
+
+        .role-item {
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .role-item i {
+            color: #0b3b2c;
+            width: 22px;
+            font-size: 1rem;
+        }
+
+        .main-content {
+            padding: 2rem 2.4rem;
+            background: white;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0a2e22;
+            margin-bottom: 1rem;
+            border-left: 5px solid #0b3b2c;
+            padding-left: 1rem;
+        }
+
+        .intro-text {
+            margin-bottom: 2rem;
+            color: #253b33;
+            font-size: 1.02rem;
+        }
+
+        .intro-text p {
+            margin-bottom: 1rem;
+        }
+
+        .highlight {
+            background: #f6fbf9;
+            padding: 1.2rem 1.5rem;
+            border-radius: 16px;
+            border: 1px solid #d6e6de;
+            margin: 1.5rem 0;
+        }
+
+        .honor-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+            margin: 1rem 0 1.8rem;
+        }
+
+        .honor-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: #174432;
+        }
+
+        .honor-item i {
+            color: #0b3b2c;
+            background: #e2f0e8;
+            padding: 6px;
+            border-radius: 50%;
+            font-size: 0.9rem;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 1.2rem 0 0.8rem;
+        }
+
+        .project-card {
+            background: #fafdfb;
+            border-radius: 18px;
+            padding: 1.4rem 1.5rem;
+            border: 1px solid #dde9e2;
+            box-shadow: 0 4px 8px rgba(0, 20, 10, 0.02);
+            transition: all 0.15s ease;
+        }
+
+        .project-card:hover {
+            border-color: #aecfc1;
+            background: #ffffff;
+        }
+
+        .project-icon {
+            font-size: 1.8rem;
+            color: #0b3b2c;
+            margin-bottom: 0.6rem;
+        }
+
+        .project-card h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0a2e22;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-sub {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4e7764;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+        }
+
+        .project-desc {
+            font-size: 0.95rem;
+            color: #1e3f32;
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .award-tag {
+            display: inline-block;
+            background: #0b3b2c;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.4rem;
+        }
+
+        .collab-note {
+            margin-top: 2rem;
+            background: #eef4f0;
+            padding: 1rem 1.5rem;
+            border-radius: 14px;
+            color: #15382b;
+            border-left: 4px solid #0b3b2c;
+            font-style: normal;
+            font-weight: 450;
+        }
+
+        .collab-note i {
+            margin-right: 8px;
+            color: #0b3b2c;
+        }
+
+        .footer-meta {
+            margin-top: 2.8rem;
+            font-size: 0.8rem;
+            color: #6f8b7e;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #dee8e3;
+            padding-top: 1.2rem;
+        }
+
+        /* ===== 折叠面板样式（新增） ===== */
+        .collapsible-section {
+            margin-bottom: 1.5rem;
+        }
+        .collapsible-section summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            user-select: none;
+        }
+        .collapsible-section summary::-webkit-details-marker {
+            display: none;
+        }
+        .collapsible-section summary .fa-chevron-down {
+            margin-left: auto;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+            color: #0b3b2c;
+        }
+        .collapsible-section[open] summary .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        /* 移动端适配（原有响应式 + 折叠行为优化） */
+        @media (max-width: 850px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                border-right: 0;
+                border-bottom: 1px solid #e2e9e5;
+            }
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+            .university-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .college-tag {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content { padding: 1.5rem; }
+            .sidebar { padding: 1.5rem; }
+            .section-title { font-size: 1.2rem; }
+            .collapsible-section summary .fa-chevron-down { font-size: 0.8rem; }
+        }
+
+        .id-badge {
+            font-family: 'SF Mono', 'Menlo', monospace;
+            background: #eaf0ec;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        /* 固定按钮样式（保持不变） */
+        .page-indicator {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            color: #a8a8a8;
+            font-size: 14px;
+            font-weight: 400;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 6px 18px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            letter-spacing: 1px;
+            z-index: 50;
+        }
+
+        .back-link {
+            position: fixed;
+            bottom: 65px;
+            left: 30px;
+            color: #153e5c;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 8px 20px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 50;
+            transition: background 0.15s;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-indicator">9/19</div>
+    <a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+
+    <div class="page-wrapper">
+        <header class="university-header">
+            <a href="tonghai.html" style="text-decoration: none; color: #3a6b58; font-weight: 500; margin-right: 20px; font-size: 0.95rem;">
+                <i class="fas fa-arrow-left" style="margin-right: 6px;"></i>返回
+            </a>
+            <div class="uni-logo">
+                <div class="uni-icon"><i class="fas fa-tree"></i></div>
+                <div class="uni-text">同海大学 <small></small></div>
+            </div>
+            <div class="college-tag">
+                <i class="fas fa-leaf" style="margin-right: 6px;"></i>园林学院 · 景观学系
+            </div>
+        </header>
+
+        <div class="profile-grid">
+            <aside class="sidebar">
+                <div class="avatar-section">
+                    <div class="avatar-circle"><i class="fas fa-user-circle"></i></div>
+                    <h2>于晓丽</h2>
+                    <div class="en-name">YU XIAOLI, Ph.D.</div>
+                    <span class="title-badge">教授 · 博士生导师</span>
+                </div>
+
+                <ul class="info-list">
+                    <li><i class="fas fa-calendar-alt"></i><strong>出生日期</strong> <span>1978.03.15</span></li>
+                    <li><i class="fas fa-id-card"></i><strong>教师工号</strong> <span><span class="id-badge">TH2021LA086</span></span></li>
+                    <li><i class="fas fa-map-pin"></i><strong>办公室</strong> <span>同海大学园林楼 A-407</span></li>
+                    <li><i class="fas fa-envelope"></i><strong>邮箱</strong> <span>xlyu@tonghai.edu.cn</span></li>
+                    <li><i class="fas fa-globe"></i><strong>研究方向</strong> <span>生态园艺设计 · 低碳景观 · GIS碳汇 · 海绵城市</span></li>
+                </ul>
+
+                <div class="research-tags">
+                    <h4><i class="fas fa-tag" style="margin-right: 6px;"></i>专长领域</h4>
+                    <div class="tag-container">
+                        <span class="tag">低维护植物群落</span>
+                        <span class="tag">高碳汇景观</span>
+                        <span class="tag">雨水花园</span>
+                        <span class="tag">GIS生态模拟</span>
+                        <span class="tag">滨水生态修复</span>
+                        <span class="tag">海绵设施</span>
+                    </div>
+                </div>
+
+                <div class="academic-role">
+                    <div class="role-item"><i class="fas fa-crown"></i><strong>国际园艺设计领域领军人物</strong></div>
+                    <div class="role-item"><i class="fas fa-users-between-lines"></i><strong>全球生态园艺联盟 · 常务理事</strong></div>
+                    <div class="role-item"><i class="fas fa-gavel"></i><strong>“星洲设计奖”评审委员</strong> (多届)</div>
+                    <div class="role-item"><i class="fas fa-water"></i><strong>跨国滨水生态项目首席专家</strong></div>
+                </div>
+
+                <div style="margin-top: 24px; font-size: 0.8rem; color: #6d8f7e;">
+                    <i class="fas fa-feather-alt"></i> 园艺 · 碳汇 · 韧性景观
+                </div>
+            </aside>
+
+            <details class="collapsible-section" open>
+                <summary class="section-title" style="display: flex; align-items: center; margin-bottom: 0.8rem; border-left: 5px solid #0b3b2c; padding-left: 1rem;">
+                    学术简介
+                    <i class="fas fa-chevron-down"></i>
+                </summary>
+                <div class="highlight">
+                    <p><strong>于晓丽教授</strong>是同海大学园林学院资深教授、博士生导师，国际园艺设计领域具有重要影响力的领军学者。她现任全球生态园艺联盟常务理事，并多次受邀担任“星洲设计奖”评审。于教授长期致力于生态园艺、低碳景观规划与海绵城市设计，尤其在低维护高碳汇植物群落与GIS碳汇模拟优化方面取得了创新性成果。</p>
+                    <p>在于晓丽教授的指导下，团队参与多项跨国科研项目及滨水生态实践，将前沿生态技术融入城乡景观更新。她注重产学研结合，其主持与指导的项目多次获得国际及行业重要奖项，并成功落地为城市生态地标。</p>
+                </div>
+            </details>
+
+                <!-- 荣誉与任职（折叠面板，默认展开） -->
+                <details class="collapsible-section" open>
+                    <summary class="section-title" style="display: flex; align-items: center; margin-bottom: 0.8rem; border-left: 5px solid #0b3b2c; padding-left: 1rem;">
+                        荣誉与任职
+                        <i class="fas fa-chevron-down"></i>
+                    </summary>
+                    <div class="highlight">
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-medal" style="color: #b68b40; font-size: 1.4rem;"></i>
+                                <span style="font-weight: 500;">全球生态园艺联盟常务理事</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-star" style="color: #0b3b2c;"></i>
+                                <span style="font-weight: 500;">星洲设计奖 · 评审 (2019-2025)</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-hand-holding-heart" style="color: #0b3b2c;"></i>
+                                <span style="font-weight: 500;">国际园艺设计领军人物</span>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 代表项目与生态实践（折叠面板，默认展开） -->
+                <details class="collapsible-section" open>
+                    <summary class="section-title" style="display: flex; align-items: center; margin-bottom: 0.8rem; border-left: 5px solid #0b3b2c; padding-left: 1rem;">
+                        代表项目与生态实践
+                        <i class="fas fa-chevron-down"></i>
+                    </summary>
+                    <div class="project-grid">
+                        <div class="project-card">
+                            <div class="project-icon"><i class="fas fa-city"></i></div>
+                            <h4>青岚市 · 星湖社区更新</h4>
+                            <div class="project-sub">低维护·高碳汇植物群落</div>
+                            <div class="project-desc">
+                                针对老旧社区绿地，设计低维护高碳汇植物群落。通过GIS碳汇模拟精准优化种植结构，提升单位面积碳汇能力约32%。该实践为城市更新中的碳中和景观提供了可复制范式。
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <span class="award-tag"><i class="fas-regular fa-leaf" style="margin-right: 4px;"></i>碳汇优化示范</span>
+                            </div>
+                        </div>
+
+                        <div class="project-card">
+                            <div class="project-icon"><i class="fas fa-droplet"></i></div>
+                            <h4>月港新城 · 雨水花园示范段</h4>
+                            <div class="project-sub">竞赛落地 · 施工图深化</div>
+                            <div class="project-desc">
+                                与导师于晓丽团队合作，负责植物选型与海绵设施结合。项目荣获月港新片区“海绵景观创新奖”，目前已进入施工图深化阶段，建成后将成为明珠湖畔标志性生态打卡点。
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <span class="award-tag"><i class="fas fa-trophy" style="margin-right: 4px;"></i>海绵景观创新奖</span>
+                            </div>
+                        </div>
+                    </div>
+               
+
+                <!-- 跨国合作备注（保持原样，不折叠） -->
+                <div class="collab-note">
+                    <i class="fas fa-handshake"></i>
+                    <strong>跨国科研 & 滨水生态实践：</strong> 在于晓丽教授指导下，团队深度参与东南亚湄公河三角洲滨水缓冲带设计、欧洲“城市湿地碳汇”联合研究等多项跨国项目。通过植物群落配置与水文模型耦合，为韧性滨水景观提供科学依据。
+                </div>
+
+                <div style="margin-top: 1.8rem; background: #ffffff; border-radius: 14px; padding: 0.2rem 0;">
+                    <div style="display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start;">
+                        <div style="flex:1; min-width: 200px;">
+                            <p style="font-size: 0.95rem;"><i class="fas fa-map-location-dot" style="color:#0b3b2c; margin-right: 6px;"></i><strong>青岚市星湖老旧社区</strong> — 设计低维护高碳汇植物群落，GIS碳汇模拟优化种植结构，显著增强老旧社区生态韧性。</p>
+                        </div>
+                        <div style="flex:1; min-width: 200px;">
+                            <p style="font-size: 0.95rem;"><i class="fas fa-map-location-dot" style="color:#0b3b2c; margin-right: 6px;"></i><strong>月港新城“雨水花园示范段”</strong> — 竞赛落地项目，负责植物选型与海绵设施融合，获“海绵景观创新奖”，方案进入施工图阶段，明珠湖畔新晋生态地标。</p>
+                        </div>
+                    </div>
+                </div>
+				 </details>
+
+                <div style="margin-top: 2rem;">
+                    <div style="display: flex; gap: 14px; background: #f9fbfa; padding: 0.8rem 1.4rem; border-radius: 40px; align-items: center;">
+                        <i class="fas fa-chalkboard-user" style="font-size: 1.6rem; color: #0b3b2c;"></i>
+                        <span style="font-weight: 500;">指导多项跨国科研及滨水生态实践 · 星洲设计奖评审 · 全球生态园艺联盟常务理事</span>
+                    </div>
+                </div>
+
+                <div class="footer-meta">
+                    <div><i class="far fa-id-badge"></i> 更新于2024年</div>
+                    <div><i class="far fa-copyright"></i> 预约请联系沈小姐：183 794 677</div>
+                </div>
+            </main>
+        </div>
+        <div style="height: 4px; background: linear-gradient(90deg, #0b3b2c 0%, #a6c7b6 80%, transparent);"></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>喂食器记录</title>
+    <!-- 直角风格 · 工业监控 · 无圆角 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            border-radius: 0 !important;
+        }
+
+        body {
+            background-color: #0b0e11;
+            font-family: 'Inter', 'SF Mono', 'Segoe UI', system-ui, -apple-system, monospace;
+            color: #e3e7eb;
+            line-height: 1.5;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .mono {
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', 'Consolas', monospace;
+        }
+
+        .monitor-container {
+            max-width: none;
+            width: 100%;
+            background-color: #101418;
+            border: 1px solid #2e3a44;
+            box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.4);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: #1a232b;
+            border-bottom: 2px solid #00c2ff;
+            padding: 14px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 600px) {
+            .device-title {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .device-title h1 {
+                font-size: 1.2rem;
+                padding-right: 0;
+                border-right: none;
+            }
+            .badge {
+                white-space: nowrap;
+                font-size: 0.75rem;
+                padding: 4px 8px;
+            }
+        }
+
+        .badge {
+            background: #1e2e3b;
+            border: 1px solid #3f5b6e;
+            color: #9fc5e2;
+            padding: 6px 14px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-led {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            background-color: #1fbf6b;
+            border: 1px solid #7ae0a8;
+            box-shadow: 0 0 6px #1fbf6b;
+            margin-right: 6px;
+        }
+
+        .sync-time {
+            color: #8fafc2;
+            font-size: 0.9rem;
+        }
+
+        .status-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.2fr;
+            gap: 1px;
+            background-color: #2a3845;
+            border-top: 1px solid #1f2c35;
+            border-bottom: 1px solid #1f2c35;
+        }
+
+        .stat-block {
+            background: #121a20;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-right: 1px solid #2e404e;
+        }
+
+        .stat-block:last-child {
+            border-right: none;
+        }
+
+        .stat-icon {
+            font-size: 2.4rem;
+            color: #00b8ff;
+            width: 48px;
+            text-align: center;
+        }
+
+        .stat-detail .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #8aa0b0;
+        }
+
+        .stat-detail .value {
+            font-size: 2.1rem;
+            font-weight: 500;
+            color: #eef4fa;
+            line-height: 1.2;
+        }
+
+        .unit {
+            font-size: 1rem;
+            color: #6f8a9c;
+            margin-left: 5px;
+        }
+
+        .sub-meta {
+            font-size: 0.85rem;
+            color: #7b99ae;
+            margin-top: 4px;
+        }
+
+        .action-bar {
+            background: #0d151c;
+            padding: 12px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            border-bottom: 1px solid #26333e;
+        }
+
+        /* 过滤组改为横向排列 */
+        .filter-group {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            background: #1a262f;
+            border: 1px solid #38505f;
+            color: #cbdae4;
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: default;
+            transition: 0.15s;
+            border-left: 2px solid transparent;
+            border-bottom: 1px solid #38505f;
+            white-space: nowrap;
+        }
+
+        .filter-btn.active {
+            background: #1f3a4b;
+            border-color: #00b4d8;
+            color: white;
+            border-left: 2px solid #00b4d8;
+        }
+
+        @media (max-width: 600px) {
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        .search-wrapper {
+            display: flex;
+            border: 1px solid #3b5466;
+            background: #0e171f;
+        }
+
+        .search-wrapper i {
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            color: #6c8b9f;
+            background: #111e27;
+            border-right: 1px solid #2a404e;
+        }
+
+        .search-wrapper input {
+            background: #0e171f;
+            border: none;
+            padding: 9px 16px;
+            min-width: 240px;
+            color: #e2ecf5;
+            font-size: 0.95rem;
+            outline: none;
+            border-left: none;
+        }
+
+        .search-wrapper input::placeholder {
+            color: #4b697e;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .transcript-section {
+            padding: 0;
+            background: #0c131a;
+        }
+
+        .list-header,
+        .transcript-item {
+            display: grid;
+            grid-template-columns: minmax(130px, auto) 1fr minmax(70px, auto) minmax(45px, auto);
+            align-items: start;
+        }
+
+        /* 展开后的详情使用三列，文字占据左侧原先标签的位置 */
+        .foldable-content .transcript-item {
+            grid-template-columns: 1fr minmax(70px, auto) minmax(45px, auto);
+        }
+
+        .list-header {
+            background: #13212b;
+            border-bottom: 2px solid #1e3f52;
+            padding: 10px 24px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #8eb3cc;
+            font-weight: 600;
+            border-top: 1px solid #1a2c38;
+        }
+
+        .transcript-list {
+            max-height: 700px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #2d5368 #0f1a21;
+        }
+
+        .transcript-list::-webkit-scrollbar {
+            width: 10px;
+        }
+        .transcript-list::-webkit-scrollbar-track {
+            background: #0f1a21;
+        }
+        .transcript-list::-webkit-scrollbar-thumb {
+            background: #2d5368;
+            border: 1px solid #1d3847;
+        }
+
+        .transcript-item {
+            padding: 16px 24px;
+            background: #101a22;
+            border-bottom: 1px solid #1e313e;
+            border-left: 3px solid transparent;
+            transition: 0.1s;
+        }
+
+        .transcript-item:hover {
+            background: #15232e;
+            border-left: 3px solid #00a6d1;
+        }
+
+        .item-time {
+            font-family: 'SF Mono', monospace;
+            color: #b0d0e8;
+        }
+
+        .date-big {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #d6e6f5;
+        }
+
+        .time-small {
+            font-size: 0.85rem;
+            color: #7d9db3;
+            margin-top: 4px;
+        }
+
+        .event-tag {
+            display: inline-block;
+            background: #1b3f53;
+            border: 1px solid #2e6d8c;
+            color: #b5e4ff;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .transcript-content {
+            padding-right: 16px;
+        }
+
+        .transcript-text {
+            font-size: 1.05rem;
+            color: #ecf3fa;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .transcript-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: #7f9fb5;
+        }
+
+        .confidence {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .confidence-bar {
+            width: 52px;
+            height: 6px;
+            background: #1c3647;
+            border: 1px solid #2e5b74;
+            display: inline-block;
+            margin-left: 6px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: #1fbf6b;
+            width: 0%;
+        }
+
+        .item-duration {
+            font-family: monospace;
+            color: #adc9df;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        .action-icon {
+            text-align: right;
+            color: #5c8aa3;
+            font-size: 1.2rem;
+            cursor: default;
+        }
+
+        .wave-decoration {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-top: 5px;
+        }
+
+        .wave-bar {
+            width: 4px;
+            height: 12px;
+            background: #2f637f;
+            border: 1px solid #4382a0;
+        }
+
+        .footer-bar {
+            background: #0d1921;
+            border-top: 1px solid #263e4e;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            color: #6d8da2;
+            font-size: 0.85rem;
+        }
+
+        .pagination span {
+            border: 1px solid #2e4d60;
+            padding: 6px 12px;
+            margin: 0 2px;
+            background: #0e1a22;
+            color: #b2d1e5;
+        }
+
+        button,
+        input,
+        .badge,
+        .filter-btn {
+            cursor: default;
+        }
+
+        .dot-unread {
+            width: 8px;
+            height: 8px;
+            background: #f05b5b;
+            border: 1px solid #ff9e9e;
+            display: inline-block;
+            margin-left: 8px;
+        }
+
+        i {
+            font-style: normal;
+        }
+
+        @media (max-width: 600px) {
+            .device-title {
+                grid-template-columns: auto 1fr 1fr;
+            }
+            .device-title h1 {
+                font-size: 1rem;
+                white-space: nowrap;
+            }
+            .badge {
+                font-size: 0.7rem;
+                white-space: nowrap;
+            }
+        }
+
+        .page-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            color: #a8a8a8;
+            font-size: 14px;
+            font-weight: 400;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 6px 18px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            letter-spacing: 1px;
+            z-index: 50;
+        }
+
+        .back-link {
+            position: fixed;
+            bottom: 20px;
+            left: 30px;
+            color: #153e5c;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 8px 20px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 50;
+            transition: background 0.15s;
+        }
+
+        /* ---------- 每条记录独立折叠 ---------- */
+        .foldable-item {
+            border-bottom: 1px solid #1e313e;
+        }
+
+        .foldable-header {
+            display: flex;
+			width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: #0f1921;
+            border-left: 3px solid #00a6d1;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 600;
+            color: #b0d0e8;
+            font-family: 'SF Mono', monospace;
+            font-size: 1rem;
+            transition: background 0.1s;
+        }
+
+        .foldable-header:hover {
+            background: #15232e;
+        }
+
+        .foldable-header i {
+            color: #5c8aa3;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .foldable-item.open .foldable-header i {
+            transform: rotate(90deg);
+        }
+
+        .foldable-content {
+            display: none;
+        }
+
+        .foldable-item.open .foldable-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-indicator">16/19</div>
+    <a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+    <div class="monitor-container">
+        <div class="top-bar">
+            <div class="device-title">
+                <h1><i class="fas fa-microchip" style="margin-right: 8px; color: #00c2ff;"></i>PET·FEEDER·AUDIO</h1>
+                <div class="badge">FW v2.3.7 · 序列号 F2W9-8X4A</div>
+                <div class="badge" style="background:#16232e;"> 喂食/饮水一体</div>
+            </div>
+            <div class="live-indicator">
+                <span class="status-led"></span>
+                <span>ONLINE · 实时转录引擎</span>
+                <span class="sync-time"><i class="far fa-clock" style="margin-right: 5px;"></i></span>
+            </div>
+        </div>
+		
+		 <!-- 过滤/操作栏 -->
+		    <div class="action-bar">
+		        <div class="filter-group">
+		            <span class="filter-btn active">全部转录</span>
+		            <span class="filter-btn">喂食事件</span>
+		            <span class="filter-btn">饮水事件</span>
+		            <span class="filter-btn">语音/呼唤</span>
+		        </div>
+			 </div>
+				
+
+        <div class="transcript-section">
+            <div class="list-header">
+                <div>时间戳 · 2025</div>
+                <div>音频转录内容</div>
+                <div>时长</div>
+                <div></div>
+            </div>
+            <div class="transcript-list" id="transcriptList">
+                <!-- 动态生成每条记录独立折叠 -->
+            </div>
+        </div>
+
+        <div class="footer-bar">
+            <div><i class="fas fa-database"></i> 转录记录 (2025-01-01 ~ 2025-02-28)</div>
+            <div class="pagination">
+                <span><i class="fas fa-chevron-left"></i></span>
+                <span>1</span>
+                <span>···</span>
+                <span><i class="fas fa-chevron-right"></i></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            "use strict";
+
+            const items = [
+                { date: "2025-02-28", time: "19:14:02", datetimeStr: "2025-02-28 23:14:02", text: "【电量不足，已自动转文字。】你怎么来了？... ...我已经决定了。", tag: "系统", confidence: 100, duration: "7s" },
+                { date: "2025-02-27", time: "11:30:17", datetimeStr: "2025-02-27 18:30:17", text: "随后电机启动，投放午餐约60g。", tag: "系统", confidence: 94, duration: "19s" },
+                { date: "2025-02-26", time: "18:30:45", datetimeStr: "2025-02-26 18:30:45", text: "【进食声】持续咀嚼，偶尔碗碰撞声，宠物在进食。", tag: "喂食", confidence: 96, duration: "22s" },
+                { date: "2025-02-25", time: "22:18:12", datetimeStr: "2025-02-25 16:18:12", text: "年糕你也在为我开心吗？这应该是我人生中第一个知心朋友.就像电视剧里的好友一样，只是呆在一起就很安心。我决定把今天设置成我一些账号的密码了，纪念一下。喵喵喵喵喵喵", tag: "语音", confidence: 83, duration: "99s" },
+                { date: "2025-02-24", time: "14:22:08", datetimeStr: "2025-02-24 14:22:08", text: "饮水声明显，宠物舔水约11秒，水流平稳。", tag: "饮水", confidence: 92, duration: "11s" },
+                { date: "2025-02-23", time: "08:12:19", datetimeStr: "2025-02-23 08:12:19", text: "喂食器电机启动，早餐投放45g。宠物立即靠近。", tag: "喂食", confidence: 98, duration: "14s" },
+                { date: "2025-02-22", time: "22:45:50", datetimeStr: "2025-02-22 22:45:50", text: "水碗补水阀门开启，水位由31%升至58%，持续24秒。", tag: "饮水", confidence: 97, duration: "24s" },
+                { date: "2025-02-21", time: "12:07:44", datetimeStr: "2025-02-21 12:07:44", text: "【系统】电量提醒，剩余18%。", tag: "系统", confidence: 100, duration: "5s" },
+                { date: "2025-02-19", time: "07:30:21", datetimeStr: "2025-02-19 07:30:21", text: "喵喵喵喵喵喵喵喵喵喵喵喵", tag: "语音", confidence: 89, duration: "13s" },
+                { date: "2025-02-18", time: "10:20:37", datetimeStr: "2025-02-18 10:20:37", text: "饮水机过滤马达声，无宠物活动。", tag: "环境", confidence: 99, duration: "18s" }
+            ];
+
+            const container = document.getElementById('transcriptList');
+            if (!container) return;
+
+            function renderFoldableItems() {
+                let html = '';
+                items.forEach(item => {
+                    const waveBars = [0.8, 1.2, 0.6, 1.5, 0.9, 1.1].map(h => `<div class="wave-bar" style="height:${8 + h * 5}px;"></div>`).join('');
+
+                    // 详情区域只保留文字、时长、操作图标，原标签已完全移除
+                    html += `
+                    <div class="foldable-item">
+                        <div class="foldable-header">
+                            <span>${item.date}</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="foldable-content">
+                            <div class="transcript-item">
+                                <div class="transcript-content">
+                                    <div class="transcript-text">"${item.text}"</div>
+                                    <div class="transcript-meta">
+                                        <span class="wave-decoration">${waveBars}</span>
+                                    </div>
+                                </div>
+                                <div class="item-duration">${item.duration}</div>
+                                <div class="action-icon">
+                                    <i class="far fa-play-circle" style="margin-right: 8px; opacity:0.7;"></i>
+                                    <i class="far fa-file-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+
+                // 绑定折叠事件：点击头部切换 open 类
+                document.querySelectorAll('.foldable-header').forEach(header => {
+                    header.addEventListener('click', function() {
+                        const foldable = this.parentElement;
+                        foldable.classList.toggle('open');
+                    });
+                });
+            }
+
+            renderFoldableItems();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+ <title>桌面</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Segoe UI Variable', 'Segoe UI', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: url('../img/win11background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      background-color: #1a2a3a;
+    }
+
+    /* 桌面区域：自动滚动，不挤压任务栏 */
+    .desktop {
+      flex: 1;
+      padding: 40px 20px 10px 20px;
+      overflow-y: auto;
+      position: relative; /* 确保 page-indicator 相对定位 */
+    }
+
+    /* 竖向排列，每列7个图标，横向间距8px */
+    .desktop-icons {
+      display: grid;
+      grid-template-rows: repeat(7, auto);
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(75px, 90px);
+      gap: 12px 8px;
+      justify-content: start;
+      align-content: start;
+    }
+
+    /* 图标样式（同时适用于 div 和 a 标签） */
+    .desktop-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 4px;
+      border-radius: 12px;
+      background: transparent;
+      transition: background 0.15s;
+      cursor: pointer; /* 统一使用 pointer 表示可点击 */
+      text-decoration: none; /* 去掉链接下划线 */
+      color: inherit; /* 继承文字颜色 */
+    }
+
+    .desktop-icon:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .desktop-icon i {
+      font-size: 25px;
+      margin-bottom: 6px;
+      color: #ffffff;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    .desktop-icon span {
+      font-size: 13px;
+      color: #ffffff;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    /* 任务栏：固定底部，不缩放 */
+    .taskbar {
+      height: 54px;
+      width: 100%;
+      flex-shrink: 0;
+      background: rgba(20, 30, 40, 0.7);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      color: #f0f4fa;
+    }
+
+    .taskbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .taskbar-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      max-width: 500px;
+    }
+
+    .taskbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .start-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 22px;
+      cursor: default;
+      transition: background 0.15s;
+    }
+
+    .start-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .widget-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #e0eaff;
+      font-size: 14px;
+      cursor: default;
+    }
+
+    .widget-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .search-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #bdd0f0;
+      font-size: 15px;
+      cursor: pointer;  /* 添加指针样式，表示可点击 */
+    }
+
+    .search-box {
+      width: 100%;
+      height: 42px;
+      background: rgba(20, 30, 45, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 40px;
+      padding: 0 22px 0 52px;
+      font-size: 14.5px;
+      color: white;
+      outline: none;
+    }
+
+    .search-box::placeholder {
+      color: #b0c8ee;
+    }
+	
+	/* 搜索建议下拉框 — 向上弹出 (Win11 毛玻璃风格) */
+	.search-suggestions {
+	  position: absolute;
+	  bottom: 100%;               /* 向上弹出，避免超出任务栏 */
+	  left: 0;
+	  right: 0;
+	  margin-bottom: 10px;
+	  background: rgba(28, 38, 52, 0.92);
+	  backdrop-filter: blur(32px);
+	  -webkit-backdrop-filter: blur(32px);
+	  border-radius: 20px;
+	  border: 1px solid rgba(255, 255, 255, 0.15);
+	  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+	  max-height: 380px;
+	  overflow-y: auto;
+	  z-index: 1000;
+	  display: none;              /* 默认隐藏 */
+	  flex-direction: column;
+	  padding: 8px 0;
+	}
+	
+	/* 滚动条美化 */
+	.search-suggestions::-webkit-scrollbar {
+	  width: 6px;
+	}
+	.search-suggestions::-webkit-scrollbar-track {
+	  background: rgba(255, 255, 255, 0.05);
+	  border-radius: 10px;
+	}
+	.search-suggestions::-webkit-scrollbar-thumb {
+	  background: rgba(255, 255, 255, 0.3);
+	  border-radius: 10px;
+	}
+	
+	/* 搜索结果样式增强 */
+	.suggestion-item {
+	  display: flex;
+	  align-items: center;
+	  gap: 14px;
+	  padding: 12px 18px;
+	  cursor: pointer;
+	  transition: background 0.1s;
+	  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	}
+	.suggestion-item:last-child {
+	  border-bottom: none;
+	}
+	.suggestion-item i {
+	  font-size: 20px;
+	  color: #6c9eff;
+	  width: 28px;
+	  text-align: center;
+	}
+	.suggestion-text {
+	  flex: 1;
+	}
+	.suggestion-title {
+	  font-size: 15px;
+	  font-weight: 500;
+	  color: #f0f4fa;
+	  margin-bottom: 4px;
+	}
+	.suggestion-desc {
+	  font-size: 12px;
+	  opacity: 0.7;
+	  color: #cbd5f0;
+	}
+	.suggestion-url {
+	  font-size: 11px;
+	  opacity: 0.5;
+	  font-family: monospace;
+	}
+	.suggestion-item mark {
+	  background: rgba(255, 235, 100, 0.3);
+	  color: #ffec80;
+	  padding: 0 2px;
+	  border-radius: 4px;
+	}
+	.suggestion-item:hover mark,
+	.suggestion-item.active mark {
+	  background: rgba(255, 235, 100, 0.6);
+	  color: #1e2a3a;
+	}
+	
+
+    .system-tray {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .tray-icon {
+      color: #d9e6ff;
+      font-size: 16px;
+      padding: 6px;
+      border-radius: 10px;
+      cursor: default;
+    }
+
+    .tray-icon:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .divider {
+      width: 1px;
+      height: 22px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .clock-area {
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-align: right;
+      cursor: default;
+    }
+
+    .clock-area:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    #timeDisplay {
+      font-size: 14.5px;
+      font-weight: 500;
+    }
+
+    #dateDisplay {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    /* 开始菜单（保持不变） */
+    .start-menu {
+      position: absolute;
+      bottom: 66px;
+      left: 20px;
+      width: 580px;
+      background: rgba(30, 40, 55, 0.85);
+      backdrop-filter: blur(48px);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 24px 20px;
+      color: white;
+      display: none;
+      z-index: 200;
+    }
+
+    .start-menu.active {
+      display: block;
+    }
+
+    .menu-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(145deg, #3a6ea5, #1e4a7a);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+    }
+
+    .user-info h4 {
+      font-weight: 500;
+      font-size: 18px;
+    }
+
+    .user-info p {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .pinned-section {
+      margin: 16px 0;
+    }
+
+    .section-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      opacity: 0.7;
+      padding: 0 12px;
+      margin-bottom: 12px;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 6px;
+      border-radius: 14px;
+      cursor: default;
+    }
+
+    .app-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .app-item i {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: #b6d4ff;
+    }
+
+    .rec-list {
+      list-style: none;
+    }
+
+    .rec-list li {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      cursor: default;
+    }
+
+    .rec-list li:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .menu-footer {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .power-icon {
+        margin-left: auto;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-decoration: none;   /* 确保无下划线 */
+        color: inherit;
+    }
+
+    .power-icon:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+   /* 右下角页码标识 —— 与之前桌面完全一致的样式 */
+   .page-indicator {
+     position: absolute;
+     bottom: 20px;
+     right: 30px;
+     color: white;
+     font-size: 14px;
+     font-weight: 400;
+     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+     background: rgba(255, 255, 255, 0.2);
+     backdrop-filter: blur(8px);
+     -webkit-backdrop-filter: blur(8px);
+     padding: 6px 18px;
+     border-radius: 40px;
+     border: 1px solid rgba(255, 255, 255, 0.25);
+     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+     letter-spacing: 1px;
+     z-index: 50;
+   }
+
+    @media (max-width: 600px) {
+      .start-menu { width: 90vw; }
+      .widget-btn span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<main class="desktop">
+  <div class="desktop-icons">
+    
+	<!-- 记事本：点击跳转到 jishiben.html -->
+	<a href="jishiben.html" class="desktop-icon">
+	  <i class="fas fa-book"></i>
+	  <span>记事本</span>
+	</a>
+	
+	<a href="weixindenglu.html" class="desktop-icon" target="_blank">
+	  <i class="fab fa-weixin"></i>
+	  <span>微信</span>
+	</a>
+	
+	<a href=youjian.html class="desktop-icon" target="_blank">
+	  <i class="fas fa-envelope"></i>
+	  <span>邮件</span>
+	</a>
+	
+	
+	
+	<div class="desktop-icon"><i class="fab fa-edge"></i><span>edge</span></div>
+
+	<div class="desktop-icon"><i class="fas fa-folder-open"></i><span>文件</span></div>
+    <!-- 回收站：无实际功能，保留演示 -->
+    <div class="desktop-icon"><i class="fas fa-trash-alt"></i><span>回收站</span></div>
+	
+	
+
+   
+  </div>
+
+  <!-- 页码标识（独立于图标网格） -->
+  <div class="page-indicator">1/19</div>
+</main>
+
+<footer class="taskbar">
+  <div class="taskbar-left">
+    <div class="start-btn" id="startButton"><i class="fab fa-windows"></i></div>
+    <div class="start-menu" id="startMenu">
+      <div class="menu-header">
+        <div class="avatar"><i class="fas fa-user-astronaut"></i></div>
+       <div class="user-info"><h4>Alex Shen</h4><p style="user-select: text;">alex.shen@outlook.com</p></div>
+      </div>
+      <div class="pinned-section">
+        <div class="section-label"><span>已固定</span><span>全部应用 <i class="fas fa-chevron-right"></i></span></div>
+        <div class="app-grid">
+          <div class="app-item"><i class="fas fa-envelope"></i><span>邮件</span></div>
+          <div class="app-item"><i class="fab fa-weixin"></i><span>微信</span></div>
+          <div class="app-item"><i class="fas fa-cog"></i><span>设置</span></div>
+        </div>
+      </div>
+      <div class="recommend-section">
+        <div class="section-label">推荐</div>
+        <ul class="rec-list">
+          <li><i class="fas fa-file-alt"></i> 项目提案.pptx</li>
+          <li><i class="fas fa-image"></i> 截图 (3).png</li>
+          <li><i class="far fa-envelope-open"></i> 欢迎使用 Windows 11</li>
+        </ul>
+      </div>
+      <div class="menu-footer">
+          <span><i class="fas fa-user-circle"></i> 账户</span>
+          <span><i class="fas fa-folder"></i> 文档</span>
+          <!-- 改为链接，点击跳转 index.html -->
+          <a href="../index.html" class="power-icon"><i class="fas fa-power-off"></i></a>
+      </div>
+    </div>
+   
+  </div>
+  
+  <div class="taskbar-center">
+    <div class="search-container">
+      <i class="fas fa-search search-icon" id="searchIcon"></i>
+	  <input type="text" class="search-box" placeholder="键入此处搜索" id="searchInput">
+	  <div class="search-suggestions" id="searchSuggestions"></div>
+    </div>
+  </div>
+  <div class="taskbar-right">
+    <div class="system-tray">
+     
+      <div class="clock-area" id="liveClock">
+        <div id="timeDisplay">15:28</div>
+        <div id="dateDisplay">2026/4/12</div>
+      </div>
+     
+    </div>
+  </div>
+</footer>
+
+<script>
+	
+	// ======================= 搜索功能（精确匹配） =======================
+	(function() {
+	  // 搜索数据源：标题(title)、简短描述(desc)、跳转地址(url)
+	  const searchData = [
+	    { title: "同海大学", desc: "同海大学——同天下共海内",url: "tonghai.html", target: "_blank"},
+	    { title: "沈沁", desc: "沈沁-园艺设计简历.PDF", url: "shenqinjianli.html" , target: "_blank"},
+		 { title: "周毅", desc: "报道：同海大学园艺设计新星沈沁不幸离世，丈夫周毅悲痛欲绝",url: "baodao.html", target: "_blank"},
+		 { title: "青岚第二医院", desc: "青岚第二医院官网",url: "yiyuan.html", target: "_blank"},
+		 { title: "航海公园", desc: "丑团航海公园预约系统",url: "gongyuanyy.html", target: "_blank"},
+		 { title: "年糕", desc: "监控喂水喂食一体机音频",url: "yitiji.html", target: "_blank"},
+		 { title: "教务处", desc: "同海大学教务处系统",url: "jiaowuchu.html", target: "_blank"},
+		 
+	    { title: "团队周报自动化工具", desc: "一键生成Excel统计表", url: "tools/weekly-report" }
+	  ];
+	
+	  const searchInput = document.getElementById('searchInput');
+	  const suggestionsBox = document.getElementById('searchSuggestions');
+	  const searchIcon = document.getElementById('searchIcon');
+	  
+	  if (!searchInput) {
+	    console.error('未找到 id="searchInput" 的搜索框，请添加该id');
+	    return;
+	  }
+	  if (!suggestionsBox) {
+	    console.error('未找到 id="searchSuggestions" 的下拉容器，请检查HTML');
+	    return;
+	  }
+	
+	  let currentResults = [];
+	  let activeIndex = -1;
+	
+	  // 防XSS
+	  function escapeHtml(str) {
+	    if (!str) return '';
+	    return str.replace(/[&<>]/g, function(m) {
+	      if (m === '&') return '&amp;';
+	      if (m === '<') return '&lt;';
+	      if (m === '>') return '&gt;';
+	      return m;
+	    });
+	  }
+	
+	  function shortenUrl(url) {
+	    try {
+	      let host = new URL(url).hostname;
+	      return host.replace(/^www\./, '');
+	    } catch(e) {
+	      return url.length > 35 ? url.slice(0, 32) + '...' : url;
+	    }
+	  }
+	
+	  function highlightKeyword(text, keyword) {
+	    if (!keyword.trim()) return escapeHtml(text);
+	    const regex = new RegExp(`(${escapeRegex(keyword)})`, 'gi');
+	    return escapeHtml(text).replace(regex, '<mark>$1</mark>');
+	  }
+	
+	  function escapeRegex(str) {
+	    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	  }
+	
+	
+	function renderSuggestions(results, keyword) {
+	  if (!results.length) {
+	    suggestionsBox.style.display = 'none';
+	    return;
+	  }
+	  suggestionsBox.style.display = 'flex';
+	  suggestionsBox.innerHTML = results.map((item, idx) => {
+	    const highlightedTitle = highlightKeyword(item.title, keyword);
+	    const highlightedDesc = highlightKeyword(item.desc, keyword);
+	    const targetAttr = item.target || '_self';   // 读取数据中的 target，默认当前页
+	    return `
+	      <div class="suggestion-item" data-url="${escapeHtml(item.url)}" data-target="${escapeHtml(targetAttr)}" data-index="${idx}">
+	        <i class="fas fa-file-alt"></i>
+	        <div class="suggestion-text">
+	          <div class="suggestion-title">${highlightedTitle}</div>
+	          <div class="suggestion-desc">${highlightedDesc}</div>
+	        </div>
+	      </div>
+	    `;
+	  }).join('');
+	
+	  document.querySelectorAll('.suggestion-item').forEach(el => {
+	    el.addEventListener('click', (e) => {
+	      e.stopPropagation();
+	      const url = el.getAttribute('data-url');
+	      const target = el.getAttribute('data-target') || '_self';
+	      if (url) window.open(url, target);   // 关键修改：新窗口打开
+	    });
+	  });
+	}
+	
+		
+	  // 精确匹配：用户输入必须与某个标题完全一致（忽略大小写）
+	  function filterAndShow(keyword) {
+	    const trimmed = keyword.trim();
+	    if (trimmed === '') {
+	      suggestionsBox.style.display = 'none';
+	      currentResults = [];
+	      activeIndex = -1;
+	      return;
+	    }
+	    const lowerKeyword = trimmed.toLowerCase();
+	    const filtered = searchData.filter(item =>
+	      item.title.toLowerCase() === lowerKeyword
+	    );
+	    currentResults = filtered;
+	    activeIndex = -1;
+	    renderSuggestions(filtered, trimmed);
+	  }
+	
+	  function updateActiveHighlight() {
+	    const items = document.querySelectorAll('.suggestion-item');
+	    items.forEach((item, idx) => {
+	      if (idx === activeIndex) {
+	        item.classList.add('active');
+	        item.scrollIntoView({ block: 'nearest' });
+	      } else {
+	        item.classList.remove('active');
+	      }
+	    });
+	  }
+	
+	  function onKeyDown(e) {
+	    const items = document.querySelectorAll('.suggestion-item');
+	    
+	    if (e.key === 'ArrowDown') {
+	      e.preventDefault();
+	      if (items.length) {
+	        activeIndex = (activeIndex + 1) % items.length;
+	        updateActiveHighlight();
+	      }
+	    } else if (e.key === 'ArrowUp') {
+	      e.preventDefault();
+	      if (items.length) {
+	        activeIndex = (activeIndex - 1 + items.length) % items.length;
+	        updateActiveHighlight();
+	      }
+	    } else if (e.key === 'Enter') {
+	      e.preventDefault();
+	      // 回车只刷新搜索结果，不自动跳转
+	      filterAndShow(searchInput.value);
+	    }
+	  }
+	
+	  searchInput.addEventListener('input', (e) => {
+	    filterAndShow(e.target.value);
+	  });
+	
+	  searchInput.addEventListener('keydown', onKeyDown);
+	
+	  // 搜索图标点击事件：弹出搜索结果
+	  if (searchIcon) {
+	    searchIcon.addEventListener('click', () => {
+	      filterAndShow(searchInput.value);
+	    });
+	  }
+	
+	  document.addEventListener('click', (e) => {
+	    if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+	      suggestionsBox.style.display = 'none';
+	      currentResults = [];
+	    }
+	  });
+	
+	  searchInput.addEventListener('focus', () => {
+	    if (searchInput.value.trim()) {
+	      filterAndShow(searchInput.value);
+	    }
+	  });
+	})();
+	
+  (function() {
+    // 时钟
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('timeDisplay').textContent = 
+        `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+      document.getElementById('dateDisplay').textContent = 
+        `${now.getFullYear()}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // 开始菜单
+    const startBtn = document.getElementById('startButton');
+    const startMenu = document.getElementById('startMenu');
+    startBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      startMenu.classList.toggle('active');
+    });
+    document.addEventListener('click', (e) => {
+      if (!startBtn.contains(e.target) && !startMenu.contains(e.target)) {
+        startMenu.classList.remove('active');
+      }
+    });
+  })();
+
+  // ======================= 新增：键盘弹起时任务栏自动贴合键盘顶部 =======================
+  (function() {
+    const taskbar = document.querySelector('.taskbar');
+    const searchInput = document.getElementById('searchInput');
+    if (!taskbar || !searchInput) return;
+
+    const initialWindowHeight = window.innerHeight;
+    const viewport = window.visualViewport;
+
+    // 添加平滑过渡
+    taskbar.style.transition = 'transform 0.15s ease';
+
+    function updateTaskbarPosition() {
+      if (!viewport) return;
+
+      const currentHeight = viewport.height;
+      const offsetTop = viewport.offsetTop;
+      const keyboardHeight = initialWindowHeight - currentHeight;
+
+      // 需要向上平移的距离 = 键盘高度 + 页面被推起的偏移量
+      let translateY = -(keyboardHeight + offsetTop);
+      if (translateY > 0) translateY = 0; // 键盘收起时不向上移动
+
+      // 避免微小变化导致抖动
+      const currentTransform = taskbar.style.transform;
+      const match = currentTransform.match(/translateY\(([-\d.]+)px\)/);
+      const currentY = match ? parseFloat(match[1]) : 0;
+
+      if (Math.abs(currentY - translateY) > 0.5) {
+        taskbar.style.transform = `translateY(${translateY}px)`;
+      }
+    }
+
+    if (viewport) {
+      viewport.addEventListener('resize', updateTaskbarPosition);
+      viewport.addEventListener('scroll', updateTaskbarPosition);
+    }
+
+    // 降级兼容：输入框聚焦/失焦时延迟更新
+    searchInput.addEventListener('focus', () => {
+      setTimeout(updateTaskbarPosition, 100);
+      setTimeout(updateTaskbarPosition, 300);
+    });
+    searchInput.addEventListener('blur', () => {
+      setTimeout(updateTaskbarPosition, 100);
+      setTimeout(updateTaskbarPosition, 300);
+    });
+
+    // 初始调用一次
+    updateTaskbarPosition();
+  })();
+</script>
+</body>
+</html>

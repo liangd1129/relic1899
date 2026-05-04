@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人主页</title>
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            background: #e6edf4;
+            min-height: 100vh;
+            padding: 30px 20px 40px;
+            color: #1e3a5f;
+            line-height: 1.5;
+        }
+
+        .main-container {
+            max-width: 880px;
+            margin: 0 auto;
+        }
+
+        /* ----- 顶部条 (保持方正简洁) ----- */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 12px 28px;
+            margin-bottom: 28px;
+            border-left: 6px solid #1e5b9e;
+            border-bottom: 1px solid #cbd6e3;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .back-link {
+            color: #1e5b9e;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-link:hover {
+            color: #0b2d4a;
+        }
+
+        .page-title {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: #163a5e;
+            letter-spacing: 0.5px;
+        }
+
+        .top-placeholder {
+            width: 80px;
+        }
+
+        /* ----- 个人资料卡 (极简，无社交数据) ----- */
+        .profile-card {
+            background: #ffffff;
+            border: 1px solid #cddae6;
+            border-top: 4px solid #1e5b9e;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.02);
+            display: flex;
+            align-items: flex-start;
+            gap: 28px;
+        }
+
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            background: #dce5ed;
+            border: 1px solid #aebfd1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.2rem;
+            color: #1e3a5f;
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 650;
+            color: #0b2d4a;
+            margin-bottom: 8px;
+        }
+
+        .profile-desc {
+            color: #2a577b;
+            font-weight: 480;
+            font-size: 1rem;
+            border-left: 3px solid #a6c1dd;
+            padding-left: 18px;
+            margin: 12px 0 6px;
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: 28px;
+            margin-top: 12px;
+            color: #3e668b;
+            font-size: 0.9rem;
+        }
+
+        .profile-meta i {
+            width: 18px;
+            color: #1e5b9e;
+            margin-right: 5px;
+        }
+
+        /* 签名/状态 */
+        .signature {
+            margin-top: 16px;
+            color: #2f5577;
+            font-style: italic;
+            border-bottom: 1px dashed #b8cee2;
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+
+        /* 分割标题 */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 28px 0 18px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #cbdae8;
+        }
+
+        .section-title h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #163a5e;
+        }
+
+        .section-title i {
+            color: #1e5b9e;
+            font-size: 1.3rem;
+        }
+
+        /* ----- 日记条目（所见所闻，不是帖子）----- */
+        .entry-card {
+            background: #ffffff;
+            border: 1px solid #cddae6;
+            border-left: 5px solid #5f7d9a;   /* 稍微柔和的颜色，区分预约系统 */
+            padding: 24px 28px;
+            margin-bottom: 22px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        }
+
+        .entry-header {
+            display: flex;
+            align-items: baseline;
+            gap: 18px;
+            margin-bottom: 16px;
+            color: #1e5b9e;
+            font-weight: 600;
+        }
+
+        .entry-date {
+            font-size: 0.9rem;
+            background: #e9f0f7;
+            padding: 3px 12px;
+            border: 1px solid #bdd1e5;
+        }
+
+        .entry-location {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #3e668b;
+        }
+
+        .entry-content {
+            color: #1d3c59;
+        }
+
+        .entry-text {
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+
+        .entry-text p {
+            margin-bottom: 12px;
+        }
+
+        /* 引用或强调 */
+        .thought {
+            background: #f4f9ff;
+            border-left: 3px solid #1e5b9e;
+            padding: 12px 18px;
+            margin: 18px 0;
+            font-style: normal;
+            color: #013a63;
+        }
+
+        /* 简单配图占位 (无社交感) */
+        .simple-media {
+            margin: 18px 0 8px;
+            background: #eef3f9;
+            border: 1px solid #c7d9e9;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #436684;
+            font-size: 0.9rem;
+        }
+
+        .simple-media i {
+            margin-right: 10px;
+            font-size: 1.4rem;
+        }
+
+        /* 底部 */
+        .footer-note {
+            margin-top: 44px;
+            text-align: center;
+            color: #4d7396;
+            font-weight: 460;
+            border-top: 1px solid #c1d3e5;
+            padding-top: 28px;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .profile-card {
+                flex-direction: column;
+            }
+            .top-bar {
+                padding: 12px 16px;
+            }
+        }
+
+        /* 去掉所有社交风格元素 */
+        .no-underline {
+            text-decoration: none;
+        }
+		
+		.page-indicator {
+		  position: fixed;   /* 改为 fixed */
+		  bottom: 20px;
+		  right: 30px;
+		  /* 其他样式保持不变 */
+		  color: #a8a8a8;
+		  font-size: 14px;
+		  font-weight: 400;
+		  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+		  background: rgba(255, 255, 255, 0.2);
+		  backdrop-filter: blur(8px);
+		  -webkit-backdrop-filter: blur(8px);
+		  padding: 6px 18px;
+		  border-radius: 40px;
+		  border: 1px solid rgba(255, 255, 255, 0.25);
+		  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+		  letter-spacing: 1px;
+		  z-index: 50;
+		}
+		
+		/* 左下角返回桌面链接 */
+		    .back-link {
+		      position: fixed;
+		      bottom: 20px;
+		      left: 30px;
+		      color: #153e5c;
+		      background: rgba(255, 255, 255, 0.2);
+		      backdrop-filter: blur(8px);
+		      -webkit-backdrop-filter: blur(8px);
+		      padding: 8px 20px;
+		      border-radius: 40px;
+		      border: 1px solid rgba(255, 255, 255, 0.25);
+		      font-size: 14px;
+		      text-decoration: none;
+		      display: inline-flex;
+		      align-items: center;
+		      gap: 8px;
+		      z-index: 50;
+		      transition: background 0.15s;
+		    }
+			
+		
+    </style>
+</head>
+<body>
+	
+	<!-- 右下角页码标识（毛玻璃效果） -->
+	<div class="page-indicator">15/19</div>
+	
+	<!-- 左下角返回桌面链接 -->
+	<a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+	
+<div class="main-container">
+    <!-- 顶部导航 -->
+    <div class="top-bar">
+       
+        <div class="page-title">
+            <i class="far fa-pen-to-square" style="margin-right: 6px;"></i> 山与 · 日常手记
+        </div>
+        <div class="top-placeholder"></div>
+    </div>
+
+    <!-- 个人简介：研究生，坚韧 -->
+    <div class="profile-card">
+        <div class="profile-avatar">
+            ⛰️
+        </div>
+        <div class="profile-info">
+            <div class="profile-name">山与</div>
+            <div class="profile-desc">
+                同海大学 · 网络安全 <br>
+                实验室、文献、出海采样。压力常伴，但仍在往前走。
+            </div>
+            <div class="profile-meta">
+                <span><i class="fas fa-map-pin"></i> 青岚市 · 同海校区</span>
+                <span><i class="far fa-calendar"></i> 记录始于 2024.09</span>
+            </div>
+            <div class="signature">
+                “今天也认真观察了世界。”
+            </div>
+        </div>
+    </div>
+
+    <!-- 记录区：所见所闻，日记形式 -->
+    <div class="section-title">
+        <i class="far fa-note-sticky"></i>
+        <h2>最近的手记</h2>
+    </div>
+
+ <!-- 条目：2024年12月 · 初识 -->
+ <div class="entry-card">
+     <div class="entry-header">
+         <span class="entry-date"><i class="far fa-calendar-alt" style="margin-right: 6px;"></i>2024年12月 · 冬</span>
+        
+     </div>
+     <div class="entry-content">
+         <div class="entry-text">
+             <p>实习第二周，才注意到斜对面工位的女生。她总是戴着耳机，中午一个人吃三明治。有次打印机卡纸，她蹲在那里修了半天，我过去帮忙，她说了声谢谢，声音很轻。</p>
+             <p>后来我管她叫阿沁，隔壁部门的产品助理。我们之间的交流仅限于早晨电梯里点头，和偶尔的“你先用打印机吧”。像两条平行线。</p>
+             <p>茶水间碰到过几次，她往杯子里放茶包的动作很慢，像在想什么事情。我没打扰她。</p>
+         </div>
+     </div>
+ </div>
+ 
+ <!-- 条目：2025年1月 · 慢慢熟悉 -->
+ <div class="entry-card">
+     <div class="entry-header">
+         <span class="entry-date"><i class="far fa-calendar-alt" style="margin-right: 6px;"></i>2025年1月 · 深冬</span>
+         
+     </div>
+     <div class="entry-content">
+         <div class="entry-text">
+             <p>元旦后公司赶项目，加班多了起来。有天晚上十点，只剩我和阿沁还在工位。我去接水，看见她趴在桌上，以为她不舒服。她抬起头说只是有点累，然后笑了笑。</p>
+             <p>那之后我们开始偶尔一起点加班餐。聊得不多，但足够知道她也喜欢海边，养了一只猫，对现在的工作谈不上喜欢也谈不上讨厌。她说话有一种很淡的幽默，比如形容难缠的需求是“像海浪一样一波又一波”。</p>
+             <p>我觉得这个人挺有意思，但也就是这样。没有刻意靠近。</p>
+         </div>
+     </div>
+ </div>
+ 
+ <!-- 条目：2025年2月中旬 · 话多了起来 -->
+ <div class="entry-card">
+     <div class="entry-header">
+         <span class="entry-date"><i class="far fa-calendar-alt" style="margin-right: 6px;"></i>2025年2月中旬</span>
+        
+     </div>
+     <div class="entry-content">
+         <div class="entry-text">
+             <p>年后回来，似乎有什么东西松动了。从第一次我主动叫他一起去便利店，第一次分享一包薯片。我主动和她聊起过年的事，她说只要不是在公司或者学校，她都很开心。</p>
+             <p>有一次午休，她给我看手机里监控软件上的视频，那只叫<strong>年糕</strong>的橘猫正试图钻进纸箱。她笑得很开心，眼睛亮亮的。那一刻我觉得，这个人笑起来真好。</p>
+             <p>但我注意到她偶尔会走神，手指无意识地摩挲袖口。问她怎么了，她说没事，只是没睡好。我相信了。</p>
+         </div>
+     </div>
+ </div>
+ 
+ <!-- 条目：2025年2月23日 · 加微信 -->
+ <div class="entry-card">
+     <div class="entry-header">
+         <span class="entry-date"><i class="far fa-calendar-alt" style="margin-right: 6px;"></i>2025年2月23日</span>
+        
+     </div>
+     <div class="entry-content">
+         <div class="entry-text">
+             <p>今天终于加了她的私人微信。之前只在公司群里说过话，总觉得隔着一层。晚上她发来一张,<strong>年糕</strong>趴在键盘上的照片，说“它在和我一起看电影”。我回了一张实验室窗外的夜景。</p>
+             <p>不知怎么就聊到了凌晨。她说起以前学过大提琴，后来没坚持；我说我读研的方向和网络安全有关，因为小时候看过的黑客电影。她说有机会想去看海洋动物。我说好，就约她一起去航海公园逛逛。</p>
+             <p>我们好像一下子变得很近。那种感觉很奇怪，像找到了一个频率相同的人。</p>
+         </div>
+     </div>
+ </div>
+ 
+ <!-- 条目：2025年2月25日 · 看见伤痕 -->
+ <div class="entry-card">
+     <div class="entry-header">
+         <span class="entry-date"><i class="far fa-calendar-alt" style="margin-right: 6px;"></i>2025年2月25日</span> 
+     </div>
+	 
+     <div class="entry-content">
+         <div class="entry-text">
+             <p>她伸手递东西给我的时候，袖子滑下去，我看见了。手腕内侧一道一道的痕迹，有的已经泛白，有的还带着淡淡的粉色。我心跳漏了一拍，但很快把目光移开。</p>
+             <p>我什么都没问。晚上回去查了很多资料，关于抑郁症，关于自伤。原来她那些突然的沉默、说“没事”时垂下的眼睛、偶尔的疲倦到无法掩饰，都是信号。</p>
+             <p>我暗下决心，要多陪着她。哪怕只是听她说些无关紧要的话，哪怕只是每天发一句“今天食堂的菜好咸”。我想让她知道，有人在。</p>
+         </div>
+         <div class="thought">
+             我想成为她可以靠一靠的朋友。
+         </div>
+     </div>
+ </div>
+ 
+ <!-- 条目：2025年2月底 · 那几天 -->
+ <div class="entry-card">
+     <div class="entry-header">
+         <span class="entry-date"><i class="far fa-calendar-alt" style="margin-right: 6px;"></i>2025年2月底</span>
+     </div>
+	 
+     <div class="entry-content">
+         <div class="entry-text">
+             <p>我开始每天给她发点无关紧要的东西：路边刚开的花、食堂新出的黑暗料理、实验室窗外的晚霞。她回的频率变高了，有时候会拍<strong>年糕</strong>翻肚皮的照片给我。</p>
+             <p>她主动说起，最近睡眠好了一点，也开始看一部新的剧。我高兴得像个傻子，一切在慢慢变好。</p>
+		</div>
+     </div>
+ </div>
+ 
+ <!-- 条目：2025年3月1日 · 她走了 -->
+ <div class="entry-card">
+     <div class="entry-header">
+         <span class="entry-date"><i class="far fa-calendar-alt" style="margin-right: 6px;"></i>2025年3月1日</span>
+        
+     </div>
+     <div class="entry-content">
+         <div class="entry-text">
+             <p>收到消息的时候，我正在改论文格式。一开始以为是恶作剧，直到脸上无意识滑下来的泪。</p>
+             <p>沈沁走了。自己选择离开的。</p>
+             <p>我坐了很久，脑子里反复回放最后一次聊天。她发了一个晚安的表情包，我没回，因为当时在赶一个 deadline。如果我知道那是最后一次……</p>
+             <p>可我不相信，她明明前天才约了我等有空了，带她去看无垠海洋下美丽的生物，她不是这样一个会爽约的人。为什么？</p>
+         </div>
+         <div class="thought">
+             我以为我离她很近了，难道她早就站在了悬崖边上，而我以为她只是在看风景。
+         </div>
+     </div>
+ </div>
+ 
+ 
+ 
+
+    <!-- 底部，安静结束 -->
+    <div class="footer-note">
+        <i class="far fa-compass"></i> 山与的手记 · 记录日常，保持坚韧
+    </div>
+</div>
+
+<script>
+    (function(){
+        // 返回按钮逻辑：优先返回上一页，否则去预约主页
+        const backBtn = document.querySelector('.back-link');
+        if(backBtn) {
+            backBtn.addEventListener('click', (e) => {
+                if (document.referrer) {
+                    window.history.back();
+                } else {
+                    window.location.href = 'index.html'; // 预约主页面
+                }
+                e.preventDefault();
+            });
+        }
+    })();
+</script>
+</body>
+</html>

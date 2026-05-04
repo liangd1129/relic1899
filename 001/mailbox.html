@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
+  <title>outlook邮箱</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: radial-gradient(circle at 30% 30%, #c6e2ff, #a0c8f0, #7eb0e0);
+      background-size: cover;
+      background-color: #b8d4f0;
+      position: relative;
+    }
+
+    /* 顶部标题栏 —— 毛玻璃 */
+    .mail-header {
+      height: 58px;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      flex-shrink: 0;
+    }
+
+    .mail-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #153e5c;
+    }
+
+    .mail-logo i {
+      font-size: 30px;
+      color: #1e5a9b;
+      background: rgba(255,255,255,0.4);
+      padding: 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .mail-logo span {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.3px;
+      text-shadow: 0 1px 4px rgba(255,255,255,0.4);
+    }
+
+    .mail-search {
+      flex: 1;
+      margin: 0 40px;
+      max-width: 520px;
+    }
+
+    .mail-search .search-box {
+      width: 100%;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 40px;
+      font-size: 14.5px;
+      color: #0b2a44;
+      outline: none;
+      transition: 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    }
+
+    .mail-search .search-box:focus {
+      background: rgba(255, 255, 255, 0.7);
+      border-color: #0078d4;
+      box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.15);
+    }
+
+    .mail-search .search-box::placeholder {
+      color: #2e577a;
+      opacity: 0.7;
+    }
+
+    .mail-profile {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .mail-profile i {
+      font-size: 20px;
+      color: #1e4d7c;
+      cursor: default;
+      padding: 8px;
+      border-radius: 12px;
+      transition: background 0.15s;
+    }
+
+    .mail-profile i:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .avatar-small {
+      width: 40px;
+      height: 40px;
+      background: #2e5f8e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    /* 主体三栏布局 */
+    .mail-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 左侧导航栏 */
+    .mail-sidebar {
+      width: 260px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 22px 10px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .compose-btn {
+      background: #1e5a9b;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      cursor: default;
+      box-shadow: 0 8px 16px rgba(30, 90, 155, 0.2);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(5px);
+      transition: background 0.15s;
+    }
+
+    .compose-btn:hover {
+      background: #1b4e84;
+    }
+
+    .folder-list {
+      list-style: none;
+    }
+
+    .folder-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      color: #153e5c;
+      font-weight: 450;
+      transition: background 0.15s;
+      cursor: pointer;
+      margin-bottom: 4px;
+    }
+
+    .folder-item i {
+      width: 24px;
+      color: #1e5a9b;
+      font-size: 18px;
+    }
+
+    .folder-item.active {
+      background: rgba(255, 255, 255, 0.45);
+      color: #0d3857;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .folder-item:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .folder-item .badge {
+      margin-left: auto;
+      background: rgba(30, 90, 155, 0.2);
+      color: #153e5c;
+      border-radius: 30px;
+      padding: 2px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    /* 中间邮件列表 */
+    .mail-list {
+      width: 360px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .list-header {
+      padding: 20px 22px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .list-header h3 {
+      font-weight: 500;
+      font-size: 20px;
+      color: #0d3857;
+    }
+
+    /* 移动端文件夹切换按钮 */
+    .folder-toggle-btn {
+      display: none;
+      background: rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #153e5c;
+      cursor: pointer;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(5px);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .folder-toggle-btn i {
+      font-size: 14px;
+    }
+    .folder-toggle-btn:active {
+      background: rgba(255,255,255,0.5);
+    }
+
+    .filter-icon {
+      color: #1e5a9b;
+      font-size: 18px;
+      background: rgba(255,255,255,0.3);
+      padding: 8px;
+      border-radius: 12px;
+    }
+
+    .email-item {
+      display: flex;
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .email-item:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .email-item.unread {
+      background: rgba(255, 255, 255, 0.3);
+      border-left: 4px solid #1e5a9b;
+    }
+
+    .email-avatar {
+      margin-right: 14px;
+    }
+
+    .avatar-circle {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #153e5c;
+      font-weight: 600;
+      font-size: 18px;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    .email-preview {
+      flex: 1;
+    }
+
+    .email-sender {
+      font-weight: 600;
+      color: #0b2a44;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .email-subject {
+      font-weight: 500;
+      color: #153e5c;
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+
+    .email-snippet {
+      color: #2e577a;
+      font-size: 13.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+      opacity: 0.9;
+    }
+
+    .email-time {
+      font-size: 12px;
+      color: #1e4d7c;
+      font-weight: 400;
+    }
+
+    /* 右侧阅读窗格 */
+    .mail-reader {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      padding: 28px 36px;
+      overflow-y: auto;
+    }
+
+    /* 阅读窗格内的返回按钮（移动端可见） */
+    .reader-back-btn {
+      display: none;
+      font-size: 24px;
+      color: #153e5c;
+      cursor: pointer;
+      margin-right: 16px;
+      padding: 8px 12px 8px 0;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.15s;
+    }
+    .reader-back-btn:active {
+      opacity: 0.6;
+    }
+
+    .reader-header {
+      margin-bottom: 30px;
+    }
+
+    .reader-subject {
+      font-size: 26px;
+      font-weight: 500;
+      color: #0b2a44;
+      margin-bottom: 18px;
+      text-shadow: 0 1px 4px rgba(255,255,255,0.3);
+    }
+
+    .reader-meta {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .sender-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .sender-detail h4 {
+      font-weight: 600;
+      color: #153e5c;
+      font-size: 18px;
+    }
+
+    .sender-detail p {
+      font-size: 13.5px;
+      color: #2e577a;
+      opacity: 0.9;
+    }
+
+    .reader-actions i {
+      margin-left: 24px;
+      color: #1e5a9b;
+      font-size: 20px;
+      cursor: default;
+      background: rgba(255,255,255,0.3);
+      padding: 10px;
+      border-radius: 14px;
+      transition: background 0.15s;
+    }
+
+    .reader-actions i:hover {
+      background: rgba(255,255,255,0.5);
+    }
+
+    .reader-body {
+      color: #0b2a44;
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .reader-body p {
+      margin-bottom: 18px;
+    }
+
+    .page-indicator {
+      position: absolute;
+      bottom: 20px;
+      right: 30px;
+      color: white;
+      font-size: 14px;
+      font-weight: 400;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 6px 18px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      letter-spacing: 1px;
+      z-index: 50;
+    }
+
+    .back-link {
+      position: absolute;
+      bottom: 20px;
+      left: 30px;
+      color: #153e5c;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      padding: 8px 20px;
+      border-radius: 40px;
+      border: 1px solid rgba(255,255,255,0.25);
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 50;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.35);
+    }
+
+    /* ========= 移动端适配 ========= */
+    @media (max-width: 600px) {
+      body {
+        background: #b8d4f0;
+      }
+
+      .mail-body {
+        display: block;
+        position: relative;
+      }
+
+      .mail-sidebar,
+      .mail-list,
+      .mail-reader {
+        width: 100% !important;
+        height: 100%;
+        flex: none;
+        display: flex;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        overflow-y: auto;
+      }
+
+      /* 默认显示邮件列表，隐藏侧边栏和阅读器 */
+      .mail-body:not(.show-reader) .mail-sidebar {
+        display: none;
+      }
+      .mail-body:not(.show-reader) .mail-list {
+        display: flex;
+        z-index: 2;
+      }
+      .mail-body:not(.show-reader) .mail-reader {
+        display: none;
+      }
+
+      /* 阅读视图：显示阅读器，隐藏列表和侧边栏 */
+      .mail-body.show-reader .mail-sidebar {
+        display: none;
+      }
+      .mail-body.show-reader .mail-list {
+        display: none;
+      }
+      .mail-body.show-reader .mail-reader {
+        display: block;
+        z-index: 3;
+      }
+
+      /* 阅读器头部加入返回按钮区域 */
+      .reader-back-btn {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .reader-header {
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .reader-subject {
+        font-size: 22px;
+        margin-bottom: 12px;
+        width: 100%;
+      }
+
+      /* 调整阅读器内边距 */
+      .mail-reader {
+        padding: 20px 16px;
+      }
+
+      /* 页码与返回链接位置调整 */
+      .page-indicator {
+        bottom: 16px;
+        right: 16px;
+        font-size: 12px;
+        padding: 4px 12px;
+        z-index: 60;
+      }
+
+      .back-link {
+        bottom: 16px;
+        left: 16px;
+        padding: 6px 14px;
+        font-size: 13px;
+        z-index: 60;
+      }
+
+      /* 邮件列表头部调整 */
+      .list-header {
+        padding: 16px 16px 12px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      /* 显示文件夹切换按钮 */
+      .folder-toggle-btn {
+        display: flex;
+      }
+
+      /* 隐藏原有的filter图标，用切换按钮代替 */
+      .filter-icon {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="mail-header">
+  <div class="mail-logo">
+    <i class="fas fa-envelope"></i>
+    <span>Outlook </span>
+  </div>
+  <div class="mail-search">
+    <input type="text" class="search-box" placeholder="搜索邮件">
+  </div>
+  <div class="mail-profile">
+    <i class="fas fa-cog"></i>
+    <i class="fas fa-question-circle"></i>
+    <div class="avatar-small">
+      <i class="fas fa-user"></i>
+    </div>
+  </div>
+</header>
+
+<div class="mail-body" id="mailBody">
+  <nav class="mail-sidebar">
+    <button class="compose-btn"><i class="fas fa-pen"></i> <span>新建邮件</span></button>
+    <ul class="folder-list">
+      <li class="folder-item active" data-folder="inbox">
+        <i class="fas fa-inbox"></i>
+        <span>收件箱</span>
+        <span class="badge" id="inboxBadge">7</span>
+      </li>
+      <li class="folder-item" data-folder="sent">
+        <i class="fas fa-paper-plane"></i>
+        <span>已发送</span>
+        <span class="badge" id="sentBadge">4</span>
+      </li>
+      <li class="folder-item">
+        <i class="fas fa-star"></i>
+        <span>重要</span>
+      </li>
+      <li class="folder-item">
+        <i class="fas fa-file-alt"></i>
+        <span>草稿</span>
+      </li>
+      <li class="folder-item">
+        <i class="fas fa-trash-alt"></i>
+        <span>已删除</span>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="mail-list" id="mailListContainer">
+    <!-- 动态邮件列表渲染在此 -->
+  </div>
+
+  <div class="mail-reader" id="readerPane">
+    <!-- 移动端返回按钮，置于内容之上 -->
+    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+      <i class="fas fa-arrow-left reader-back-btn" id="mobileReaderBackBtn" onclick="document.getElementById('mailBody').classList.remove('show-reader');"></i>
+      <span style="font-weight: 500; color: #153e5c;">邮件详情</span>
+    </div>
+    <div class="reader-header">
+      <div class="reader-subject" id="readerSubject"></div>
+      <div class="reader-meta">
+        <div class="sender-info">
+          <div class="avatar-circle" id="readerAvatar">S</div>
+          <div class="sender-detail">
+            <h4 id="readerSender">--</h4>
+            <p id="readerEmail">--</p>
+          </div>
+        </div>
+        <div class="reader-actions">
+          <i class="fas fa-reply"></i>
+          <i class="fas fa-reply-all"></i>
+          <i class="fas fa-archive"></i>
+          <i class="fas fa-trash-alt"></i>
+        </div>
+      </div>
+    </div>
+    <div class="reader-body" id="readerBody">
+      <p>请从左侧选择一封邮件。</p>
+    </div>
+  </div>
+</div>
+
+<div class="page-indicator">6/19</div>
+<a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+
+<script>
+  // ---------- 邮件数据集（收件箱 & 已发送，时间线覆盖2024.12—2025.02）----------
+  const SHEN_EMAIL = "shenqin@tonghai.edu.cn";
+  const YU_EMAIL = "xlyu@tonghai.edu.cn";
+
+  // 收件箱邮件
+  const inboxMails = [
+   {
+     id: "inbox_yu_threat",
+     subject: "Re: 关于离开实习公司休息一段时间的申请",
+     fromName: "于晓丽",
+     fromEmail: YU_EMAIL,
+     body: `<p>沈沁，</p>
+            <p>请假邮件收到了。身体是第一位，你想休息我当然理解，也不会拦着。</p>
+            <p>不过有几句话我想提前跟你说一下：你现在研二下学期了，实验室的几个项目节点都卡在三四月份，论文外审、预答辩也都集中在这段时间。你这个时候离开实习公司，倒不是不可以，但后续组里的一些工作安排和推荐材料，我这边可能要重新考虑一下优先级——毕竟我也要对你最终的培养质量负责，对吧？</p>
+            <p>另外你手头那两个横向课题的数据分析，本来是要在这个月底结题的，既然你要休息，那你自己把握好节奏，别到时候交不上来。我也不想到时候在学院那边替你说话的时候，拿不出像样的成果。</p>
+            <p>总之你好好休息，也希望你能想清楚，这段时间的投入和你最后能不能顺利毕业，其实是挂钩的。有什么事再联系。</p>
+            <p>于晓丽</p>`,
+     time: "2025年2月27日",
+     timestamp: 1740595200000,
+     isRead: false,
+     folder: "inbox"
+   },
+    {
+      id: "inbox_work2",
+      subject: "【工作安排】课题组景观数据汇总及竞赛材料",
+      fromName: "于晓丽 教授",
+      fromEmail: YU_EMAIL,
+      body: `<p>沈沁，</p><p>下周五之前把去年下半年江南地区园林项目的调研数据全部整理成PPT，另外国际生态园艺联盟的申报书初稿这周必须发我。注意细节，不要出现低级错误。</p><p>于晓丽<br>同海大学园林学院 · 博士生导师<br>全球生态园艺联盟常务理事</p>`,
+      time: "2025年2月10日",
+      timestamp: 1739116800000,
+      isRead: true,
+      folder: "inbox"
+    },
+    {
+      id: "inbox_work1",
+      subject: "【教务提醒】研究生论文中期报告提交截止",
+      fromName: "同海大学园林学院",
+      fromEmail: "academic@tonghai.edu.cn",
+      body: `<p>各位同学，2024-2025学年第二学期研究生论文中期报告请于2025年3月1日前提交系统。</p><p>详情见附件。</p>`,
+      time: "2025年2月5日",
+      timestamp: 1738684800000,
+      isRead: true,
+      folder: "inbox"
+    },
+    {
+      id: "inbox_yu_official",
+      subject: "【于晓丽】帮我登录教师系统处理一下事务",
+      fromName: "于晓丽",
+      fromEmail: YU_EMAIL,
+      body: `<p>沈沁，</p><p>我这两天在外地参加星洲设计奖评审，教师系统里本科生“园林植物配置”课程的期末成绩需要录入，另外学院教学项目申报书需要点击确认。</p><p>你登陆我的<strong>教务处</strong>，密码是原始密码，今晚之前帮我全部弄完。弄完给我发个消息。</p><p>态度认真些，这是重要的教学事务。</p><p>于晓丽</p>`,
+      time: "2025年1月12日",
+      timestamp: 1736611200000,
+      isRead: true,
+      folder: "inbox"
+    },
+    {
+      id: "inbox_appointment",
+      subject: "【预约】于晓丽老师 论文进展讨论",
+      fromName: "于晓丽 助理",
+      fromEmail: "yu_assist@tonghai.edu.cn",
+      body: `<p>沈沁同学，</p><p>于老师下周三（1月22日）上午9:30-11:00 安排与你讨论毕业论文框架及期刊投稿事宜，请提前准备好材料，准时到园林楼401。</p><p>—— 教务办公室</p>`,
+      time: "2025年1月15日",
+      timestamp: 1736899200000,
+      isRead: true,
+      folder: "inbox"
+    },
+    {
+      id: "inbox_spam2",
+      subject: "【限时特惠】园林工具大促，买二送一",
+      fromName: "花园优选",
+      fromEmail: "sale@gardenmart.com",
+      body: `<p>亲爱的会员，顶级修枝剪、电动割草机全场5折起，立即抢购！</p><p>点击领取优惠券。</p>`,
+      time: "2024年12月28日",
+      timestamp: 1735315200000,
+      isRead: true,
+      folder: "inbox"
+    },
+    {
+      id: "inbox_work_early",
+      subject: "【工作通知】园林学院设计周志愿者征集",
+      fromName: "园林学院办公室",
+      fromEmail: "landscape@tonghai.edu.cn",
+      body: `<p>各位同学，学院定于2025年1月10日举办设计周，需志愿者协助会场，有意向请报名。</p>`,
+      time: "2024年12月20日",
+      timestamp: 1734652800000,
+      isRead: true,
+      folder: "inbox"
+    }
+  ];
+
+  const sentMails = [
+	 { 
+	   id: "sent_latest",
+	   subject: "这件事也有你的一份。",
+	   toName: "于晓丽",
+	   toEmail: YU_EMAIL,
+	   body: `<p>等着。</p>`,
+	   time: "2026年4月01日",
+	   timestamp: 1746640000000,
+	   folder: "sent"
+	 }, 
+    {
+      id: "sent_reply_official",
+      subject: "Re: 帮我登录教师系统处理一下事务",
+      toName: "于晓丽",
+      toEmail: YU_EMAIL,
+      body: `<p>于老师，</p><p>已登录您的教师系统，成绩录入和项目申报确认都已处理完毕，请放心。若有其他需要请随时告知。</p><p>沈沁</p>`,
+      time: "2025年1月12日",
+      timestamp: 1736640000000,
+      folder: "sent"
+    },
+    {
+      id: "sent_reply_appointment",
+      subject: "Re: 【预约】于晓丽老师 论文进展讨论",
+      toName: "于晓丽 助理",
+      toEmail: "yu_assist@tonghai.edu.cn",
+      body: `<p>老师您好，</p><p>收到，1月22日上午9:30我会带好论文框架材料准时到园林楼401参加讨论。谢谢通知。</p><p>沈沁</p>`,
+      time: "2025年1月16日",
+      timestamp: 1736985600000,
+      folder: "sent"
+    },
+    {
+      id: "sent_reply_work",
+      subject: "Re: 【工作安排】课题组景观数据汇总及竞赛材料",
+      toName: "于晓丽",
+      toEmail: YU_EMAIL,
+      body: `<p>于老师，</p><p>收到工作任务。江南园林调研数据PPT我会在2月14日前完成发给您，国际生态园艺联盟申报书初稿也尽快整理。有任何进展会及时汇报。</p><p>沈沁</p>`,
+      time: "2025年2月10日",
+      timestamp: 1739145600000,
+      folder: "sent"
+    },
+    {
+      id: "sent_leave_rest",
+      subject: "【请假申请】关于离开实习公司休息一段时间的申请",
+      toName: "于晓丽",
+      toEmail: YU_EMAIL,
+      body: `<p>于老师，</p><p>因为身体原因及学业压力较大，我想申请从实习公司（绿屿设计）暂时离开休息一段时间，时间从2月24日开始，预计休息三周。期间导师安排的任务我会远程尽力完成，研究生课题也不会落下。望您批准。</p><p>沈沁</p><p>2025年2月23日</p>`,
+      time: "2025年2月23日",
+      timestamp: 1740412800000,
+      folder: "sent"
+    }
+  ];
+
+  let currentFolder = "inbox";
+  let currentSelectedMailId = null;
+
+  const mailBody = document.getElementById('mailBody');
+
+  function isMobile() {
+    return window.innerWidth <= 600;
+  }
+
+  // 进入阅读视图（移动端专用）
+  function enterReaderView() {
+    if (isMobile()) {
+      mailBody.classList.add('show-reader');
+    }
+  }
+
+  // 返回列表视图（移动端专用）
+  function exitReaderView() {
+    if (isMobile()) {
+      mailBody.classList.remove('show-reader');
+    }
+  }
+
+  // 渲染邮件列表（移动端头部添加切换按钮）
+  function renderMailList() {
+    const container = document.getElementById("mailListContainer");
+    if (!container) return;
+    const mails = currentFolder === "inbox" ? inboxMails : sentMails;
+    const sorted = [...mails].sort((a,b) => b.timestamp - a.timestamp);
+    
+    const folderDisplayName = currentFolder === "inbox" ? "收件箱" : "已发送";
+    const oppositeFolder = currentFolder === "inbox" ? "sent" : "inbox";
+    const oppositeName = currentFolder === "inbox" ? "已发送" : "收件箱";
+    
+    let listHtml = `
+      <div class="list-header">
+        <h3>${folderDisplayName}</h3>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button class="folder-toggle-btn" id="mobileFolderToggle">
+            <i class="fas fa-exchange-alt"></i> 切换到${oppositeName}
+          </button>
+          <i class="fas fa-sliders-h filter-icon"></i>
+        </div>
+      </div>
+    `;
+    for (const mail of sorted) {
+      const isUnread = (currentFolder === "inbox" && !mail.isRead) ? "unread" : "";
+      let senderDisplay = "";
+      let avatarInitial = "";
+      if (currentFolder === "inbox") {
+        senderDisplay = mail.fromName;
+        avatarInitial = mail.fromName.charAt(0);
+      } else {
+        senderDisplay = `致: ${mail.toName}`;
+        avatarInitial = mail.toName.charAt(0);
+      }
+      let plainBody = mail.body.replace(/<[^>]*>/g, '');
+      let snippet = plainBody.substring(0, 48) + (plainBody.length > 48 ? "…" : "");
+      listHtml += `
+        <div class="email-item ${isUnread}" data-mail-id="${mail.id}" data-folder="${currentFolder}">
+          <div class="email-avatar">
+            <div class="avatar-circle">${avatarInitial}</div>
+          </div>
+          <div class="email-preview">
+            <div class="email-sender">
+              ${escapeHtml(senderDisplay)} <span class="email-time">${mail.time}</span>
+            </div>
+            <div class="email-subject">${escapeHtml(mail.subject)}</div>
+            <div class="email-snippet">${escapeHtml(snippet)}</div>
+          </div>
+        </div>
+      `;
+    }
+    container.innerHTML = listHtml;
+
+    // 绑定切换按钮事件
+    const toggleBtn = document.getElementById('mobileFolderToggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const newFolder = currentFolder === 'inbox' ? 'sent' : 'inbox';
+        switchFolder(newFolder);
+      });
+    }
+
+    // 绑定邮件项点击
+    document.querySelectorAll('.email-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        const mailId = item.getAttribute('data-mail-id');
+        const folder = item.getAttribute('data-folder');
+        if (folder === 'inbox') {
+          const mail = inboxMails.find(m => m.id === mailId);
+          if (mail) {
+            if (!mail.isRead) {
+              mail.isRead = true;
+              renderMailList();
+            }
+            displayMailDetail(mail, 'inbox');
+            currentSelectedMailId = mailId;
+          }
+        } else {
+          const mail = sentMails.find(m => m.id === mailId);
+          if (mail) {
+            displayMailDetail(mail, 'sent');
+            currentSelectedMailId = mailId;
+          }
+        }
+        // 移动端进入阅读视图
+        enterReaderView();
+        // 高亮当前项
+        document.querySelectorAll('.email-item').forEach(el => el.style.background = '');
+        item.style.background = 'rgba(255,255,255,0.3)';
+      });
+    });
+  }
+
+  function displayMailDetail(mail, folderType) {
+    const readerSubject = document.getElementById("readerSubject");
+    const readerSender = document.getElementById("readerSender");
+    const readerEmail = document.getElementById("readerEmail");
+    const readerBody = document.getElementById("readerBody");
+    const readerAvatar = document.getElementById("readerAvatar");
+    
+    if (!readerSubject) return;
+    readerSubject.innerText = mail.subject;
+    
+    if (folderType === "inbox") {
+      readerSender.innerText = mail.fromName;
+      readerEmail.innerText = mail.fromEmail;
+      readerAvatar.innerText = mail.fromName.charAt(0);
+    } else {
+      readerSender.innerText = `收件人: ${mail.toName}`;
+      readerEmail.innerText = mail.toEmail;
+      readerAvatar.innerText = mail.toName.charAt(0);
+    }
+    readerBody.innerHTML = mail.body;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function updateBadges() {
+    const inboxBadge = document.getElementById("inboxBadge");
+    if (inboxBadge) inboxBadge.innerText = inboxMails.length;
+    const sentBadge = document.getElementById("sentBadge");
+    if (sentBadge) sentBadge.innerText = sentMails.length;
+  }
+
+  function switchFolder(folder) {
+    currentFolder = folder;
+    // 更新侧边栏激活样式（桌面端）
+    document.querySelectorAll('.folder-item').forEach(item => {
+      const f = item.getAttribute('data-folder');
+      if ((f === 'inbox' && folder === 'inbox') || (f === 'sent' && folder === 'sent')) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+    renderMailList();
+    // 移动端切换文件夹后回到列表视图
+    if (isMobile()) {
+      exitReaderView();
+    }
+    const mails = folder === "inbox" ? inboxMails : sentMails;
+    if (mails.length > 0) {
+      const sorted = [...mails].sort((a,b) => b.timestamp - a.timestamp);
+      const firstMail = sorted[0];
+      if (firstMail) {
+        if (folder === 'inbox') displayMailDetail(firstMail, 'inbox');
+        else displayMailDetail(firstMail, 'sent');
+        currentSelectedMailId = firstMail.id;
+        setTimeout(() => {
+          const firstElem = document.querySelector('.email-item');
+          if (firstElem) firstElem.style.background = 'rgba(255,255,255,0.3)';
+        }, 20);
+      } else {
+        document.getElementById("readerSubject").innerText = "暂无邮件";
+        document.getElementById("readerBody").innerHTML = "<p>文件夹为空。</p>";
+      }
+    } else {
+      document.getElementById("readerSubject").innerText = "暂无邮件";
+      document.getElementById("readerBody").innerHTML = "<p>暂无邮件内容。</p>";
+    }
+  }
+
+  function init() {
+    updateBadges();
+    switchFolder("inbox");
+    setTimeout(() => {
+      const targetMail = inboxMails.find(m => m.id === "inbox_yu_official");
+      if (targetMail) {
+        displayMailDetail(targetMail, "inbox");
+        currentSelectedMailId = targetMail.id;
+        const targetElem = document.querySelector(`.email-item[data-mail-id="inbox_yu_official"]`);
+        if (targetElem) {
+          document.querySelectorAll('.email-item').forEach(el => el.style.background = '');
+          targetElem.style.background = 'rgba(255,255,255,0.3)';
+        }
+        if (!targetMail.isRead) {
+          targetMail.isRead = true;
+          renderMailList();
+          updateBadges();
+        }
+      }
+      // 确保移动端初始不显示阅读器
+      if (isMobile()) {
+        mailBody.classList.remove('show-reader');
+      }
+    }, 50);
+  }
+
+  // 桌面端侧边栏切换
+  document.querySelectorAll('.folder-item[data-folder]').forEach(folderItem => {
+    folderItem.addEventListener('click', (e) => {
+      const folder = folderItem.getAttribute('data-folder');
+      if (folder === 'inbox' || folder === 'sent') {
+        switchFolder(folder);
+      }
+    });
+  });
+
+  // 监听窗口大小变化，重置移动端类（避免桌面/移动切换错乱）
+  window.addEventListener('resize', () => {
+    if (!isMobile()) {
+      mailBody.classList.remove('show-reader');
+    } else {
+      // 如果当前在移动端且没有显示阅读器，保持列表显示
+    }
+  });
+
+  init();
+</script>
+</body>
+</html>

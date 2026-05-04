@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>园林设计简历</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eaf5e9;
+            font-family: 'Segoe UI', 'Roboto', 'Poppins', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            line-height: 1.5;
+            color: #1e2f2c;
+            padding: 2rem 1.5rem;
+        }
+
+        .resume-card {
+            max-width: 1150px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 32, 0, 0.15);
+            overflow: hidden;
+        }
+		
+		/* 右下角页码标识（全局） */
+		.page-indicator {
+		    position: fixed;
+		    bottom: 20px;
+		    right: 30px;
+		    z-index: 50;
+		    color: #e2f0da;
+		    font-size: 14px;
+		    font-weight: 400;
+		    background: rgba(30, 47, 44, 0.75);   /* 深色半透明，可见度高 */
+		    backdrop-filter: blur(8px);
+		    -webkit-backdrop-filter: blur(8px);
+		    padding: 6px 18px;
+		    border-radius: 40px;
+		    border: 1px solid rgba(255, 255, 255, 0.4);
+		    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+		    letter-spacing: 1px;
+		}
+		
+		/* 左下角返回桌面链接（全局） */
+		.back-link {
+		    position: fixed;
+		    bottom: 20px;
+		    left: 30px;
+		    z-index: 50;
+		    color: #e2f0da;
+		    background: rgba(30, 47, 44, 0.75);
+		    backdrop-filter: blur(8px);
+		    -webkit-backdrop-filter: blur(8px);
+		    padding: 8px 20px;
+		    border-radius: 40px;
+		    border: 1px solid rgba(255, 255, 255, 0.4);
+		    font-size: 14px;
+		    text-decoration: none;
+		    display: inline-flex;
+		    align-items: center;
+		    gap: 8px;
+		    transition: background 0.15s;
+		    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+		}
+		
+
+        .resume-grid {
+            display: grid;
+            grid-template-columns: 34% 66%;
+        }
+
+        .sidebar {
+            background: #1f3b2c;
+            color: #eef4e6;
+            padding: 2rem 1.8rem;
+            height: 100%;
+        }
+
+        .name-large {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: white;
+            margin-bottom: 0.4rem;
+            border-left: 4px solid #9bc48b;
+            padding-left: 1rem;
+        }
+
+        .job-tag {
+            font-size: 0.9rem;
+            background: rgba(155, 196, 139, 0.25);
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            margin: 0.75rem 0 1rem 1rem;
+            backdrop-filter: blur(2px);
+            font-weight: 500;
+            max-width: 100%;
+            word-break: break-word;
+        }
+
+        .contact-info {
+            margin: 2rem 0 1.8rem 0;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            word-break: break-word;
+            color: #d9e6d3;
+        }
+
+        .contact-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #bdd9ae;
+        }
+
+        .divider-light {
+            height: 1px;
+            background: rgba(189, 217, 174, 0.3);
+            margin: 1.8rem 0 1.5rem 0;
+        }
+
+        .section-title-side {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+            position: relative;
+            display: inline-block;
+            color: #e2f0da;
+            border-bottom: 2px solid #9bc48b;
+            padding-bottom: 5px;
+        }
+
+        .skill-list {
+            list-style: none;
+            margin-bottom: 1.8rem;
+        }
+
+        .skill-list li {
+            margin-bottom: 0.7rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            font-size: 0.85rem;
+        }
+
+        .skill-name {
+            width: 100px;
+            font-weight: 500;
+            color: #e2f0da;
+        }
+
+        .skill-bar {
+            flex: 1;
+            height: 5px;
+            background: #345a45;
+            border-radius: 8px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .skill-level {
+            height: 5px;
+            background: #9bc48b;
+            border-radius: 8px;
+            width: 85%;
+        }
+
+        .level-90 { width: 90%; }
+        .level-85 { width: 85%; }
+        .level-80 { width: 80%; }
+        .level-75 { width: 75%; }
+        .level-70 { width: 70%; }
+
+        .lang-item, .cert-item {
+            font-size: 0.85rem;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: baseline;
+        }
+        .lang-item strong, .cert-item strong {
+            width: 75px;
+            font-weight: 500;
+        }
+
+        .interest-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+        .interest-tags span {
+            background: #2e5540;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            color: #e2f0da;
+        }
+
+        .main-content {
+            background: white;
+            padding: 2rem 2rem 2rem 2rem;
+        }
+
+        .main-section {
+            margin-bottom: 2rem;
+        }
+
+        .main-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f3b2c;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            border-left: 4px solid #6f9e5c;
+            padding-left: 1rem;
+        }
+
+        .main-title i {
+            color: #5b8c4e;
+            font-size: 1.2rem;
+        }
+
+        .timeline-item {
+            margin-bottom: 1.6rem;
+        }
+
+        .item-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.3rem;
+        }
+
+        .item-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1f2e28;
+        }
+
+        .item-sub {
+            font-weight: 600;
+            color: #4e6b5c;
+            font-size: 0.85rem;
+        }
+
+        .item-date {
+            font-size: 0.75rem;
+            background: #eef3ec;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            color: #3e6b4f;
+            font-weight: 500;
+        }
+
+        .item-desc {
+            font-size: 0.85rem;
+            color: #2c423b;
+            margin-top: 0.5rem;
+            line-height: 1.45;
+            padding-right: 0.5rem;
+        }
+
+        .highlight-mentor {
+            background: #eef6ea;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #2c6e3c;
+            margin-top: 0.3rem;
+        }
+
+        .highlight-mentor i {
+            margin-right: 5px;
+            font-size: 0.7rem;
+        }
+
+        .award-badge {
+            display: flex;
+            align-items: baseline;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .award-name {
+            font-weight: 600;
+            width: 180px;
+            font-size: 0.85rem;
+        }
+        .award-detail {
+            font-size: 0.8rem;
+            color: #4a685b;
+        }
+
+        .project-list {
+            list-style: none;
+        }
+        .project-list li {
+            margin-bottom: 1.2rem;
+        }
+
+        .self-eval {
+            background: #f9fef7;
+            border-radius: 1rem;
+            padding: 1rem 1.2rem;
+            margin-top: 1rem;
+            border: 1px solid #ddebe0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #2c4a3a;
+        }
+
+        .mentor-star {
+            background: #e5f2df;
+            border-left: 3px solid #6f9e5c;
+            padding: 0.5rem 1rem;
+            margin: 0.8rem 0 0.2rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #8aa79a;
+            padding: 1rem 0 0.5rem;
+            border-top: 1px solid #e2ecd9;
+            margin-top: 1rem;
+        }
+
+        /* 右侧面板内的折叠组件样式 */
+        .collapsible-section summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+        .collapsible-section summary::-webkit-details-marker {
+            display: none;
+        }
+        .collapsible-section summary .fa-chevron-down {
+            margin-left: auto;
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+        .collapsible-section[open] summary .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        /* ========== 平板/手机适配 ========== */
+        @media (max-width: 780px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .resume-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* 侧边栏变成 flex 容器，实现专业技能在左，其余在右 */
+            .sidebar {
+                padding: 1.2rem 1rem;
+                display: flex;
+                flex-wrap: wrap;
+                column-gap: 0.8rem;
+            }
+
+            /* 隐藏所有分隔线 */
+            .sidebar .divider-light {
+                display: none;
+            }
+
+            /* 专业技能（第一个 block-wrap）占左侧 */
+            .sidebar > .block-wrap {
+                width: 58%;
+            }
+
+            /* 右侧三个板块的容器 */
+            .right-group {
+                width: calc(42% - 0.8rem);
+                display: flex;
+                flex-direction: column;
+            }
+
+            .right-group .block-wrap {
+                width: 100%;
+                margin-bottom: 0.8rem;
+            }
+
+            /* 右侧内部的分隔线同样隐藏 */
+            .right-group .divider-light {
+                display: none;
+            }
+
+            /* 左侧个人信息保持垂直 */
+            .sidebar .name-large,
+            .sidebar .job-tag,
+            .sidebar .contact-info {
+                width: 100%;   /* 让它们独占一行 */
+            }
+
+            /* 字号和间距全面压缩 */
+            .name-large {
+                font-size: 1.5rem;
+                margin-bottom: 0.2rem;
+            }
+            .job-tag {
+                margin: 0.4rem 0 0.6rem 0.5rem;
+                font-size: 0.8rem;
+            }
+            .contact-info {
+                margin: 1rem 0 0.8rem 0;
+            }
+            .contact-item {
+                margin-bottom: 0.5rem;
+                font-size: 0.78rem;
+            }
+
+            .section-title-side {
+                font-size: 0.85rem;
+                margin-bottom: 0.7rem;
+                padding-bottom: 3px;
+            }
+
+            .skill-list li {
+                margin-bottom: 0.4rem;
+                font-size: 0.72rem;
+            }
+            .skill-name {
+                width: 80px;
+                font-size: 0.7rem;
+            }
+            .skill-bar {
+                height: 4px;
+                margin-top: 4px;
+            }
+            .skill-level {
+                height: 4px;
+            }
+
+            .lang-item, .cert-item {
+                font-size: 0.72rem;
+                margin-bottom: 0.5rem;
+            }
+            .interest-tags span {
+                font-size: 0.68rem;
+                padding: 0.2rem 0.5rem;
+            }
+
+            /* 主内容区 */
+            .main-content {
+                padding: 1.2rem 1rem;
+            }
+            .main-section {
+                margin-bottom: 1.2rem;
+            }
+            .main-title {
+                font-size: 1rem;
+                margin-bottom: 0.7rem;
+                padding-left: 0.7rem;
+            }
+            .timeline-item {
+                margin-bottom: 1rem;
+            }
+            .item-title {
+                font-size: 0.88rem;
+            }
+            .item-sub {
+                font-size: 0.78rem;
+            }
+            .item-date {
+                font-size: 0.7rem;
+                padding: 0.15rem 0.5rem;
+            }
+            .item-desc {
+                font-size: 0.78rem;
+                margin-top: 0.3rem;
+                line-height: 1.4;
+            }
+            .item-header {
+                gap: 4px;
+                flex-direction: column;
+            }
+
+            .mentor-star {
+                padding: 0.4rem 0.7rem;
+                font-size: 0.75rem;
+                margin: 0.5rem 0 0.1rem;
+            }
+            .highlight-mentor {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.6rem;
+            }
+
+            .award-badge {
+                margin-bottom: 0.4rem;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .award-name {
+                width: auto;
+                font-size: 0.8rem;
+            }
+            .award-detail {
+                font-size: 0.74rem;
+            }
+
+            .self-eval {
+                padding: 0.7rem 0.9rem;
+                font-size: 0.78rem;
+            }
+
+            footer {
+                padding: 0.5rem 0 0.2rem;
+                margin-top: 0.5rem;
+                font-size: 0.65rem;
+            }
+
+            .page-indicator {
+                   font-size: 11px;
+                   padding: 4px 12px;
+                   bottom: 12px;
+                   right: 15px;
+               }
+               .back-link {
+                   font-size: 12px;
+                   padding: 5px 14px;
+                   bottom: 12px;
+                   left: 15px;
+               }
+        }
+
+        /* 超小屏微调 */
+        @media (max-width: 480px) {
+            .sidebar {
+                padding: 1rem 0.8rem;
+            }
+            .sidebar > .block-wrap {
+                width: 55%;
+            }
+            .right-group {
+                width: calc(45% - 0.8rem);
+            }
+            .name-large {
+                font-size: 1.3rem;
+            }
+            .section-title-side {
+                font-size: 0.78rem;
+            }
+            .skill-name {
+                width: 70px;
+                font-size: 0.66rem;
+            }
+            .main-title {
+                font-size: 0.95rem;
+            }
+            .item-title {
+                font-size: 0.82rem;
+            }
+        }
+
+        /* 打印样式保留 */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .resume-card {
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 右下角页码标识 -->
+    <div class="page-indicator">7/19</div>
+    <!-- 左下角返回桌面链接 -->
+    <a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+
+    <div class="resume-card">
+        <div class="resume-grid">
+            <!-- 左侧：个人信息 + 技能/语言/证书/热爱（重新布局） -->
+            <aside class="sidebar">
+                <!-- 姓名、职位、联系方式保持原结构（宽度100%） -->
+                <div class="name-large">沈沁</div>
+                <div class="job-tag">
+                    <i class="fas fa-leaf" style="margin-right: 6px;"></i> 园艺设计师 · 硕士应届
+                </div>
+                <div class="contact-info">
+                    <div class="contact-item"><i class="fas fa-phone-alt"></i> <span>+86 138 112 805</span></div>
+                    <div class="contact-item"><i class="fab fa-weixin"></i> <span>alexshen0110</span></div>
+                    <div class="contact-item"><i class="fas fa-map-marker-alt"></i> <span>中国 · 青岚市</span></div>
+                    <div class="contact-item"><i class="fas fa-palette"></i> <span>作品集: qin.design/folio</span></div>
+                </div>
+
+                <div class="divider-light"></div>
+
+                <!-- 专业技能板块 -->
+                <div class="block-wrap">
+                    <div class="section-title-side"><i class="fas fa-code-branch" style="margin-right: 8px;"></i> 专业技能</div>
+                    <ul class="skill-list">
+                        <li><span class="skill-name">景观方案设计</span><div class="skill-bar"><div class="skill-level level-90"></div></div></li>
+                        <li><span class="skill-name">植物配置/造景</span><div class="skill-bar"><div class="skill-level level-90"></div></div></li>
+                        <li><span class="skill-name">AutoCAD / SketchUp</span><div class="skill-bar"><div class="skill-level level-85"></div></div></li>
+                        <li><span class="skill-name">Rhino + Lumion</span><div class="skill-bar"><div class="skill-level level-80"></div></div></li>
+                       
+                        <li><span class="skill-name">GIS 基础分析</span><div class="skill-bar"><div class="skill-level level-75"></div></div></li>
+                    </ul>
+                </div>
+
+                <div class="divider-light"></div>
+
+                <!-- 右侧三个板块的容器 -->
+                <div class="right-group">
+                    <div class="block-wrap">
+                        <div class="section-title-side"><i class="fas fa-language"></i> 语言能力</div>
+                        <div class="lang-item"><strong>中文</strong> 母语</div>
+                        <div class="lang-item"><strong>英语</strong> ECA-6</div>
+                        <div class="lang-item"><strong>日语</strong> 日常会话</div>
+                    </div>
+
+                    <div class="divider-light"></div>
+
+                    <div class="block-wrap">
+                        <div class="section-title-side"><i class="fas fa-certificate"></i> 证书 & 荣誉</div>
+                        <div class="cert-item"><strong>园艺设计师</strong>职业资格</div>
+                        <div class="cert-item"><strong>生态造景师</strong>高级技能证书</div>
+                       
+                    </div>
+
+                    <div class="divider-light"></div>
+
+                    
+                </div><!-- end right-group -->
+            </aside>
+
+            <!-- 右侧主内容（部分板块使用可折叠设计） -->
+            <main class="main-content">
+                <!-- 教育背景（始终展开） -->
+                <div class="main-section">
+                    <div class="main-title"><i class="fas fa-graduation-cap"></i> 教育背景</div>
+                    <div class="timeline-item">
+                        <div class="item-header">
+                            <span class="item-title">同海大学 · 园艺设计专业 硕士研究生</span>
+                            <span class="item-date">2023 – 2026 (预计)</span>
+                        </div>
+                        <div class="item-sub">可持续景观与植物群落设计 | GPA: 3.9/4.0</div>
+                        <div class="item-desc">
+                            导师：<strong>于晓丽 教授</strong> 国际园艺设计领域领军人物，全球生态园艺联盟常务理事，多次担任“星洲设计奖”评审。
+                        </div>
+                        <div class="mentor-star">
+                            <i class="fas fa-star-of-life" style="color:#4c8b3c;"></i> 师从于晓丽教授 —— 生态园艺设计先驱
+                        </div>
+                        <div class="highlight-mentor"><i class="fas fa-trophy"></i> 推荐信：“沈沁是极具潜力的新一代园艺设计师。”</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="item-header">
+                            <span class="item-title">同海大学 · 园艺学 学士学位</span>
+                            <span class="item-date">2019 – 2023</span>
+                        </div>
+                        <div class="item-sub">园林树木学、花卉学、景观生态学 | 校一等奖学金（2次）</div>
+                        <div class="item-desc">毕业设计《基于乡土植物的社区疗愈花园设计》获学院优秀设计奖。</div>
+                    </div>
+                </div>
+<!-- 实习经历（可折叠） -->
+<details class="main-section collapsible-section" open>
+    <summary class="main-title">
+        <i class="fas fa-briefcase"></i> 实习经历
+        <i class="fas fa-chevron-down"></i>
+    </summary>
+    <div class="timeline-item">
+        <div class="item-header">
+            <span class="item-title">园艺设计实习生</span>
+            <span class="item-date">2025.01 – 至今</span>
+        </div>
+        <div class="item-sub">青岚绿屿景观设计事务所 · 植栽设计组</div>
+        <div class="item-desc">
+            ▸ 参与“清溪河滨水生态廊道二期”植物专项设计，独立完成60余种乡土植物筛选及季相分析；<br>
+            ▸ 协助深化花境配置图纸，项目获业主高度评价；<br>
+            ▸ 负责植物素材库数字化，提升团队效率30%。
+        </div>
+    </div>
+</details>
+
+                <!-- 重点项目（可折叠） -->
+                <details class="main-section collapsible-section" open>
+                    <summary class="main-title">
+                        <i class="fas fa-tree"></i> 重点项目
+                        <i class="fas fa-chevron-down"></i>
+                    </summary>
+                    <ul class="project-list">
+                        <li>
+                            <div class="item-header"><span class="item-title">城市“碳汇花园”微更新设计</span><span class="item-date">2024.11 – 2025.02</span></div>
+                            <div class="item-desc">选址星湖老旧社区，设计低维护高碳汇植物群落，成果被纳入“社区微花园”试点计划。</div>
+                        </li>
+                        <li>
+                            <div class="item-header"><span class="item-title">月港新城“雨水花园示范段”竞赛</span><span class="item-date">2024.09 – 2025.01</span></div>
+                            <div class="item-desc">负责植物选型与海绵设施结合，获“海绵景观创新奖”，方案已进入施工图阶段。</div>
+                        </li>
+                        <li>
+                            <div class="item-header"><span class="item-title">同海大学校园植物图谱编撰</span><span class="item-date">2024.03 – 2024.12</span></div>
+                            <div class="item-desc">副主编，完成80余种植物形态手绘及物候记录，已出版电子版。</div>
+                        </li>
+                    </ul>
+                </details>
+
+                <!-- 获奖荣誉（可折叠） -->
+                <details class="main-section collapsible-section" open>
+                    <summary class="main-title">
+                        <i class="fas fa-medal"></i> 获奖 & 荣誉
+                        <i class="fas fa-chevron-down"></i>
+                    </summary>
+                    <div class="award-badge"><span class="award-name">金叶奖 城市更新类</span><span class="award-detail">一等奖 (2025) —《韧性绿洲·社区共享农场》</span></div>
+                    <div class="award-badge"><span class="award-name">全国新锐园艺设计邀请赛</span><span class="award-detail">二等奖 (2024) 《呼吸驳岸》</span></div>
+                    <div class="award-badge"><span class="award-name">青岚市“花园都市”大赛</span><span class="award-detail">最佳植物应用奖 (2025)</span></div>
+                    <div class="award-badge"><span class="award-name">同海大学优秀研究生奖学金</span><span class="award-detail">连续两年 (2024, 2025)</span></div>
+                </details>
+
+                <!-- 学术交流（可折叠） -->
+                <details class="main-section collapsible-section">
+                    <summary class="main-title">
+                        <i class="fas fa-file-alt"></i> 学术交流 & 出版物
+                        <i class="fas fa-chevron-down"></i>
+                    </summary>
+                    <div class="item-desc" style="margin-bottom:10px;">▪ 2024国际园艺设计虚拟峰会海报展示。</div>
+                    <div class="item-desc" style="margin-bottom:10px;">▪ 第二作者论文被《景观设计前沿》(LAF) 2025增刊录用。</div>
+                    <div class="item-desc">▪ 受邀完成青岚市清溪河鸟类栖息地植物配置方案。</div>
+                </details>
+
+                <!-- 自我评价（可折叠） -->
+                <details class="main-section collapsible-section">
+                    <summary class="main-title">
+                        <i class="fas fa-user-check"></i> 自我评价
+                        <i class="fas fa-chevron-down"></i>
+                    </summary>
+                    <div class="self-eval">
+                        拥有扎实的园艺设计理论与植物应用功底，善于将生态学思维融入现代景观。在于晓丽教授团队的两年科研训练中，积累了丰富的项目落地经验与协作精神。对本土植物群落、生物多样性设计有持续热情，希望未来在可持续园艺设计领域不断创造兼具美感与生态价值的作品。
+                    </div>
+                </details>
+
+                <footer>
+                    <i class="fas fa-seedling" style="margin-right:6px;"></i> 在线简历 · 沈沁 | 欢迎联系共同探索自然美学
+                </footer>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

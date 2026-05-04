@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  
+  <title>outlook登陆页面</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 30%, #c6e2ff, #a0c8f0, #7eb0e0);
+      background-size: cover;
+      background-color: #b8d4f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-card {
+      width: 440px;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 32px;
+      padding: 44px 38px;
+      box-shadow: 0 25px 40px -10px rgba(0, 20, 40, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .login-header i {
+      font-size: 52px;
+      color: #1e4d7c;
+      background: rgba(255, 255, 255, 0.5);
+      padding: 16px;
+      border-radius: 24px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+      margin-bottom: 18px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .login-header h2 {
+      font-weight: 450;
+      font-size: 32px;
+      color: #0d3857;
+      letter-spacing: -0.5px;
+      text-shadow: 0 1px 4px rgba(255, 255, 255, 0.5);
+    }
+
+    .login-header p {
+      color: #1e3a5f;
+      margin-top: 8px;
+      font-size: 15px;
+      font-weight: 450;
+      opacity: 0.9;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #153e5c;
+      margin-bottom: 8px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 28px;
+      font-size: 15px;
+      color: #0b2a44;
+      outline: none;
+      transition: all 0.2s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+    }
+
+    .input-field:focus {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: #0078d4;
+      box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.15);
+    }
+
+    .input-field::placeholder {
+      color: #3d6a99;
+      font-weight: 400;
+      opacity: 0.7;
+    }
+
+    /* 错误提示信息 */
+    .error-message {
+      color: #c42e1d;
+      font-size: 13px;
+      margin-top: 6px;
+      margin-bottom: 6px;
+      min-height: 20px;
+      padding-left: 8px;
+      font-weight: 450;
+      text-shadow: 0 1px 3px rgba(255,255,255,0.4);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: #1e5a9b;
+      border: none;
+      border-radius: 40px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 8px 18px rgba(30, 90, 155, 0.25);
+      margin-top: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      letter-spacing: 0.5px;
+    }
+
+    .login-btn:hover {
+      background: #1b4e84;
+      box-shadow: 0 10px 22px rgba(30, 90, 155, 0.35);
+    }
+
+    .login-btn:active {
+      transform: scale(0.98);
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 28px;
+      color: #153e5c;
+      font-size: 14px;
+      font-weight: 450;
+    }
+
+    .login-footer a {
+      color: #1e5a9b;
+      text-decoration: none;
+      font-weight: 500;
+      margin: 0 4px;
+    }
+
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* 忘记密码链接样式 */
+    .forgot-link {
+      text-align: center;
+      margin-top: 18px;
+    }
+    .forgot-link a {
+      color: #1e5a9b;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      background: rgba(255,255,255,0.3);
+      padding: 6px 16px;
+      border-radius: 30px;
+      backdrop-filter: blur(4px);
+      transition: all 0.2s;
+      display: inline-block;
+    }
+    .forgot-link a:hover {
+      background: rgba(255,255,255,0.6);
+      text-decoration: underline;
+      transform: scale(1.02);
+    }
+
+    /* 右下角页码标识 */
+    .page-indicator {
+      position: absolute;
+      bottom: 20px;
+      right: 30px;
+      color: white;
+      font-size: 14px;
+      font-weight: 400;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 6px 18px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      letter-spacing: 1px;
+      z-index: 50;
+    }
+	
+    /* 左下角返回桌面链接 */
+    .back-link {
+      position: fixed;
+      bottom: 20px;
+      left: 30px;
+      color: #153e5c;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 8px 20px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 50;
+      transition: background 0.15s;
+    }
+	
+    .back-link:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    /* ---------- 模态框 (忘记密码弹窗) ---------- */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      width: 90%;
+      max-width: 420px;
+      background: rgba(245, 248, 252, 0.96);
+      backdrop-filter: blur(20px);
+      border-radius: 40px;
+      padding: 32px 28px;
+      box-shadow: 0 30px 45px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      animation: fadeSlideUp 0.2s ease-out;
+      position: relative;
+    }
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      padding-bottom: 12px;
+    }
+    .modal-header h3 {
+      font-size: 24px;
+      font-weight: 500;
+      color: #0d3857;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-header h3 i {
+      font-size: 24px;
+      color: #1e5a9b;
+    }
+    .close-modal {
+      font-size: 28px;
+      cursor: pointer;
+      color: #5a7b9c;
+      transition: 0.2s;
+      line-height: 1;
+    }
+    .close-modal:hover {
+      color: #c42e1d;
+      transform: scale(1.1);
+    }
+    .modal .input-group {
+      margin-bottom: 20px;
+    }
+    .modal .input-field {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #bdd4e8;
+    }
+    .modal .input-field:focus {
+      border-color: #1e5a9b;
+    }
+    .modal-error {
+      color: #d9534f;
+      font-size: 13px;
+      margin-top: -10px;
+      margin-bottom: 15px;
+      padding-left: 8px;
+      min-height: 28px;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .verify-btn {
+      flex: 1;
+      background: #1e5a9b;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .verify-btn:hover {
+      background: #0f4575;
+    }
+    .cancel-modal-btn {
+      flex: 1;
+      background: rgba(100, 120, 140, 0.2);
+      border: 1px solid rgba(30, 90, 155, 0.3);
+      color: #1e5a9b;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .cancel-modal-btn:hover {
+      background: rgba(100, 120, 140, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="login-header">
+    <i class="fas fa-envelope-open-text"></i>
+    <h2>Outlook</h2>
+    <p>登录以继续使用邮箱</p>
+  </div>
+
+  <!-- 登录表单 -->
+  <div class="input-group">
+    <label>电子邮件</label>
+    <input type="email" class="input-field" id="emailInput" placeholder="账号">
+  </div>
+  <div class="input-group">
+    <label>密码</label>
+    <input type="password" class="input-field" id="passwordInput" placeholder="密码" >
+  </div>
+  
+  <!-- 错误信息显示区域 -->
+  <div class="error-message" id="errorMessage"></div>
+
+  <button class="login-btn" id="loginBtn">登 录</button>
+
+  <!-- 忘记密码链接 -->
+  <div class="forgot-link">
+    <a href="#" id="forgotPasswordBtn"><i class="fas fa-key"></i> 忘记密码？</a>
+  </div>
+
+  <div class="login-footer">
+    <a href="#">无法访问账户？</a> · 
+    <a href="#">创建一个</a>
+  </div>
+</div>
+
+<!-- 右下角页码标识 -->
+<div class="page-indicator">5/19</div>
+
+<!-- 左下角返回桌面链接 -->
+<a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+
+<!-- 忘记密码模态框 (身份验证弹窗) -->
+<div id="forgotModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-shield-alt"></i> 身份验证</h3>
+      <span class="close-modal" id="closeModalBtn">&times;</span>
+    </div>
+    <div class="input-group">
+      <label>账号（电子邮件）</label>
+      <input type="email" class="input-field" id="modalAccount" placeholder="请输入注册邮箱" autocomplete="off">
+    </div>
+    <div class="input-group">
+      <label>身份码</label>
+      <input type="text" class="input-field" id="modalIdNumber" placeholder="身份码 / 预留ID" autocomplete="off">
+    </div>
+    <div class="input-group">
+      <label>手机号</label>
+      <input type="tel" class="input-field" id="modalPhone" placeholder="预留手机号码" autocomplete="off">
+    </div>
+    <div id="modalErrorMsg" class="modal-error"></div>
+    <div class="modal-buttons">
+      <button class="verify-btn" id="verifyIdentityBtn"><i class="fas fa-check-circle"></i> 验证并登录</button>
+      <button class="cancel-modal-btn" id="cancelModalBtn">取消</button>
+    </div>
+    
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ✅ 如果已经登录过，直接跳转，不显示登录页
+    if (localStorage.getItem('outlookLogged') === 'true') {
+      location.replace('mailbox.html');
+      return;
+    }
+
+    const REDIRECT_URL = 'mailbox.html';           // 跳转的目标页面
+
+    const FORGOT_VALID_ACCOUNT = 'alex.shen@outlook.com';
+    const FORGOT_VALID_ID_NUMBER = '2132001100576';
+    const FORGOT_VALID_PHONE = '183794677';
+
+    // DOM 元素 (登录相关)
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginBtn = document.getElementById('loginBtn');
+    const errorMsg = document.getElementById('errorMessage');
+
+    // 忘记密码模态框元素
+    const modal = document.getElementById('forgotModal');
+    const forgotBtn = document.getElementById('forgotPasswordBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const verifyBtn = document.getElementById('verifyIdentityBtn');
+    const modalAccount = document.getElementById('modalAccount');
+    const modalIdNumber = document.getElementById('modalIdNumber');
+    const modalPhone = document.getElementById('modalPhone');
+    const modalErrorMsg = document.getElementById('modalErrorMsg');
+
+    // 清空原有登录错误
+    function clearError() {
+      errorMsg.textContent = '';
+    }
+    function showError(text) {
+      errorMsg.textContent = text;
+    }
+
+    // 登录验证逻辑 (原封不动保留)
+    function handleLogin() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showError('请输入电子邮件和密码');
+        return;
+      }
+
+      if (email === VALID_EMAIL && password === VALID_PASSWORD) {
+        window.location.href = REDIRECT_URL;
+      } else {
+        showError('账户或密码错误，请重试。');
+      }
+    }
+
+    // 绑定原有登录事件
+    loginBtn.addEventListener('click', handleLogin);
+    emailInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleLogin();
+      }
+    });
+    passwordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleLogin();
+      }
+    });
+    emailInput.addEventListener('input', clearError);
+    passwordInput.addEventListener('input', clearError);
+
+    // ---------- 忘记密码模态框逻辑 ----------
+    // 打开模态框 (同时清空之前输入内容和错误)
+    function openModal() {
+      modal.style.display = 'flex';
+      // 清空表单
+      modalAccount.value = '';
+      modalIdNumber.value = '';
+      modalPhone.value = '';
+      modalErrorMsg.textContent = '';
+      // 让账号输入框获取焦点
+      setTimeout(() => modalAccount.focus(), 50);
+    }
+
+    // 关闭模态框
+    function closeModal() {
+      modal.style.display = 'none';
+      modalErrorMsg.textContent = '';
+    }
+
+    // 验证三项是否和指定内容完全一致
+    function validateIdentity() {
+      const account = modalAccount.value.trim();
+      const idNumber = modalIdNumber.value.trim();
+      const phone = modalPhone.value.trim();
+
+      // 空值校验
+      if (!account || !idNumber || !phone) {
+        modalErrorMsg.textContent = '❌ 请完整填写账号、身份码和手机号';
+        return false;
+      }
+
+      // 账号比较：统一转为小写比较 (邮箱标准通常大小写不敏感)
+      const isAccountMatch = account.toLowerCase() === FORGOT_VALID_ACCOUNT.toLowerCase();
+      // 身份号严格匹配
+      const isIdMatch = idNumber === FORGOT_VALID_ID_NUMBER;
+      // 手机号严格匹配
+      const isPhoneMatch = phone === FORGOT_VALID_PHONE;
+
+      if (!isAccountMatch) {
+        modalErrorMsg.textContent = '❌ 账号与预留信息不匹配';
+        return false;
+      }
+      if (!isIdMatch) {
+        modalErrorMsg.textContent = '❌ 身份码验证失败';
+        return false;
+      }
+      if (!isPhoneMatch) {
+        modalErrorMsg.textContent = '❌ 手机号验证失败';
+        return false;
+      }
+
+      // ✅ 三项全部匹配成功 -> 记录登录状态，然后跳转
+      localStorage.setItem('outlookLogged', 'true');
+      window.location.href = REDIRECT_URL;
+      return true;
+    }
+
+    // 为验证按钮绑定事件
+    function onVerify() {
+      validateIdentity();
+    }
+
+    // 监听键盘事件：在模态框内按回车执行验证
+    function handleModalKeypress(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        validateIdentity();
+      }
+    }
+
+    // 绑定模态框打开按钮
+    if (forgotBtn) {
+      forgotBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal();
+      });
+    }
+
+    // 关闭方式：X按钮、取消按钮、点击模态框背景关闭
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+    if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeModal);
+    
+    // 点击模态框背景（灰色区域）关闭弹窗
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // 验证按钮点击
+    if (verifyBtn) verifyBtn.addEventListener('click', onVerify);
+    
+    // 给模态框内三个输入框添加回车监听
+    modalAccount.addEventListener('keypress', handleModalKeypress);
+    modalIdNumber.addEventListener('keypress', handleModalKeypress);
+    modalPhone.addEventListener('keypress', handleModalKeypress);
+
+    // 额外防止模态框打开时影响原有登录表单回车
+    function toggleBodyScroll(disable) {
+      if (disable) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    }
+    // 监听模态框显示隐藏来锁定滚动
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mut) => {
+        if (mut.attributeName === 'style') {
+          if (modal.style.display === 'flex') {
+            toggleBodyScroll(true);
+          } else {
+            toggleBodyScroll(false);
+          }
+        }
+      });
+    });
+    observer.observe(modal, { attributes: true });
+    // 初始化时如果模态框隐藏，保证滚动正常
+    window.addEventListener('load', () => {
+      toggleBodyScroll(false);
+    });
+    // 页面卸载前恢复
+    window.addEventListener('beforeunload', () => {
+      toggleBodyScroll(false);
+    });
+  })();
+</script>
+
+</body>
+</html>

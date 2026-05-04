@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>新闻</title>
+  <!-- Font Awesome 图标库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', '宋体', SimSun, serif;
+      background-color: #f5f5f5;
+      color: #1e1e1e;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 版头区域 */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      border-bottom: 1px solid #e0e0e0;
+      background: #fafafa;
+      font-family: 'Arial', 'Helvetica', sans-serif;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .date-weather i {
+      margin-right: 6px;
+      color: #8b1e1e;
+    }
+
+    .top-links a {
+      color: #333;
+      text-decoration: none;
+      margin-left: 18px;
+      font-size: 0.9rem;
+    }
+
+    .top-links a:hover {
+      color: #a52a2a;
+    }
+
+    .header-main {
+      padding: 20px 24px 10px 24px;
+      border-bottom: 3px double #2c3e50;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 3.5rem;
+      font-weight: 700;
+      font-family: 'Times New Roman', '宋体', serif;
+      letter-spacing: 4px;
+      color: #1a3e4c;
+      text-shadow: 2px 2px 0 #e9e3d5;
+      line-height: 1.1;
+    }
+
+    .logo small {
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 2px;
+      color: #6b4e3a;
+      margin-left: 12px;
+      font-style: italic;
+    }
+
+    .slogan {
+      font-family: 'Arial', sans-serif;
+      color: #5a5a5a;
+      border-left: 2px solid #b0a28a;
+      padding-left: 16px;
+      font-size: 0.95rem;
+      font-style: italic;
+    }
+
+    .nav-bar {
+      background: #1e3a4c;
+      padding: 0 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #a52a2a;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    .nav-links li {
+      margin-right: 28px;
+    }
+
+    .nav-links a {
+      display: inline-block;
+      padding: 14px 0;
+      color: #f0ede6;
+      text-decoration: none;
+      font-family: 'Arial', 'Helvetica', sans-serif;
+      font-weight: 500;
+      font-size: 1rem;
+      border-bottom: 3px solid transparent;
+    }
+
+    .nav-links a:hover,
+    .nav-links .active {
+      border-bottom-color: #d4a373;
+      color: #ffffff;
+    }
+
+    .search-icon {
+      color: #f0ede6;
+      font-size: 1.2rem;
+    }
+
+    .breaking-news {
+      background: #fff3e0;
+      padding: 8px 24px;
+      border-bottom: 1px solid #e6d5b8;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      align-items: center;
+    }
+
+    .breaking-label {
+      background: #a52a2a;
+      color: white;
+      padding: 4px 12px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      margin-right: 18px;
+      border-radius: 20px;
+    }
+
+    .breaking-text {
+      color: #4a2c1b;
+      font-weight: 500;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      padding: 30px 24px 40px 24px;
+    }
+
+    .article-section {
+      min-width: 0;
+    }
+
+    .breadcrumb {
+      font-family: 'Arial', sans-serif;
+      font-size: 0.8rem;
+      color: #6f6f6f;
+      margin-bottom: 12px;
+    }
+
+    .breadcrumb a {
+      color: #1e3a4c;
+      text-decoration: none;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 10px 0 12px;
+      font-family: 'Times New Roman', '宋体', serif;
+      color: #1f2e3a;
+    }
+
+    .subhead {
+      font-size: 1.2rem;
+      color: #4d4d4d;
+      margin-bottom: 18px;
+      font-style: italic;
+      border-left: 4px solid #a52a2a;
+      padding-left: 18px;
+    }
+
+    .article-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #d9d2c5;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .byline i {
+      margin-right: 6px;
+      color: #8b1e1e;
+    }
+
+    .timestamp {
+      color: #6b6b6b;
+    }
+
+    .social-share i {
+      margin-left: 15px;
+      color: #5a5a5a;
+      font-size: 1.2rem;
+      cursor: default;
+    }
+
+    .feature-image {
+      background: linear-gradient(145deg, #3a4f5e, #1f313c);
+      height: 320px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #ece4d9;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-image i {
+      font-size: 3.5rem;
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+
+    .feature-image .caption {
+      background: rgba(0,0,0,0.5);
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .img-credit {
+      text-align: right;
+      font-size: 0.75rem;
+      color: #7a7a7a;
+      margin: 4px 0 20px;
+    }
+
+    .article-body p {
+      margin-bottom: 1.4em;
+      font-size: 1.1rem;
+      text-align: justify;
+    }
+
+    .article-body .dropcap::first-letter {
+      font-size: 3.8em;
+      float: left;
+      padding-right: 10px;
+      line-height: 0.8;
+      font-weight: bold;
+      color: #a52a2a;
+      font-family: 'Times New Roman', serif;
+    }
+
+    .pull-quote {
+      margin: 28px 0;
+      padding: 18px 28px;
+      background: #f9f6f0;
+      border-left: 6px solid #a57c5c;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: #2d3e4f;
+    }
+
+    .helpline {
+      background: #eef3f5;
+      padding: 18px 22px;
+      border-radius: 12px;
+      margin-top: 30px;
+      font-family: 'Arial', sans-serif;
+      border: 1px solid #cbdae3;
+    }
+
+    .helpline i {
+      color: #1e3a4c;
+      margin-right: 8px;
+    }
+
+    /* 右侧边栏 */
+    .sidebar-widget {
+      background: #ffffff;
+      border: 1px solid #e2ddd6;
+      border-radius: 8px;
+      padding: 20px 18px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .widget-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      border-bottom: 3px solid #1e3a4c;
+      padding-bottom: 8px;
+      margin-bottom: 18px;
+      font-family: 'Times New Roman', serif;
+    }
+
+    .widget-title i {
+      margin-right: 10px;
+      color: #a52a2a;
+    }
+
+    .news-list {
+      list-style: none;
+    }
+
+    .news-list li {
+      padding: 12px 0;
+      border-bottom: 1px dashed #d4cfc8;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .news-list .tag {
+      background: #a52a2a;
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-right: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .news-list a {
+      text-decoration: none;
+      color: #1e1e1e;
+      font-family: 'Arial', sans-serif;
+      font-weight: 500;
+    }
+
+    .hot-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .hot-number {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #c2b19e;
+      margin-right: 15px;
+      font-family: 'Arial', sans-serif;
+      min-width: 32px;
+    }
+
+    .ad-placeholder {
+      background: #e6dfd6;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4e3e32;
+      border-radius: 6px;
+      border: 1px dashed #a79b8e;
+    }
+
+    .footer {
+      background: #1a2e3a;
+      color: #cfd9de;
+      padding: 30px 24px;
+      border-top: 4px solid #a52a2a;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .footer-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-links a {
+      color: #cfd9de;
+      text-decoration: none;
+      margin-right: 24px;
+      font-size: 0.9rem;
+    }
+
+    .copyright {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .logo {
+        font-size: 2.8rem;
+      }
+    }
+
+    /* 文章内小标 */
+    .highlight-badge {
+      background: #eaf4e4;
+      padding: 2px 8px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      color: #2e5c3e;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    /* 固定按钮 */
+    .page-indicator {
+      position: fixed;
+      bottom: 20px;
+      right: 30px;
+      color: #a8a8a8;
+      font-size: 14px;
+      font-weight: 400;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 6px 18px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      letter-spacing: 1px;
+      z-index: 50;
+    }
+
+    .back-link {
+      position: fixed;
+      bottom: 20px;
+      left: 30px;
+      color: #153e5c;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 8px 20px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 50;
+      transition: background 0.15s;
+    }
+
+    /* ========= 折叠面板样式（新增） ========= */
+    .collapsible-widget summary {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      list-style: none;
+    }
+    .collapsible-widget summary::-webkit-details-marker {
+      display: none;
+    }
+    .collapsible-widget summary .fa-chevron-down {
+      margin-left: auto;
+      font-size: 0.8rem;
+      transition: transform 0.2s;
+      color: #a52a2a;
+    }
+    .collapsible-widget[open] summary .fa-chevron-down {
+      transform: rotate(180deg);
+    }
+    /* 折叠时保持 widget-title 原有样式，仅微调内联 */
+    .collapsible-widget .widget-title {
+      margin-bottom: 18px; /* 与原来一致 */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 右下角页码标识（毛玻璃效果） -->
+  <div class="page-indicator">11/19</div>
+  <!-- 左下角返回桌面链接 -->
+  <a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+
+<div class="container">
+  <!-- 顶部工具条（略） -->
+
+  <!-- 版头：青岚新闻 -->
+  <div class="header-main">
+    <div class="logo">青岚新闻</div>
+    <div class="slogan">深度 · 温度 · 真度</div>
+  </div>
+
+  <!-- 导航栏 -->
+  <div class="nav-bar">
+    <ul class="nav-links">
+      <li><a href="#" class="active">首页</a></li>
+      <li><a href="#">要闻</a></li>
+      <li><a href="#">社会</a></li>
+      <li><a href="#">教育</a></li>
+      <li><a href="#">校园</a></li>
+    </ul>
+    <div class="search-icon">
+      <i class="fas fa-search"></i>
+    </div>
+  </div>
+
+  <!-- 快讯条（略） -->
+
+  <!-- 主体内容 -->
+  <div class="main-grid">
+    <section class="article-section">
+      <div class="breadcrumb">
+        <a href="#">首页</a> <i class="fas fa-chevron-right"></i> 
+        <a href="#">社会</a> <i class="fas fa-chevron-right"></i> 
+        <span>正文</span>
+      </div>
+
+      <h1>同海大学园艺设计新星沈沁不幸离世，丈夫周毅悲痛欲绝</h1>
+      <div class="subhead">师从国际园艺大师于晓丽，曾获金叶奖一等奖；警方排除他杀，家属呼吁给予空间</div>
+
+      <div class="article-meta">
+        <div class="timestamp">
+          <i class="far fa-clock"></i> 发布于 2025-03-02 22:14  ·  更新于 2025-03-03 09:07
+        </div>
+        <div class="social-share">
+          <i class="fab fa-weixin"></i>
+          <i class="fab fa-weibo"></i>
+          <i class="far fa-bookmark"></i>
+        </div>
+      </div>
+
+      <!-- 配图区域 -->
+      <div class="feature-image">
+        <i class="fas fa-leaf"></i>
+        <span class="caption">沈沁参与设计的清溪河生态廊道 · 资料图</span>
+      </div>
+      <div class="img-credit">图片来源：青岚绿屿景观设计事务所</div>
+
+      <div class="article-body">
+        <p class="dropcap"><strong>青岚新闻讯</strong> 一对被同海大学师生称为“园艺设计神仙眷侣”的研究生夫妇，近日遭遇令人扼腕的变故。3月1日晚间，丈夫周毅返回位于青岚市澜庭苑小区的家中时，发现妻子沈沁（25岁）倒卧在卧室，手腕有严重割伤，已无意识。周毅立即拨打急救电话，沈沁被紧急送往<strong>青岚第二医院</strong>抢救，但终因失血过多、伤势过重，于3月2日凌晨2时17分被宣告临床死亡。警方现场勘查后初步排除刑事案件可能，目前相关善后工作正在进行中。</p>
+        
+        <p>据青岚市公安局湖东分局通报，3月1日20时23分接报警称澜庭苑小区某户有人割腕。民警及120迅速到场，伤者被送往青岚第二医院。院方消息称，沈沁送达时已因失血性休克陷入深度昏迷，虽经多学科会诊并实施手术，但因其伤势过重，最终未能挽回生命。“患者入院后始终没有恢复自主心跳，我们尽了最大努力。”一位参与抢救的医生低声表示。丈夫周毅事发后情绪崩溃，目前由家人陪同。</p>
+
+        <div class="pull-quote">
+          <i class="fas fa-quote-left" style="margin-right: 8px; opacity: 0.6;"></i> 
+          她是于晓丽教授最欣赏的学生之一，对植物的理解超越了大多数同龄人，我们失去了一位真正的设计新星。
+        </div>
+
+        <p>沈沁与丈夫周毅均为同海大学建筑与设计学院园艺设计方向2023级硕士研究生，今年6月即将毕业。周毅专攻生态景观规划与参数化设计，沈沁则深耕植物群落设计与可持续景观。两人曾搭档完成“青岚湿地·共生花园”方案，获得全国新锐园艺设计邀请赛二等奖。知情人士透露，事发前沈沁并无明显异常，但毕业设计与求职压力较大，具体原因仍在调查中。</p>
+
+        <p>同海大学昨晚发布情况说明：“对沈沁同学的离世，学校深感悲痛和惋惜。沈沁同学在校期间品学兼优，是园艺设计领域的杰出青年代表。事发后，学院第一时间成立工作小组，配合警方及家属处理后续事宜，并对相关同学开展心理疏导。” 于晓丽教授通过助手表示，沈沁“具备卓越的植物审美与落地逻辑，是极具潜力的新一代园艺设计师”，她为此感到无比痛心，恳请外界尊重逝者与家属。</p>
+
+        <p>丈夫周毅目前由家人陪伴，情绪极不稳定。其导师婉拒采访。校方已取消原定本周的毕业展预热活动，并为受影响学生提供心理咨询。关于割腕自杀的具体诱因，警方与校方均未透露更多细节。青岚市心理援助中心专家呼吁，毕业季学生若感到持续低落，应及时寻求专业帮助。</p>
+      </div>
+
+      <!-- 心理援助热线 -->
+      <div class="helpline">
+        <i class="fas fa-hand-holding-heart"></i> 
+        <strong> 青岚市24小时心理援助热线：</strong> 400-881-999  ·  同海大学心理咨询中心：0531-688 123<br>
+        <span style="font-size: 0.9rem;">如果你或身边的人正在经历困难，请勇敢伸出手，总有人愿意倾听。</span>
+      </div>
+
+      <!-- 标签 -->
+      <div style="margin-top: 24px; font-family: Arial;">
+        <span style="background: #eae3db; padding: 4px 12px; border-radius: 20px; margin-right: 8px;">#沈沁</span>
+        <span style="background: #eae3db; padding: 4px 12px; border-radius: 20px; margin-right: 8px;">#同海大学</span>
+        <span style="background: #eae3db; padding: 4px 12px; border-radius: 20px;">#园艺设计</span>
+      </div>
+    </section>
+
+    <!-- 右侧边栏（四个模块改为可折叠） -->
+    <aside class="sidebar">
+      <!-- 最新新闻（可折叠） -->
+      <details class="sidebar-widget collapsible-widget" open>
+        <summary class="widget-title">
+          <i class="far fa-clock"></i> 最新新闻
+          <i class="fas fa-chevron-down"></i>
+        </summary>
+        <ul class="news-list">
+          <li><span class="tag">科技</span><a href="javascript:void(0)">青岚国家实验室发布新一代生态传感器，实时监测植物碳汇</a></li>
+          <li><span class="tag">教育</span><a href="javascript:void(0)">同海大学2026毕业展改为线上举行，新增“疗愈花园”虚拟展厅</a></li>
+          <li><span class="tag">城市</span><a href="javascript:void(0)">青岚滨江步道三期贯通，全长8.2公里串联六大湿地公园</a></li>
+          <li><span class="tag">文化</span><a href="javascript:void(0)">“花园都市”国际设计周下月启幕，首设青年园艺师扶持计划</a></li>
+          <li><span class="tag">民生</span><a href="javascript:void(0)">春季心理关怀行动启动，全市高校心理咨询室延长服务至午夜</a></li>
+        </ul>
+      </details>
+
+      <!-- 热门推荐（可折叠） -->
+      <details class="sidebar-widget collapsible-widget" open>
+        <summary class="widget-title">
+          <i class="fas fa-fire"></i> 热门推荐
+          <i class="fas fa-chevron-down"></i>
+        </summary>
+        <div class="hot-item">
+          <span class="hot-number">1</span>
+          <a href="javascript:void(0)" style="text-decoration: none; color:#1e1e1e; font-weight:600;">毕业设计特辑｜当AI遇上植物：2026园艺设计新趋势</a>
+        </div>
+        <div class="hot-item">
+          <span class="hot-number">2</span>
+          <a href="javascript:void(0)" style="text-decoration: none; color:#1e1e1e; font-weight:600;">专访于晓丽团队：我们如何用本土植物修复城市“灰色角落”</a>
+        </div>
+        <div class="hot-item">
+          <span class="hot-number">3</span>
+          <a href="javascript:void(0)" style="text-decoration: none; color:#1e1e1e; font-weight:600;">月港新城“雨水花园”成网红打卡地，海绵景观理念获市民点赞</a>
+        </div>
+        <div class="hot-item">
+          <span class="hot-number">4</span>
+          <a href="javascript:void(0)" style="text-decoration: none; color:#1e1e1e; font-weight:600;">青岚植物图谱APP上线，可识别2000余种乡土植物</a>
+        </div>
+        <div class="hot-item">
+          <span class="hot-number">5</span>
+          <a href="javascript:void(0)" style="text-decoration: none; color:#1e1e1e; font-weight:600;">研究生心理压力报告：近四成受访者曾寻求专业帮助</a>
+        </div>
+      </details>
+
+      <!-- 广告位（可折叠） -->
+      <details class="sidebar-widget collapsible-widget" open>
+        <summary class="widget-title">
+          <i class="fas fa-ad"></i> 广告位
+          <i class="fas fa-chevron-down"></i>
+        </summary>
+        <div class="ad-placeholder">
+          <i class="fas fa-ad" style="margin-right: 8px;"></i> 广 告 位
+        </div>
+        <p style="font-size:0.8rem; color:#888; margin-top:8px;">青岚设计周 · 青年力量特别展 5.1启幕</p>
+      </details>
+
+      <!-- 相关专题（可折叠） -->
+      <details class="sidebar-widget collapsible-widget" open>
+        <summary class="widget-title">
+          <i class="fas fa-folder-open"></i> 相关专题
+          <i class="fas fa-chevron-down"></i>
+        </summary>
+        <ul class="news-list" style="list-style: none;">
+          <li><a href="javascript:void(0)"><i class="far fa-file-alt" style="margin-right: 8px;"></i>毕业季·心事</a></li>
+          <li><a href="javascript:void(0)"><i class="far fa-file-alt" style="margin-right: 8px;"></i>园艺设计的“青岚力量”</a></li>
+          <li><a href="javascript:void(0)"><i class="far fa-file-alt" style="margin-right: 8px;"></i>关注研究生心理健康</a></li>
+        </ul>
+      </details>
+    </aside>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="#">关于青岚新闻</a>
+        <a href="#">版权声明</a>
+        <a href="#">广告合作</a>
+        <a href="#">人员招聘</a>
+        <a href="#">内容纠错</a>
+        <a href="#">隐私政策</a>
+      </div>
+      <div class="copyright">
+        © 2025 青岚新闻 Qinglan News. 保留所有权利。 
+      </div>
+    </div>
+    <div style="margin-top: 16px; font-size:0.8rem; opacity:0.7; border-top: 1px solid #3e5563; padding-top: 16px;">
+      <i class="far fa-newspaper"></i> 本报道基于公开资料及采访。
+    </div>
+  </footer>
+</div>
+</body>
+</html>

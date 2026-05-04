@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>公众号文章 · 命理缺水</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f0f0f0;  /* 微信聊天背景灰 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.75;
+            color: #1a1a1a;
+            padding: 0 0 24px 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ---------- 新增：顶部返回按钮 (仿微信导航) ---------- */
+        .top-return-bar {
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #efefef;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            box-sizing: border-box;
+        }
+
+        .return-link {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.15s;
+        }
+
+        .return-link i {
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        .return-link:hover {
+            opacity: 0.7;
+        }
+
+        /* 文章卡片 — 高度模仿微信公众号文章卡片 */
+        .wechat-post {
+            max-width: 640px;
+            width: 100%;
+            background-color: #ffffff;
+            margin: 16px auto 0;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 8px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            padding: 0 16px 24px;
+        }
+
+        /* 顶部公众号信息栏 */
+        .profile-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0 10px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 12px;
+        }
+
+        .profile-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(145deg, #0a2f5e, #0b3b6b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 2px 6px rgba(0, 40, 80, 0.15);
+            border: 1.5px solid rgba(255,255,255,0.5);
+        }
+
+        .profile-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #0e0e0e;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-original {
+            background-color: #f2f2f2;
+            color: #07c160;
+            font-size: 10px;
+            font-weight: 500;
+            padding: 2px 6px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+        }
+
+        .profile-meta {
+            font-size: 12px;
+            color: #8f8f8f;
+            margin-top: 2px;
+        }
+
+        .follow-btn {
+            background-color: #f2f2f2;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a1a1a;
+            cursor: default;
+            transition: 0.1s;
+            border: 0.5px solid #e0e0e0;
+        }
+
+        .follow-btn i {
+            margin-right: 4px;
+            color: #07c160;
+            font-size: 12px;
+        }
+
+        /* 标题区 */
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin: 12px 0 10px;
+            color: #0b0b0b;
+            letter-spacing: -0.3px;
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            color: #6b6b6b;
+            font-size: 14px;
+            border-bottom: 1px solid #efefef;
+            padding-bottom: 16px;
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .post-author i {
+            color: #1e6f9f;
+            font-size: 14px;
+        }
+
+        .post-time i {
+            margin-right: 4px;
+        }
+
+        /* 正文 — 完全微信排版风格 */
+        .article-content {
+            font-size: 17px;
+            color: #1e1e1e;
+            word-break: break-word;
+            text-align: justify;
+        }
+
+        .article-content p {
+            margin-bottom: 1.2em;
+        }
+
+        /* 强调夸张的命理提示框 */
+        .warning-block {
+            background: #fef7e7;
+            border-left: 6px solid #d4a017;
+            padding: 18px 18px;
+            margin: 24px 0;
+            border-radius: 4px 12px 12px 4px;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(212, 160, 23, 0.08);
+        }
+
+        .warning-block i {
+            color: #c98600;
+            margin-right: 8px;
+        }
+
+        .highlight-red {
+            color: #c02b2b;
+            font-weight: 700;
+            background: linear-gradient(90deg, #fff1f0, transparent);
+            padding: 0 4px;
+        }
+
+        .big-water {
+            font-size: 1.4em;
+            font-weight: 800;
+            color: #005c8a;
+            text-shadow: 0 0 2px rgba(0,150,200,0.2);
+        }
+
+        .do-not-list {
+            margin: 24px 0;
+            padding-left: 6px;
+        }
+
+        .do-not-item {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #e0e0e0;
+            padding-bottom: 16px;
+        }
+
+        .do-not-icon {
+            width: 36px;
+            height: 36px;
+            background-color: #1a1a1a;
+            color: #ffd966;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-weight: 800;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .do-not-content {
+            flex: 1;
+        }
+
+        .do-not-title {
+            font-weight: 700;
+            font-size: 19px;
+            margin-bottom: 6px;
+            color: #002b42;
+        }
+
+        .do-not-desc {
+            color: #3a3a3a;
+            font-size: 16px;
+        }
+
+        .do-not-desc i {
+            color: #b34b00;
+        }
+
+        .exaggerate-quote {
+            background: #eef4fa;
+            padding: 18px 20px;
+            border-radius: 16px;
+            margin: 28px 0;
+            font-style: normal;
+            position: relative;
+            border: 1px solid #c7ddef;
+        }
+
+        .exaggerate-quote i.fa-quote-left {
+            color: #2a6d9c;
+            opacity: 0.5;
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .exaggerate-quote i.fa-quote-right {
+            color: #2a6d9c;
+            opacity: 0.5;
+            font-size: 20px;
+            margin-left: 8px;
+            vertical-align: bottom;
+        }
+
+        .divider {
+            margin: 28px 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a1a1a1;
+            font-size: 13px;
+            gap: 10px;
+        }
+
+        .divider-line {
+            height: 1px;
+            background: #e2e2e2;
+            flex: 1;
+        }
+
+        /* 底部互动区（点赞/在看/分享） */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin: 20px 0 12px;
+            padding: 16px 0 8px;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #5f5f5f;
+            font-size: 13px;
+            gap: 4px;
+            cursor: default;
+        }
+
+        .action-item i {
+            font-size: 24px;
+            color: #2c2c2c;
+        }
+
+        .action-item .count {
+            font-weight: 500;
+            color: #1f1f1f;
+        }
+
+        .action-item.highlight i {
+            color: #1e6f9f;
+        }
+
+        /* 声明框 — 剧情需要，内容不可信 */
+        .disclaimer-box {
+            background: #f9f9f9;
+            border: 1.5px solid #d32f2f;
+            border-radius: 20px;
+            padding: 18px 20px;
+            margin: 28px 0 10px;
+            text-align: center;
+            color: #a52222;
+            font-weight: 600;
+            font-size: 17px;
+            box-shadow: 0 2px 8px rgba(200,0,0,0.05);
+        }
+
+        .disclaimer-box i {
+            margin-right: 8px;
+            color: #c0392b;
+        }
+
+        .disclaimer-small {
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+            margin-top: 16px;
+            letter-spacing: 0.3px;
+        }
+
+        /* 阅读原文/标签 */
+        .tag-row {
+            margin: 16px 0 8px;
+            font-size: 14px;
+            color: #3e6b8c;
+        }
+
+        .tag-row i {
+            margin-right: 6px;
+        }
+
+        /* 底部留白 */
+        .footer-note {
+            text-align: center;
+            font-size: 12px;
+            color: #b3b3b3;
+            margin-top: 24px;
+        }
+
+        /* 文章内小标题 */
+        h3 {
+            font-size: 20px;
+            margin: 24px 0 12px;
+            font-weight: 650;
+            color: #0a3149;
+        }
+
+        .bold-underline {
+            font-weight: 700;
+            border-bottom: 2px solid #0a3149;
+            padding-bottom: 2px;
+        }
+		
+		.page-indicator {
+		  position: fixed;   /* 改为 fixed */
+		  bottom: 20px;
+		  right: 30px;
+		  /* 其他样式保持不变 */
+		  color: #a8a8a8;
+		  font-size: 14px;
+		  font-weight: 400;
+		  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+		  background: rgba(255, 255, 255, 0.2);
+		  backdrop-filter: blur(8px);
+		  -webkit-backdrop-filter: blur(8px);
+		  padding: 6px 18px;
+		  border-radius: 40px;
+		  border: 1px solid rgba(255, 255, 255, 0.25);
+		  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+		  letter-spacing: 1px;
+		  z-index: 50;
+		}
+		
+		/* 左下角返回桌面链接 */
+		    .back-link {
+		      position: fixed;
+		      bottom: 20px;
+		      left: 30px;
+		      color: #153e5c;
+		      background: rgba(255, 255, 255, 0.2);
+		      backdrop-filter: blur(8px);
+		      -webkit-backdrop-filter: blur(8px);
+		      padding: 8px 20px;
+		      border-radius: 40px;
+		      border: 1px solid rgba(255, 255, 255, 0.25);
+		      font-size: 14px;
+		      text-decoration: none;
+		      display: inline-flex;
+		      align-items: center;
+		      gap: 8px;
+		      z-index: 50;
+		      transition: background 0.15s;
+		    }
+			
+
+        /* 响应微调 */
+        @media (max-width: 480px) {
+            .wechat-post {
+                padding: 0 14px 20px;
+                margin-top: 8px;
+                border-radius: 0;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .top-return-bar {
+                padding: 12px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ⭐ 最上面加入的返回按钮 · 点击跳转 weixin.html ⭐ -->
+    <div class="top-return-bar">
+        <a href="weixin.html" class="return-link">
+            <i class="fas fa-arrow-left"></i> 返回
+        </a>
+    </div>
+	
+	<!-- 右下角页码标识（毛玻璃效果） -->
+	<div class="page-indicator">10/19</div>
+	
+	<!-- 左下角返回桌面链接 (保持不变) -->
+	<a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+	
+    <div class="wechat-post">
+        <!-- 头部：公众号信息 （高度仿微信）-->
+        <div class="profile-bar">
+            <div class="profile-left">
+                <div class="avatar">
+                    <i class="fas fa-droplet"></i>
+                </div>
+                <div class="profile-text">
+                    <div class="profile-name">
+                        灵机命理馆
+                        <span class="badge-original">原创</span>
+                    </div>
+                    <div class="profile-meta">
+                         <span>阅读 1万+</span>
+                    </div>
+                </div>
+            </div>
+            <div class="follow-btn">
+                <i class="fas fa-check-circle"></i> 已关注
+            </div>
+        </div>
+
+        <!-- 主标题 -->
+        <h1>💧 十月这几天出生的人！命里极度缺水！一篇知道什么不能做！</h1>
+        
+        <!-- 作者/时间 -->
+        <div class="post-meta">
+            <div class="post-author">
+                <i class="fas fa-user-astronaut"></i> 阿开说命理
+            </div>
+            <div class="post-time">
+                <i class="far fa-calendar-alt"></i> 2019年10月3日 18:30
+            </div>
+        </div>
+
+        <!-- 正文内容 夸张命理 -->
+        <div class="article-content">
+            <p>
+                <span class="big-water">⚠️ 命局预警：</span>公历<strong>10月5日和10月18日</strong>出生的人， 
+                恰逢寒露后、霜降前，戌土当令，火炎土燥，<span class="highlight-red">八字原局滴水不见，是百年一遇的“旱魃命格”！</span>
+                水主智、主财、主肾，极度缺水者，如沙漠行舟，事事受阻，稍有不慎便烈火焚原。
+            </p>
+
+            <!-- 夸张警示框 -->
+            <div class="warning-block">
+                <i class="fas fa-skull-crossbones"></i> 
+                <strong>【生死状·五大致命禁忌】</strong> 以下行为对十月缺水命格而言，形同自杀！轻则破财招灾，重则……你懂的。
+                <i class="fas fa-water" style="margin-left: 12px;"></i>
+            </div>
+
+            <!-- 不能做的清单（极度夸张） -->
+            <div class="do-not-list">
+                <div class="do-not-item">
+                    <div class="do-not-icon">🔥</div>
+                    <div class="do-not-content">
+                        <div class="do-not-title">一、绝对禁止吃辣！一口辣，烧干最后一滴肾水</div>
+                        <div class="do-not-desc">
+                            <i class="fas fa-pepper-hot"></i> 辣椒属离火，缺水命遇火则<span class="highlight-red">“水汽蒸发”</span>。
+                            吃一顿火锅，相当于在体内引爆十个太阳！<br>
+                            <span style="background: #ffe6e6;">⚠️ 真实案例：某互联网高管10月12日生，连吃三天麻辣烫，次日公司破产，头发掉光，至今还在沙漠找水。</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="do-not-item">
+                    <div class="do-not-icon">🏜️</div>
+                    <div class="do-not-content">
+                        <div class="do-not-title">二、严禁踏入沙漠/戈壁/桑拿房</div>
+                        <div class="do-not-desc">
+                            缺水之人进入极度干燥环境，会引发“命理虹吸”——方圆十里的水分都会被抽干，包括你体内的血液和脑脊液。
+                            <i class="fas fa-dizzy"></i> 已经有三位缺水缘主在迪拜沙漠拍完照后，直接变成了木乃伊（剧情需要）。
+                        </div>
+                    </div>
+                </div>
+                <div class="do-not-item">
+                    <div class="do-not-icon">❤️‍🔥</div>
+                    <div class="do-not-content">
+                        <div class="do-not-title">三、禁止穿红色内衣/大红唇/戴红宝石</div>
+                        <div class="do-not-desc">
+                            红色为火，火旺水干。穿红色等于自焚命门。<strong>尤其十月缺水女命</strong>，若涂正红色口红出门，
+                            当天必定与人争吵，且皮肤爆皮如同蛇蜕。想活命？穿黑色、蓝色，戴海蓝宝！
+                        </div>
+                    </div>
+                </div>
+                <div class="do-not-item">
+                    <div class="do-not-icon">😡</div>
+                    <div class="do-not-content">
+                        <div class="do-not-title">四、千万不能发怒/熬夜/剧烈运动</div>
+                        <div class="do-not-desc">
+                            怒伤肝，肝木生火；熬夜耗阴，阴即是水。缺水者若在23点后睡觉，<span class="highlight-red">每一分钟都在蒸发寿命！</span>
+                            剧烈运动流汗？那是你最后一点“生命原浆”！想补水？多躺平、多冥想、多看大海视频。
+                        </div>
+                    </div>
+                </div>
+                <div class="do-not-item">
+                    <div class="do-not-icon">🚫</div>
+                    <div class="do-not-content">
+                        <div class="do-not-title">五、禁止去南方城市发展/旅游（尤其广东、海南）</div>
+                        <div class="do-not-desc">
+                            南方属火，缺水命入火地如同飞蛾扑火。曾有缺水命格者定居深圳，三年后账户余额归零，而且……他居然开始怕水了。
+                            北方、西方才是你的生门！
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 夸张引用的“古籍” -->
+            <div class="exaggerate-quote">
+                <i class="fas fa-quote-left"></i> 
+                <span style="font-weight: 600; font-size: 1.05rem;">《玄天补水箓》有云：</span>“戌月生人水绝踪，火土乘权万事凶。若犯红炉辛辣物，三载之内骨肉空。”
+                <i class="fas fa-quote-right"></i>
+                <div style="margin-top: 12px; font-size: 15px; color: #3f5e75;">
+                    —— 此乃历代命理宗师血泪总结，缺水者务必每日诵读三遍，方可保平安。
+                </div>
+            </div>
+
+            <h3>💀 血泪案例：不听劝的后果</h3>
+            <p>
+                壬午月，有一位10月15日出生的缘主，不信邪，非要去重庆吃九宫格，还穿了一身大红袍。
+                结果第二天，他家的鱼缸莫名其妙炸裂，养了八年的金龙鱼直接变成鱼干；更恐怖的是，他本人体重一天之内掉了8斤——全是水分！
+                现在他每天抱着加湿器忏悔，但为时已晚。<i class="far fa-sad-tear" style="color: #0077be;"></i>
+            </p>
+
+            <!-- 转折：夸张的“唯一生机” -->
+            <div style="background: #e3f2fd; border-radius: 18px; padding: 18px; margin: 24px 0;">
+                <i class="fas fa-hand-holding-water" style="color: #0d6dad; margin-right: 8px;"></i>
+                <strong style="font-size: 18px;">唯一补救法：每天灌水三升？没用！必须“接天水”</strong><br>
+                每日卯时（5-7点）面向北方，用蓝/黑色杯子喝温水，心中默念“壬癸亥子”三千遍。
+                并且在家中北方放置鱼缸、流水摆件。但请注意——<span class="highlight-red">以上方法依旧无法改变极度缺水的本质，只求别死得太快。</span>
+            </div>
+
+            <div class="divider">
+                <span class="divider-line"></span>
+                <span><i class="far fa-gem"></i> 水 · 命 · 绝 · 密 <i class="far fa-gem"></i></span>
+                <span class="divider-line"></span>
+            </div>
+
+           
+        </div><!-- end article-content -->
+
+        <!-- 底部互动数据 (仿微信) -->
+        <div class="action-bar">
+            <div class="action-item">
+                <i class="far fa-thumbs-up"></i>
+                <span class="count">2392</span>
+                <span>点赞</span>
+            </div>
+            <div class="action-item highlight">
+                <i class="far fa-star"></i>
+                <span class="count">100</span>
+                <span>在看</span>
+            </div>
+            <div class="action-item">
+                <i class="far fa-comment-dots"></i>
+                <span class="count">92</span>
+                <span>留言</span>
+            </div>
+            <div class="action-item">
+                <i class="fas fa-share-alt"></i>
+                <span>分享</span>
+            </div>
+        </div>
+
+        <!-- 标签 / 阅读原文 -->
+        <div class="tag-row">
+            <i class="fas fa-tag"></i> 命理玄学 · 五行缺水 · 十月禁忌
+        </div>
+        <div style="font-size: 15px; color: #1e6f9f; margin: 8px 0 4px;">
+            <i class="fas fa-link"></i> 阅读原文   <span style="margin:0 12px">|</span>  投诉
+        </div>
+
+        <!-- 底部小字声明 (再次提醒) -->
+        <div class="disclaimer-small">
+            <i class="far fa-smile-wink"></i> 内容纯属娱乐 · 剧情需要 · 请勿轻信
+        </div>
+       
+    </div>
+    <!-- 额外的留白，更像微信文章流 -->
+    <div style="max-width:640px; width:100%; margin-top:8px; text-align:center; font-size:12px; color:#aaa;">
+        朋友都在读   ·   1个朋友读过
+    </div>
+</body>
+</html>

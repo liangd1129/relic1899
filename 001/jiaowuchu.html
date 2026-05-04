@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <meta name="description" content="同海大学教务处 · 统一身份认证登录">
+  <title>教务处登陆系统</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ----- 沿用同海大学官网直角风格 · 一屏优化版 ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', '微软雅黑', 'PingFang SC', system-ui, sans-serif;
+    }
+
+    body {
+      background-color: #f5f7fb;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;               /* 固定视口高度，防止溢出滚动 */
+      overflow-y: auto;            /* 若因极端情况溢出仍可滚动，但正常情况下不会出现滚动条 */
+      overflow-x: hidden;
+    }
+
+    :root {
+      --primary-blue: #1a3a5c;
+      --accent-green: #1e4a3d;
+      --border-light: #d0d7de;
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+      --shadow-hover: 0 8px 20px rgba(0, 40, 30, 0.08);
+    }
+
+    /* 简洁顶栏 — 压缩高度，依然直角 */
+    .top-minimal {
+      background: white;
+      padding: 0.3rem 4%;           /* 减小垂直内边距 */
+      border-bottom: 1px solid #e2e6ea;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+      flex-shrink: 0;               /* 防止被压缩 */
+    }
+
+    .logo-simple {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      background: var(--primary-blue);
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      font-weight: 700;
+      border-radius: 0;                
+      box-shadow: 0 4px 8px rgba(26, 58, 92, 0.15);
+    }
+
+    .logo-simple h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+      letter-spacing: 2px;
+    }
+
+    .logo-simple span {
+      color: var(--accent-green);
+      font-weight: 500;
+      margin-left: 8px;
+      font-size: 1rem;
+      border-left: 2px solid #b7d9b1;
+      padding-left: 12px;
+    }
+
+    /* 主容器 — 绝对居中，收缩空间 */
+    .login-wrapper {
+      flex: 1 1 0;                  /* 占据剩余高度，允许收缩 */
+      min-height: 0;                /* 防止flex溢出 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1.5rem;       /* 减小上下内边距，让卡片更紧凑 */
+    }
+
+    /* 登录卡片 — 直角，内边距微调 */
+    .login-card {
+      background: white;
+      width: 100%;
+      max-width: 460px;
+      padding: 1.5rem 1.8rem 1.8rem;  /* 压缩垂直内边距 */
+      box-shadow: var(--shadow-sm), 0 10px 25px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e6ea;
+      border-radius: 0;
+      transition: box-shadow 0.2s;
+    }
+
+    .login-card:hover {
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 1.2rem;        /* 缩小间距 */
+    }
+
+    .card-header i {
+      font-size: 2.2rem;            /* 略微缩小图标 */
+      color: var(--primary-blue);
+      background: #eef3f8;
+      padding: 0.6rem;
+      border-radius: 0;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-header h3 {
+      font-size: 1.7rem;
+      font-weight: 650;
+      color: var(--primary-blue);
+      letter-spacing: 1px;
+    }
+
+    .card-header .sub {
+      color: #5e7a93;
+      font-size: 0.9rem;
+      margin-top: 4px;
+      border-bottom: 1px dashed #cbd6e2;
+      padding-bottom: 10px;
+    }
+
+    /* 角色切换按钮组 — 压缩下边距 */
+    .role-switch {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;          /* 原28px → 20px */
+      border: 1px solid #bcccd9;
+      background: #f2f5f9;
+    }
+
+    .role-btn {
+      flex: 1;
+      text-align: center;
+      padding: 0.7rem 0;            /* 轻微减小 */
+      font-weight: 600;
+      font-size: 1.05rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #3a5e7a;
+      transition: all 0.15s;
+      border-radius: 0;
+      border-right: 1px solid #bcccd9;
+    }
+
+    .role-btn:last-child {
+      border-right: none;
+    }
+
+    .role-btn i {
+      margin-right: 8px;
+      font-size: 1rem;
+    }
+
+    .role-btn.active {
+      background: var(--primary-blue);
+      color: white;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .role-btn:not(.active):hover {
+      background: #d9e2ec;
+    }
+
+    /* 表单 — 紧凑 */
+    .input-group {
+      margin-bottom: 16px;          /* 原20px → 16px */
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      color: #1e3a5f;
+      margin-bottom: 5px;
+      font-size: 0.95rem;
+    }
+
+    .input-group label i {
+      width: 20px;
+      color: var(--primary-blue);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.75rem 1rem;        /* 略微减小垂直填充 */
+      border: 1px solid #bcccd9;
+      background: white;
+      font-size: 1rem;
+      border-radius: 0;
+      transition: border 0.15s;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 2px rgba(26,58,92,0.1);
+    }
+
+    /* 提示文字 */
+    .hint-text {
+      font-size: 0.85rem;
+      color: #6f8a9f;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .hint-text i {
+      font-size: 0.8rem;
+      color: var(--accent-green);
+    }
+
+    /* 登录按钮 — 直角，减小上下外边距 */
+    .login-btn {
+      width: 100%;
+      background: var(--primary-blue);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;       /* 略微减小 */
+      font-size: 1.15rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 0;
+      border: 1px solid #0f2e47;
+      transition: all 0.2s;
+      margin: 12px 0 8px;           /* 压缩上下边距 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .login-btn i {
+      font-size: 1.1rem;
+    }
+
+    .login-btn:hover {
+      background: #0f3b55;
+      border-color: var(--primary-blue);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    /* 底部小字 — 紧凑 */
+    .footer-note {
+      text-align: center;
+      margin-top: 12px;             /* 减小 */
+      color: #4f6f87;
+      font-size: 0.85rem;
+      border-top: 1px solid #e2e6ea;
+      padding-top: 12px;
+    }
+
+    .test-accounts {
+      background: #f0f4fa;
+      padding: 10px 12px;
+      margin-top: 16px;
+      font-size: 0.8rem;
+      color: #1e3a5f;
+      border-left: 4px solid var(--accent-green);
+      border-radius: 0;
+    }
+
+    .test-accounts strong {
+      color: var(--primary-blue);
+    }
+
+    .test-accounts i {
+      margin-right: 4px;
+      color: var(--accent-green);
+    }
+
+    /* 错误消息 */
+    .error-msg {
+      color: #c7423f;
+      font-size: 0.85rem;
+      margin-top: 4px;
+      min-height: 20px;
+    }
+
+    /* 底部版权栏 — 压缩高度，与flex配合 */
+    .copyright-bar {
+      text-align: center;
+      padding: 0.4rem 0.8rem;       /* 更紧凑 */
+      color: #6a859e;
+      font-size: 0.75rem;
+      border-top: 1px solid #dee6ed;
+      background: white;
+      flex-shrink: 0;               /* 保持高度不压缩 */
+    }
+
+    /* 右下角页码标识 (毛玻璃) — 保持不变，但确保不影响高度 */
+    .page-indicator {
+      position: fixed;
+      bottom: 20px;
+      right: 30px;
+      color: #a8a8a8;
+      font-size: 14px;
+      font-weight: 400;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 6px 18px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      letter-spacing: 1px;
+      z-index: 50;
+    }
+
+    /* 左下角返回桌面链接 */
+    .back-link {
+      position: fixed;
+      bottom: 20px;
+      left: 30px;
+      color: #153e5c;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 8px 20px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 50;
+      transition: background 0.15s;
+    }
+
+    @media (max-width: 500px) {
+      .login-card {
+        padding: 1.5rem 1.5rem;
+      }
+      .logo-simple h2 {
+        font-size: 1.4rem;
+      }
+      /* 移动端高度紧张时再微调 */
+      .login-wrapper {
+        padding: 0.3rem 1rem;
+      }
+      .card-header {
+        margin-bottom: 1rem;
+      }
+      .role-switch {
+        margin-bottom: 16px;
+      }
+    }
+
+    /* 针对非常扁的屏幕（高度<650px）再压缩一点点，确保不滚动 */
+    @media (max-height: 650px) {
+      .top-minimal {
+        padding: 0.2rem 4%;
+      }
+      .login-card {
+        padding: 1.2rem 1.5rem 1.5rem;
+      }
+      .card-header i {
+        font-size: 1.8rem;
+        padding: 0.4rem;
+      }
+      .card-header h3 {
+        font-size: 1.5rem;
+      }
+      .login-btn {
+        padding: 0.7rem 1.5rem;
+        margin: 8px 0 6px;
+      }
+      .input-group {
+        margin-bottom: 12px;
+      }
+      .copyright-bar {
+        padding: 0.2rem 0.8rem;
+      }
+    }
+
+    /* 强制直角 (保持原风格) */
+    .login-card, .role-btn, .input-field, .login-btn, .logo-icon, .test-accounts {
+      border-radius: 0 !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 右下角页码标识（毛玻璃效果） -->
+  <div class="page-indicator">17/19</div>
+  
+  <!-- 左下角返回桌面链接 -->
+  <a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+
+  <!-- 顶栏 (压缩高度) -->
+  <div class="top-minimal">
+    <div class="logo-simple">
+      <div class="logo-icon">同</div>
+      <h2>同海大学 <span>· 教务处</span></h2>
+    </div>
+  </div>
+
+  <!-- 登录卡片区域 (flex:1 居中) -->
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="card-header">
+        <i class="fas fa-graduation-cap"></i>
+        <h3>身份认证登录</h3>
+        <div class="sub">统一身份认证 · 教务/研究生</div>
+      </div>
+
+      <!-- 角色切换：教工 / 学生 -->
+      <div class="role-switch">
+        <button class="role-btn active" id="roleStudentBtn"><i class="fas fa-user-graduate"></i> 学生</button>
+        <button class="role-btn" id="roleTeacherBtn"><i class="fas fa-chalkboard-user"></i> 教工</button>
+      </div>
+
+      <form id="loginForm" onsubmit="return false;">
+        <div class="input-group">
+          <label for="username"><i class="fas fa-user-circle"></i> <span id="usernameLabel">学号</span></label>
+          <input type="text" id="username" class="input-field" placeholder="请输入学号" autocomplete="off" required>
+        </div>
+
+        <div class="input-group">
+          <label for="password"><i class="fas fa-lock"></i> 密码</label>
+          <input type="password" id="password" class="input-field" placeholder="请输入密码" required>
+        </div>
+
+        <div class="error-msg" id="loginMessage"></div>
+
+        <button type="submit" class="login-btn" id="loginBtn">
+          <i class="fas fa-sign-in-alt"></i> 登录教务系统
+        </button>
+      </form>
+
+      <div class="footer-note">
+        <i class="fas fa-shield-alt"></i> 首次登录？默认密码为出生日期 (YYYYMMDD)
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部版权 (更紧凑) -->
+  <div class="copyright-bar">
+    <i class="far fa-copyright"></i> 同海大学教务处 · 统一认证服务
+  </div>
+
+  <script>
+    (function() {
+      "use strict";
+
+      // DOM 元素
+      const roleStudentBtn = document.getElementById('roleStudentBtn');
+      const roleTeacherBtn = document.getElementById('roleTeacherBtn');
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+      const usernameLabelSpan = document.getElementById('usernameLabel');
+      const loginMessage = document.getElementById('loginMessage');
+      const loginForm = document.getElementById('loginForm');
+      const loginBtn = document.getElementById('loginBtn');
+
+      let currentRole = 'student';   // 默认学生
+
+      // 指定账号密码 (不自动填充)
+      const VALID_CREDENTIALS = {
+        student: {
+          username: '24071225',
+          password: '20250225'
+        },
+        teacher: {
+          username: 'TH2021LA086',
+          password: '19780315'
+        }
+      };
+
+      // 根据角色更新占位符与标签
+      function updateUIBasedOnRole(role) {
+        if (role === 'student') {
+          usernameInput.placeholder = '请输入学号';
+          usernameLabelSpan.textContent = '学号';
+        } else {
+          usernameInput.placeholder = '请输入工号';
+          usernameLabelSpan.textContent = '工号';
+        }
+      }
+
+      function setActiveRole(role) {
+        currentRole = role;
+        
+        if (role === 'student') {
+          roleStudentBtn.classList.add('active');
+          roleTeacherBtn.classList.remove('active');
+        } else {
+          roleTeacherBtn.classList.add('active');
+          roleStudentBtn.classList.remove('active');
+        }
+        
+        updateUIBasedOnRole(role);
+        
+        // 清空账号和密码输入框
+        usernameInput.value = '';
+        passwordInput.value = '';
+        
+        // 清空错误信息
+        loginMessage.textContent = '';
+      }
+
+      // 登录验证 + 新窗口打开页面
+      function performLogin() {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        
+        if (!username || !password) {
+          loginMessage.textContent = '⚠️ 账号和密码不能为空';
+          return false;
+        }
+
+        const valid = VALID_CREDENTIALS[currentRole];
+        
+        if (username === valid.username && password === valid.password) {
+          loginMessage.style.color = '#1e7a5e';
+          loginMessage.innerHTML = '<i class="fas fa-check-circle"></i> 登录成功，正在打开新窗口...';
+          
+          setTimeout(() => {
+            if (currentRole === 'student') {
+              window.open('xuesheng.html', '_blank');
+            } else {
+              window.open('zhigong.html', '_blank');
+            }
+            loginMessage.innerHTML = '';
+          }, 600);
+          
+          return true;
+        } else {
+          loginMessage.style.color = '#c7423f';
+          loginMessage.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 账号或密码错误。';
+          return false;
+        }
+      }
+
+      // 事件绑定
+      roleStudentBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        setActiveRole('student');
+      });
+
+      roleTeacherBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        setActiveRole('teacher');
+      });
+
+      loginBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        performLogin();
+      });
+
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        performLogin();
+      });
+
+      usernameInput.addEventListener('input', function() {
+        loginMessage.textContent = '';
+        loginMessage.style.color = '#c7423f';
+      });
+      passwordInput.addEventListener('input', function() {
+        loginMessage.textContent = '';
+        loginMessage.style.color = '#c7423f';
+      });
+
+      // 初始化
+      setActiveRole('student');
+      usernameInput.value = '';
+      passwordInput.value = '';
+    })();
+  </script>
+</body>
+</html>

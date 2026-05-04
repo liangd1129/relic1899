@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>微博正文 - 同海大学举报事件</title>
+    <!-- Font Awesome 6 (免费图标库，用于仿真微博图标) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f0f2f5;  /* 微博浅灰背景 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            padding: 16px 12px;
+            color: #1e1e2f;
+        }
+
+        /* 主容器 - 移动优先，模拟手机微博卡片 */
+        .weibo-card {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        /* 热度顶部条 (仿爆款标识) */
+        .hot-tag-bar {
+            padding: 12px 16px 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: none;
+        }
+        .hot-icon {
+            background: #f53f3f;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            line-height: 1.4;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .hot-icon i {
+            font-size: 10px;
+        }
+        .hot-rank {
+            font-size: 13px;
+            color: #f53f3f;
+            font-weight: 600;
+            background: #fee8e8;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .trend-text {
+            font-size: 12px;
+            color: #8e8e9e;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 卡片主体内容 */
+        .card-inner {
+            padding: 0 16px 12px 16px;
+        }
+
+        /* 头部区域: 头像 + 用户信息 + 时间更多 */
+        .post-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-top: 8px;
+        }
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(145deg, #ff7a45, #ff4d2e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            flex: 1;
+        }
+        .name-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .display-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #000000;
+        }
+        .verified {
+            background: #ff8200;
+            color: white;
+            border-radius: 20px;
+            font-size: 11px;
+            padding: 2px 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-weight: 500;
+        }
+        .verified i {
+            font-size: 10px;
+        }
+        .badge {
+            background: #e8e8ed;
+            color: #8e8e9e;
+            border-radius: 12px;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+        .user-id {
+            font-size: 12px;
+            color: #8e8e9e;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .time-more {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        .post-time {
+            font-size: 12px;
+            color: #8e8e9e;
+            white-space: nowrap;
+        }
+        .more-icon {
+            color: #6e6e80;
+            font-size: 16px;
+            cursor: default;
+        }
+
+        /* 正文区域 */
+        .post-content {
+            font-size: 15px;
+            line-height: 1.55;
+            color: #1e1e2a;
+            margin: 12px 0 16px 0;
+        }
+        .post-content p {
+            margin-bottom: 14px;
+        }
+        .topic-link {
+            color: #1e6fdf;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .topic-link:hover {
+            text-decoration: underline;
+        }
+        .highlight-text {
+            background: #fff2e0;
+            padding: 2px 4px;
+            border-radius: 8px;
+            font-weight: 500;
+            color: #c23d00;
+        }
+        .quote-box {
+            background: #f8f9fa;
+            border-left: 3px solid #f53f3f;
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin: 12px 0;
+            font-size: 14px;
+            color: #2c2c38;
+        }
+        .image-placeholder {
+            background: #eef2f7;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            margin: 16px 0 12px;
+            border: 1px solid #ecedef;
+        }
+        .image-placeholder i {
+            font-size: 28px;
+            color: #6e6e80;
+        }
+        .image-placeholder span {
+            font-size: 13px;
+            color: #3e3e4e;
+        }
+
+        /* 转评赞计数栏 */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0 8px;
+            border-top: 1px solid #efefef;
+            border-bottom: 1px solid #efefef;
+            margin-bottom: 12px;
+            color: #5e5e70;
+            font-size: 13px;
+        }
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stats-number {
+            font-weight: 600;
+            color: #1e1e2a;
+        }
+
+        /* 底部互动按钮 */
+        .action-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 6px;
+            margin-bottom: 12px;
+        }
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: none;
+            font-size: 15px;
+            color: #5e5e70;
+            padding: 6px 16px;
+            border-radius: 30px;
+            transition: background 0.2s;
+            cursor: default;
+            font-weight: 500;
+        }
+        .action-btn i {
+            font-size: 18px;
+        }
+        .action-btn:hover {
+            background: #f0f2f5;
+        }
+
+        /* 热门评论区域 (加强真实感) */
+        .comments-section {
+            background: #f9f9fb;
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin-top: 8px;
+        }
+        .comments-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #5e5e70;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .comment-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            background: #d9d9e3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #3a3a4a;
+            flex-shrink: 0;
+        }
+        .comment-body {
+            flex: 1;
+        }
+        .comment-name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .comment-text {
+            font-size: 13px;
+            color: #2c2c3a;
+            margin-top: 2px;
+        }
+        .comment-time {
+            font-size: 11px;
+            color: #9e9eae;
+            margin-top: 4px;
+        }
+
+        /* 脚注免责声明 */
+        .disclaimer {
+            text-align: center;
+            font-size: 11px;
+            color: #a1a1b0;
+            padding: 16px 16px 12px;
+            border-top: 1px solid #eef0f2;
+            background: white;
+            border-radius: 0 0 16px 16px;
+        }
+
+        /* 辅助元素 */
+        .separator {
+            height: 8px;
+            background: transparent;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+		.page-indicator {
+		  position: fixed;   /* 改为 fixed */
+		  bottom: 20px;
+		  right: 30px;
+		  /* 其他样式保持不变 */
+		  color: #a8a8a8;
+		  font-size: 14px;
+		  font-weight: 400;
+		  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+		  background: rgba(255, 255, 255, 0.2);
+		  backdrop-filter: blur(8px);
+		  -webkit-backdrop-filter: blur(8px);
+		  padding: 6px 18px;
+		  border-radius: 40px;
+		  border: 1px solid rgba(255, 255, 255, 0.25);
+		  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+		  letter-spacing: 1px;
+		  z-index: 50;
+		}
+		
+		/* ---------- 新增：顶部返回按钮 (仿微信导航) ---------- */
+		.top-return-bar {
+		    max-width: 640px;
+		    width: 100%;
+		    margin: 0 auto;
+		    background-color: #ffffff;
+		    padding: 12px 16px;
+		    display: flex;
+		    align-items: center;
+		    border-bottom: 1px solid #efefef;
+		    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+		    box-sizing: border-box;
+		}
+		
+		.return-link {
+		    color: #1a1a1a;
+		    text-decoration: none;
+		    font-size: 17px;
+		    font-weight: 500;
+		    display: inline-flex;
+		    align-items: center;
+		    gap: 8px;
+		    transition: opacity 0.15s;
+		}
+		
+		.return-link i {
+		    font-size: 18px;
+		    color: #2c3e50;
+		}
+		
+		.return-link:hover {
+		    opacity: 0.7;
+		}
+		
+		/* 新增：固定在右下角的醒目结束按钮 (与结局一并存) */
+		.fixed-end-btn {
+		  position: fixed;
+		  bottom: 80px;           /* 可根据需要微调 */
+		  right: 30px;
+		  z-index: 100;
+		  
+		  display: inline-flex;
+		  align-items: center;
+		  justify-content: center;
+		  padding: 10px 24px;       /* 更紧凑的内边距 */
+		  background: #a52a2a;
+		  color: #ffffff;
+		  font-family: 'Times New Roman', Georgia, '宋体', serif;
+		  font-size: 1.2rem;        /* 字体稍小 */
+		  font-weight: 700;
+		  letter-spacing: 3px;
+		  text-decoration: none;
+		  border: 2.5px solid #e6c9a8;
+		  border-radius: 40px;
+		  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+		  backdrop-filter: blur(4px);
+		  -webkit-backdrop-filter: blur(4px);
+		  transition: all 0.25s ease;
+		}
+		
+		.fixed-end-btn i {
+		  margin-right: 10px;
+		  color: #f5dbb1;
+		  font-size: 1.2rem;       /* 图标也相应缩小 */
+		}
+		
+		/* 手机屏幕下进一步缩小 */
+		@media (max-width: 600px) {
+		  .fixed-end-btn {
+		    bottom: 90px;
+		    right: 20px;
+		    padding: 8px 18px;
+		    font-size: 1rem;
+		    letter-spacing: 2px;
+		  }
+		  .fixed-end-btn i {
+		    font-size: 1.1rem;
+		    margin-right: 8px;
+		  }
+		}
+		
+		.fixed-end-btn i {
+		  margin-right: 14px;
+		  color: #f5dbb1;
+		  font-size: 1.6rem;
+		  transition: transform 0.2s;
+		}
+		
+		.fixed-end-btn:hover {
+		  background: #1e3a4c;       /* 悬停变为深蓝，与导航栏呼应 */
+		  border-color: #d4a373;
+		  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+		  transform: translateY(-3px);
+		}
+		
+		.fixed-end-btn:hover i {
+		  transform: translateX(4px); /* 箭头轻微右移 */
+		  color: #ffffff;
+		}
+		
+    </style>
+</head>
+<body>
+	
+	
+	<!-- ⭐ 最上面加入的返回按钮 · 点击跳转 weixin.html ⭐ -->
+	<div class="top-return-bar">
+	    <a href="xuesheng.html" class="return-link">
+	        <i class="fas fa-arrow-left"></i> 返回
+	    </a>
+	</div>
+	
+	<!-- 右下角页码标识（毛玻璃效果） -->
+	<div class="page-indicator">结局二</div>
+	
+	<a href="weituo.html" class="fixed-end-btn" target="_self">
+	  <i class="fas fa-arrow-right"></i> 委托总结
+	</a>
+	
+<div class="weibo-card">
+    <!-- 极高热度标识栏 -->
+    <div class="hot-tag-bar">
+        <div class="hot-icon">
+            <i class="fas fa-fire"></i> 爆
+        </div>
+        <div class="hot-rank">热度 2147.3万</div>
+        <div class="trend-text"><i class="fas fa-chart-line"></i> 实时上升 · 沸</div>
+    </div>
+
+    <div class="card-inner">
+        <!-- 头部信息 -->
+        <div class="post-header">
+            <div class="avatar">
+                <span>实</span>
+            </div>
+            <div class="user-info">
+                <div class="name-row">
+                    <span class="display-name">举报人·陈屿</span>
+                    <span class="verified"><i class="fas fa-check-circle"></i> 实名举报V</span>
+                    <span class="badge">同海大学事件</span>
+                </div>
+                <div class="user-id">
+                    <span>@真实声音_2026</span>
+                    <span><i class="fas fa-globe"></i> 来自 微博网页版</span>
+                </div>
+            </div>
+            <div class="time-more">
+                <!-- 动态时间: 打开网页时的现实时间 -->
+                <div class="post-time" id="livePostTime">刚刚</div>
+                <div class="more-icon"><i class="fas fa-ellipsis-h"></i></div>
+            </div>
+        </div>
+
+        <!-- 正文内容: 包含所有必要元素 -->
+        <div class="post-content">
+            <p>【实名举报】本人陈屿，现公开实名举报<span class="topic-link">@同海大学</span> 园艺设计学院于晓丽教授及硕士生周毅。以下内容均为本人实名提交给相关部门的举报材料，事实清晰，愿负法律责任。</p>
+            
+            
+               <p> 核心指控一：于晓丽教授长期压榨学生，强迫学生处理私人事务
+                于晓丽利用导师职权，长期指使其课题组学生沈沁处理个人家庭及私人事务，包括但不限于：代取快递、接送子女上下学、打扫私人住宅、办理银行业务、甚至为其撰写项目申报书以外的生活类文书。学生稍有不满便以“延期毕业”“断送学术前途”相威胁。多名学生敢怒不敢言，身心俱疲。沈沁作为于晓丽的硕士生，曾被迫每周花费20小时以上替于晓丽处理私事，严重影响学业与精神状态。</p>
+            
+
+            <p>【重大刑事案件举报】 硕士生<span class="topic-link">@周毅</span> 涉嫌于2025年3月1日在家中杀害其妻子沈沁，并伪装成自杀现场。根据本人获取的线索与证人证言，2025年3月1日晚，周毅与妻子沈沁因情感及家庭矛盾发生激烈争吵，周毅将其杀害后清理现场并报警谎称妻子抑郁轻生。本人敦促有关部门重新调查该命案，还沈沁一个公道。</p>
+
+            <p>于晓丽压榨学生具体表现：除了指使学生处理私人事务，还要求学生周末无薪为其家庭聚会充当服务人员，克扣研究生津贴，威胁不听话学生无法毕业。周毅在此环境下心态逐渐扭曲，同时被迫成为于晓丽“管理工具”压榨其他师弟师妹。恶性循环最终酿成家庭悲剧。于晓丽对周毅的杀妻行为是否存在间接催化作用，必须严查到底！</p>
+            
+            <p>附本人已向国家纪检委、教育部及同海大学纪委递交实名材料，并附有沈沁与于晓丽之间的邮件记录（要求沈沁待处理教学事务）、周毅杀妻案疑点法医意见。微博平台作为重大舆论监督阵地，恳请扩散，还逝者真相！</p>
+            
+            <!-- 仿图片/证据占位符，仿真微博图文 -->
+            <div class="image-placeholder">
+                <i class="fas fa-file-image"></i>
+                <span>【证据截图】于晓丽安排学生处理私人事务聊天记录</span>
+                <i class="fas fa-chevron-right" style="margin-left: auto; font-size: 12px;"></i>
+            </div>
+
+            <div class="flex-between" style="margin-top: 8px;">
+                <div><span class="topic-link">#同海大学于晓丽压榨学生#</span> <span class="topic-link">#周毅杀妻案疑云#</span></div>
+                <div><span class="topic-link">@微博政务</span> <span class="topic-link">@头条新闻</span></div>
+            </div>
+        </div>
+
+        <!-- 转评赞数据栏（超高热度） -->
+        <div class="stats-bar">
+            <div class="stats-item"><i class="far fa-comment-dots"></i> <span class="stats-number">18.7万</span> 评论</div>
+            <div class="stats-item"><i class="fas fa-retweet"></i> <span class="stats-number">112.3万</span> 转发</div>
+            <div class="stats-item"><i class="far fa-heart"></i> <span class="stats-number">406.9万</span> 点赞</div>
+            <div class="stats-item"><i class="far fa-chart-bar"></i> <span class="stats-number">2147万</span> 阅读</div>
+        </div>
+
+        <!-- 底部互动按钮区（仿微博操作栏） -->
+        <div class="action-bar">
+            <div class="action-btn"><i class="far fa-thumbs-up"></i> 点赞</div>
+            <div class="action-btn"><i class="far fa-comment"></i> 评论</div>
+            <div class="action-btn"><i class="fas fa-retweet"></i> 转发</div>
+            <div class="action-btn"><i class="far fa-bookmark"></i> 收藏</div>
+        </div>
+
+        <!-- 热门评论区域，增加微博真实感 -->
+        <div class="comments-section">
+            <div class="comments-title">
+                <i class="fas fa-fire-flame-curved" style="color:#ff5a5f;"></i> 热门评论
+                <span style="font-size:11px; background:#eef0f2; padding:2px 8px; border-radius:20px;">按热度排序</span>
+            </div>
+            <div class="comment-item">
+                <div class="comment-avatar"><i class="fas fa-user-graduate"></i></div>
+                <div class="comment-body">
+                    <div class="comment-name">同海大学校友_小周</div>
+                    <div class="comment-text">于晓丽压榨学生早就是公开的秘密，我们实验室之前就有人被迫给她孩子辅导作业！必须一查到底！支持实名举报！！</div>
+                    <div class="comment-time"><i class="far fa-thumbs-up"></i> 12.4万赞 · 2小时前</div>
+                </div>
+            </div>
+            <div class="comment-item">
+                <div class="comment-avatar"><i class="fas fa-balance-scale"></i></div>
+                <div class="comment-body">
+                    <div class="comment-name">法医推理君V</div>
+                    <div class="comment-text">作为法医专业，看过沈沁案部分公开资料，伤痕和现场确实存在诸多疑点，伪装自杀可能性极高。支持上级部门复查！周毅必须接受正义审判。</div>
+                    <div class="comment-time"><i class="far fa-thumbs-up"></i> 9.8万赞 · 4小时前</div>
+                </div>
+            </div>
+            <div class="comment-item">
+                <div class="comment-avatar"><i class="fas fa-newspaper"></i></div>
+                <div class="comment-body">
+                    <div class="comment-name">每日热点观察</div>
+                    <div class="comment-text">实名举报勇气可嘉，于晓丽、周毅事件持续发酵，期待同海大学和警方正式回应！热度已爆，愿真相不被掩埋。</div>
+                    <div class="comment-time"><i class="far fa-thumbs-up"></i> 5.2万赞 · 6小时前</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 免责声明 + 完全模拟时间动态更新 -->
+    <div class="disclaimer">
+        <i class="fas fa-shield-alt"></i>事件内容纯属虚构练习，如有雷同纯属巧合。尊重逝者，呼吁理性讨论。<br>
+        <span id="currentTimestamp" style="font-family: monospace; font-size: 10px;"></span>
+    </div>
+</div>
+
+<script>
+    // 文章时间 = 打开网页的现实时间（高仿真，精确到秒）
+    function updatePostTime() {
+        const now = new Date();
+        // 格式示例: 2026年4月15日 15:30:45
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        
+        const formattedTime = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+        const timeElement = document.getElementById('livePostTime');
+        if (timeElement) {
+            // 显示完整现实时间，微博风格也可以显示精确时间
+            timeElement.innerText = formattedTime;
+            // 加上title提示 “刚刚发布”其实不需要，直接展示绝对时间符合需求
+            timeElement.title = "发布于 " + formattedTime;
+        }
+        
+       
+    }
+
+    // 页面加载时设置时间，并每秒更新（现实时间动态流动增强真实感）
+    updatePostTime();
+    setInterval(updatePostTime, 1000);
+
+    // 可选: 让页面标题也显示实时动态（微博风味）
+    let originalTitle = document.title;
+    setInterval(() => {
+        const now = new Date();
+        const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+        document.title = `微博正文 · ${timeStr} | 热度爆了`;
+    }, 1000);
+</script>
+</body>
+</html>

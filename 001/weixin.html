@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
+    <title>微信</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #1a1a1a;
+        }
+
+        .wechat {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            background-color: #ffffff;
+            overflow: hidden;
+            border: none;
+            box-shadow: none;
+            position: relative;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: #f8f8f8;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .sidebar-header {
+            padding: 16px 16px 12px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #e6e6e6;
+        }
+
+        .profile-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #2b9e5c;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 18px;
+            color: #5e5e5e;
+            font-size: 18px;
+        }
+
+        .header-icons i {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .search-box {
+            background: #e2e2e2;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #6e6e6e;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-box i {
+            font-size: 13px;
+            color: #7a7a7a;
+        }
+
+        .search-box span {
+            opacity: 0.8;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #f8f8f8;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid #ebebeb;
+        }
+
+        .chat-item:hover {
+            background-color: #eaeaea;
+        }
+
+        .chat-item.active {
+            background-color: #d9d9d9;
+            border-left: 4px solid #2b9e5c;
+            padding-left: 12px;
+        }
+
+        .chat-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            background: #4a8cff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 18px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+
+        .chat-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #111;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
+        }
+
+        .chat-time {
+            font-size: 11px;
+            color: #999;
+            flex-shrink: 0;
+            margin-left: 6px;
+        }
+
+        .chat-last-msg {
+            font-size: 12px;
+            color: #6e6e6e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+        }
+
+        .chat-header {
+            padding: 10px 20px;
+            background: #f8f8f8;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 6px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.15s;
+            flex-shrink: 0;
+        }
+
+        .contact-avatar.visible {
+            display: flex;
+        }
+
+        .contact-avatar:hover {
+            opacity: 0.85;
+        }
+
+        /* 移动端返回按钮 */
+        .mobile-back-btn {
+            display: none;
+            font-size: 24px;
+            color: #1a1a1a;
+            cursor: pointer;
+            padding: 12px 16px 12px 0;
+            margin-right: 4px;
+            transition: opacity 0.15s;
+            position: relative;
+            z-index: 10;
+            -webkit-tap-highlight-color: transparent;
+            pointer-events: auto;
+        }
+        .mobile-back-btn:active {
+            opacity: 0.5;
+        }
+
+        .chat-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 22px;
+            color: #5e5e5e;
+            font-size: 18px;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ededed;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .message-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .message-row.me {
+            justify-content: flex-end;
+        }
+
+        .message-row.other {
+            justify-content: flex-start;
+        }
+
+        .message-divider {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .divider-text {
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            color: #5e5e5e;
+            font-size: 12px;
+            padding: 4px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            letter-spacing: 2px;
+            font-weight: 400;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-break: break-word;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .me .message-bubble {
+            background-color: #95ec69;
+            color: #111;
+            border-top-right-radius: 4px;
+            margin-right: 2px;
+        }
+
+        .other .message-bubble {
+            background-color: #ffffff;
+            color: #111;
+            border-top-left-radius: 4px;
+            margin-left: 2px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .article-card {
+            max-width: 280px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9e9e9;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin: 4px 0;
+        }
+
+        .article-card:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .article-cover {
+            width: 100%;
+            height: 140px;
+            background-size: cover;
+            background-position: center;
+            background-color: #d0d0d0;
+        }
+
+        .article-info {
+            padding: 12px 14px;
+        }
+
+        .article-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #111;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .article-desc {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            color: #b0b0b0;
+        }
+
+        .article-meta i {
+            margin-right: 4px;
+            font-size: 10px;
+        }
+
+        .article-card .msg-time {
+            margin-top: 0;
+            margin-left: auto;
+        }
+
+        .msg-time {
+            font-size: 10px;
+            color: #7a7a7a;
+            margin-top: 4px;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+        }
+
+        .other .msg-time {
+            color: #8a8a8a;
+            justify-content: flex-start;
+        }
+
+        .me .msg-time i {
+            font-size: 10px;
+            margin-left: 4px;
+            opacity: 0.7;
+        }
+
+        .chat-footer {
+            background: #f8f8f8;
+            border-top: 1px solid #e0e0e0;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .input-actions-left {
+            display: flex;
+            gap: 16px;
+            color: #6e6e6e;
+            font-size: 22px;
+        }
+
+        .input-actions-left i {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .message-input-wrapper {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 22px;
+            border: 1px solid #d2d2d2;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            padding: 4px 0;
+            resize: none;
+            font-family: inherit;
+        }
+
+        .message-input::placeholder {
+            color: #b0b0b0;
+        }
+
+        .send-btn {
+            background: #f8f8f8;
+            border: none;
+            color: #2b9e5c;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+        }
+
+        .send-btn:hover {
+            background: #e2e2e2;
+        }
+
+        .send-btn i {
+            font-size: 20px;
+        }
+
+        .fa-regular, .fas, .far {
+            pointer-events: none;
+        }
+
+        .empty-messages {
+            text-align: center;
+            color: #a6a6a6;
+            padding: 40px 0;
+            font-size: 14px;
+        }
+
+        .moments-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .moments-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .moments-card {
+            width: 400px;
+            max-width: 90vw;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.2s;
+        }
+
+        .moments-overlay.show .moments-card {
+            transform: scale(1);
+        }
+
+        .moments-header {
+            padding: 16px 18px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .moments-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #888;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .moments-body {
+            padding: 18px;
+        }
+
+        .moment-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .moment-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .moment-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        .moment-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .moment-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .moment-content {
+            margin-left: 56px;
+        }
+
+        .moment-text {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .moment-location {
+            font-size: 12px;
+            color: #1a6fc4;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .moment-location i {
+            font-size: 11px;
+            color: #1a6fc4;
+        }
+
+        .moment-images {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .moment-images img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            background: #ddd;
+        }
+
+        .chat-list::-webkit-scrollbar,
+        .messages-container::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .chat-list::-webkit-scrollbar-thumb,
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        .page-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            color: #a8a8a8;
+            font-size: 14px;
+            font-weight: 400;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 6px 18px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            letter-spacing: 1px;
+            z-index: 50;
+        }
+
+        /* ========= 移动端适配 ========= */
+        @media (max-width: 600px) {
+            body {
+                background: #f8f8f8;
+            }
+            .wechat {
+                display: block;
+                position: relative;
+            }
+
+            .sidebar, .chat-main {
+                width: 100% !important;
+                height: 100%;
+                flex: none;
+                display: flex;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                background-color: #f8f8f8;
+            }
+
+            /* 默认显示侧边栏，隐藏聊天区 */
+            .wechat:not(.show-chat) .sidebar {
+                display: flex;
+                z-index: 2;
+            }
+            .wechat:not(.show-chat) .chat-main {
+                display: none;
+            }
+
+            /* 聊天视图：显示聊天区，隐藏侧边栏 */
+            .wechat.show-chat .sidebar {
+                display: none;
+            }
+            .wechat.show-chat .chat-main {
+                display: flex;
+                z-index: 3;
+            }
+
+            .mobile-back-btn {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 48px;
+                height: 48px;
+                background-color: transparent;
+                pointer-events: auto;
+                z-index: 100;
+            }
+
+            .chat-header {
+                padding: 10px 16px;
+            }
+            .header-left {
+                gap: 6px;
+            }
+            .chat-title {
+                font-size: 17px;
+            }
+
+            .page-indicator {
+                bottom: 16px;
+                right: 16px;
+                font-size: 13px;
+                padding: 4px 14px;
+                z-index: 60;
+            }
+
+            .chat-footer {
+                padding: 10px 12px;
+            }
+            .message-input-wrapper {
+                padding: 6px 12px;
+            }
+
+            .sidebar-header {
+                padding: 16px 16px 12px;
+            }
+            .chat-item {
+                padding: 12px 16px;
+            }
+            .chat-avatar {
+                width: 44px;
+                height: 44px;
+            }
+        }
+		
+		/* 左下角返回桌面链接 */
+		    .back-link {
+		      position: fixed;
+		      bottom: 20px;
+		      left: 30px;
+		      color: #153e5c;
+		      background: rgba(255, 255, 255, 0.2);
+		      backdrop-filter: blur(8px);
+		      -webkit-backdrop-filter: blur(8px);
+		      padding: 8px 20px;
+		      border-radius: 40px;
+		      border: 1px solid rgba(255, 255, 255, 0.25);
+		      font-size: 14px;
+		      text-decoration: none;
+		      display: inline-flex;
+		      align-items: center;
+		      gap: 8px;
+		      z-index: 50;
+		      transition: background 0.15s;
+		    }
+			
+    </style>
+</head>
+<body>
+	
+	<!-- 左下角返回桌面链接 -->
+	<a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+	
+    <div class="page-indicator">4/19</div>
+
+    <div class="wechat" id="wechatContainer">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="profile-row">
+                    <div class="user-avatar">沁</div>
+                    <div class="header-icons">
+                        <i class="fas fa-plus-circle"></i>
+                        <i class="far fa-comment-dots"></i>
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <span>搜索</span>
+                </div>
+            </div>
+            <div class="chat-list" id="chatList"></div>
+        </div>
+
+        <div class="chat-main">
+            <div class="chat-header">
+                <div class="header-left">
+                    <!-- 原生 onclick 返回，最可靠 -->
+                    <i class="fas fa-arrow-left mobile-back-btn" id="mobileBackBtn" onclick="document.getElementById('wechatContainer').classList.remove('show-chat'); if(window.messageInput) messageInput.blur();"></i>
+                    <div class="contact-avatar" id="contactAvatar"></div>
+                    <span class="chat-title" id="chatTitle">文件传输助手</span>
+                </div>
+                <div class="header-actions">
+                    <i class="fas fa-search"></i>
+                    <i class="fas fa-phone-alt"></i>
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+            </div>
+            <div class="messages-container" id="messagesContainer"></div>
+            <div class="chat-footer">
+                <div class="input-actions-left">
+                    <i class="far fa-smile"></i>
+                    <i class="fas fa-paperclip"></i>
+                    <i class="far fa-image"></i>
+                </div>
+                <div class="message-input-wrapper">
+                    <input type="text" class="message-input" id="messageInput" placeholder="输入消息..." autocomplete="off">
+                </div>
+                <button class="send-btn" id="sendBtn" title="发送 (Enter)">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 朋友圈浮层 -->
+    <div class="moments-overlay" id="momentsOverlay">
+        <div class="moments-card">
+            <div class="moments-header">
+                <h3 id="momentUserName">陈屿的朋友圈</h3>
+                <button class="close-btn" id="closeMomentsBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="moments-body">
+                <div class="moment-item">
+                    <div class="moment-user">
+                        <div class="moment-avatar" id="momentAvatar" style="background: #f39c12;">屿</div>
+                        <div>
+                            <div class="moment-name" id="momentName">陈屿</div>
+                            <div class="moment-time">2026年1月1日 19:30</div>
+                        </div>
+                    </div>
+                    <div class="moment-content">
+                        <div class="moment-text">到了很多地方，可美景却不知道分享给谁。</div>
+                        
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee;">
+                    <div class="moment-item">
+                        <div class="moment-user">
+                            <div class="moment-avatar" style="background: #f39c12;">屿</div>
+                            <div>
+                                <div class="moment-name">陈屿</div>
+                                <div class="moment-time">2025年2月25日 14:20</div>
+                            </div>
+                        </div>
+                        <div class="moment-content">
+                            <div class="moment-text">和认识很久的朋友到公园，我们坐在椅子上聊了很多，她就像是世界上的另一个我，相见恨晚。</div>
+                            <div class="moment-images">
+                                <img src="../img/hanghaigongyuan.jpg">
+                            </div>
+                            <div class="moment-location">
+                                <i class="fas fa-map-marker-alt"></i> 航海公园
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            "use strict";
+
+            const MOBILE_BREAKPOINT = 600;
+            const wechatEl = document.getElementById('wechatContainer');
+
+            function isMobileView() {
+                return window.innerWidth <= MOBILE_BREAKPOINT;
+            }
+
+            function enterChatView() {
+                if (isMobileView()) {
+                    wechatEl.classList.add('show-chat');
+                }
+            }
+
+            function backToChatList() {
+                if (isMobileView()) {
+                    wechatEl.classList.remove('show-chat');
+                    if (messageInput) messageInput.blur();
+                }
+            }
+
+            function handleViewportChange() {
+                if (!isMobileView()) {
+                    wechatEl.classList.remove('show-chat');
+                }
+            }
+
+            function formatTime(date) {
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+
+            const conversationsData = [
+                {
+                    id: 1,
+                    name: '妈妈',
+                    avatarColor: '#4a8cff',
+                    avatarLetter: '沈',
+                    lastMessage: '我的孩子，为什么这么狠心？',
+                    lastTime: '2025年3月2日',
+                    messages: [
+                        { type: 'divider', text: '···' },
+                        { sender: 'me', text: '妈妈 我已经到同海了 不用担心', time: '2019年9月21日' },
+                        { sender: 'other', text: '开学第一天，收拾好了就早点休息吧。', time: '2019年9月21日' },
+                        { sender: 'me', text: '嗯', time: '2019年9月21日' },
+                        { 
+                            sender: 'other', 
+                            type: 'article',
+                            article: {
+                                title: '十月这几天出生的人！命里极度缺水！一篇知道什么不能做！',
+                                desc: '阿开说命理',
+                                link: 'gongzhonghao.html'
+                            },
+                            time: '2019年10月3日'
+                        },
+                        { sender: 'me', text: '妈妈 你少看点毒公众号行吗', time: '2019年10月3日' },
+                        { sender: 'other', text: '什么毒公众号？你就是这几天出生的，算命先生也说命里十分缺水，名字还是特意给你取的！', time: '2019年10月3日' },
+                        { sender: 'me', text: '行行行 我看看', time: '2019年10月3日' },
+                        { type: 'divider', text: '···' },
+                        { sender: 'other', text: '我的孩子，为什么这么狠心？', time: '2025年3月2日' }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: '陈屿',
+                    avatarColor: '#f39c12',
+                    avatarLetter: '屿',
+                    lastMessage: '你不是说你不会再那样了吗',
+                    lastTime: '2025年3月2日',
+                    messages: [
+                        { sender: 'other', text: '终于加到你了。之前那个号我问了三次你都没通过，还以为你烦我。', time: '2025年2月23日' },
+                        { sender: 'me', text: '那是工作号  这个月就注销了', time: '2025年2月23日' },
+                        { sender: 'other', text: '注销？', time: '2025年2月23日' },
+                        { sender: 'me', text: '嗯 实习期到了 我不续', time: '2025年2月23日' },
+                        { sender: 'other', text: '你导师知道吗？她放你走吗？', time: '2025年2月23日' },
+                        { sender: 'me', text: '还没说', time: '2025年2月23日' },
+                        { sender: 'other', text: '她不同意怎么办？', time: '2025年2月23日' },
+                        { sender: 'other', text: '万一她卡着你不让你毕业', time: '2025年2月23日' },
+                        { sender: 'me', text: '我不想管这么多了', time: '2025年2月23日' },
+                        { sender: 'other', text: '周哥应该知道吧', time: '2025年2月23日' },
+                        { sender: 'me', text: '周毅知道', time: '2025年2月23日' },
+                        { sender: 'other', text: '好 你做好决定就好 这边别人问了我帮你解释', time: '2025年2月23日' },
+                        { sender: 'me', text: '谢谢你 实习这几个月你是我唯一能说上话的', time: '2025年2月23日' },
+                        { sender: 'other', text: '咱俩的关系还说什么谢谢', time: '2025年2月23日' },
+                        { type: 'divider', text: '···' },
+                        { sender: 'other', text: '不是和我约好了吗？为什么？', time: '2025年3月2日' },
+                    ]
+                },
+                {
+                    id: 3,
+                    name: '老公',
+                    avatarColor: '#2ecc71',
+                    avatarLetter: '周',
+                    lastMessage: '为什么？',
+                    lastTime: '2025年4月1日',
+                    messages: [
+                        { sender: 'other', text: '图书馆三楼靠窗，给你占了', time: '2019年9月12日' },
+                        { sender: 'me', text: '好。', time: '2019年9月12日' },
+                        { sender: 'other', text: '你昨天说那个座位舒服', time: '2019年9月12日' },
+                        { sender: 'me', text: '谢谢。', time: '2019年9月12日' },
+                        { sender: 'other', text: '坚果放你桌上了', time: '2019年9月12日' },
+                        { sender: 'me', text: '嗯。', time: '2019年9月12日' },
+                        { type: 'divider', text: '···' },
+                        { sender: 'other', text: '毕业照，咱俩拍一张', time: '2022年6月18日' },
+                        { sender: 'me', text: '嗯。', time: '2022年6月18日' },
+                        { sender: 'other', text: '笑一下', time: '2022年6月18日' },
+                        { sender: 'me', text: '笑了。', time: '2022年6月18日' },
+                        { sender: 'other', text: '行吧，也挺可爱的', time: '2022年6月18日' },
+                        { type: 'divider', text: '···' },
+                        { sender: 'other', text: '证领了，5月21号', time: '2023年5月21日' },
+                        { sender: 'me', text: '嗯。', time: '2023年5月21日' },
+                        { sender: 'other', text: '不夸我一句？', time: '2023年5月21日' },
+                        { sender: 'me', text: '日子选得好。', time: '2023年5月21日' },
+                        { sender: 'other', text: '回家。', time: '2023年5月21日' },
+                        { type: 'divider', text: '···' },
+                        { sender: 'other', text: '两点了，还没睡', time: '2024年12月15日' },
+                        { sender: 'me', text: '睡不着。', time: '2024年12月15日' },
+                        { sender: 'other', text: '...', time: '2024年12月15日' },
+						{ sender: 'other', text: '我不懂你导师都已经给你这么多好项目了', time: '2024年12月15日' },
+						{ sender: 'other', text: '我想要都没办法', time: '2024年12月15日' },
+						{ sender: 'other', text: '可你为什么这么矫情？', time: '2024年12月15日' },
+                        { sender: 'me', text: '我和你没什么好说的了。', time: '2024年12月15日' },
+                        { type: 'divider', text: '···' },
+                        { sender: 'other', text: '今天去见导师了？', time: '2024年12月28日' },
+                        { sender: 'me', text: '嗯。', time: '2024年12月28日' },
+                        { sender: 'other', text: '上次我太急了，你今天累不累', time: '2024年12月28日' },
+                        { sender: 'me', text: '累。', time: '2024年12月28日' },
+                        { sender: 'other', text: '我煮粥，早点回来', time: '2024年12月28日' },
+                        { type: 'divider', text: '···' },
+                        { sender: 'other', text: '晚上十点半了，导师消息？', time: '2025年1月10日' },
+                        { sender: 'me', text: '论文的事。', time: '2025年1月10日' },
+                        { sender: 'other', text: '嗯。我知道，又是你那位手眼通天的好导师，真羡慕你。', time: '2025年1月10日' },
+                        { sender: 'me', text: '...', time: '2025年1月10日' },
+                        { type: 'divider', text: '···' },
+                        { sender: 'other', text: '最近好点没', time: '2025年1月28日' },
+                        { sender: 'me', text: '好点了。', time: '2025年1月28日' },
+                        { sender: 'other', text: '有活儿别硬扛', time: '2025年1月28日' },
+                        { sender: 'me', text: '知道。', time: '2025年1月28日' },
+                        { sender: 'other', text: '……', time: '2025年1月28日' },
+                        { sender: 'me', text: '？', time: '2025年1月28日' },
+                        { sender: 'other', text: '没什么。', time: '2025年1月28日' },
+                        { type: 'divider', text: '···' },
+                        { sender: 'other', text: '下午还去导师那？', time: '2025年2月5日' },
+                        { sender: 'me', text: '嗯。', time: '2025年2月5日' },
+                        { sender: 'other', text: '围巾戴上，外面冷', time: '2025年2月5日' },
+                        { sender: 'me', text: '好。', time: '2025年2月5日' },
+                        { sender: 'other', text: '早点回来。', time: '2025年2月5日' },
+                        { sender: 'me', text: '知道了。', time: '2025年2月5日' },
+                        { sender: 'other', text: '……我等你。', time: '2025年2月5日' },
+                        { type: 'divider', text: '···' },
+                        { sender: 'me', text: '是你？', time: '2026年4月1日' },
+                        { sender: 'me', text: '为什么？', time: '2026年4月1日' },
+                    ]
+                }
+            ];
+
+            let conversations = JSON.parse(JSON.stringify(conversationsData));
+            let currentChatId = 1;
+
+            const chatListEl = document.getElementById('chatList');
+            const chatTitleEl = document.getElementById('chatTitle');
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const contactAvatar = document.getElementById('contactAvatar');
+            const momentsOverlay = document.getElementById('momentsOverlay');
+            const closeMomentsBtn = document.getElementById('closeMomentsBtn');
+            const momentUserName = document.getElementById('momentUserName');
+            const momentName = document.getElementById('momentName');
+            const momentAvatar = document.getElementById('momentAvatar');
+
+            // 将 messageInput 挂载到 window，以便内联 onclick 可以访问
+            window.messageInput = messageInput;
+
+            function updateHeaderAndMoments(conv) {
+                chatTitleEl.textContent = conv.name;
+                if (conv.id === 2) {
+                    contactAvatar.classList.add('visible');
+                    contactAvatar.style.background = conv.avatarColor;
+                    contactAvatar.textContent = conv.avatarLetter;
+                    momentUserName.textContent = conv.name + '的朋友圈';
+                    momentName.textContent = conv.name;
+                    momentAvatar.style.background = conv.avatarColor;
+                    momentAvatar.textContent = conv.avatarLetter;
+                } else {
+                    contactAvatar.classList.remove('visible');
+                    contactAvatar.style.background = '';
+                    contactAvatar.textContent = '';
+                }
+            }
+
+            function renderSidebar() {
+                if (!chatListEl) return;
+                let html = '';
+                conversations.forEach(conv => {
+                    const activeClass = conv.id === currentChatId ? 'active' : '';
+                    let lastMsgDisplay = conv.lastMessage || '';
+                    if (lastMsgDisplay.length > 14) lastMsgDisplay = lastMsgDisplay.substring(0, 12) + '…';
+                    html += `
+                        <div class="chat-item ${activeClass}" data-chat-id="${conv.id}">
+                            <div class="chat-avatar" style="background: ${conv.avatarColor};">
+                                ${conv.avatarLetter}
+                            </div>
+                            <div class="chat-info">
+                                <div class="chat-top">
+                                    <span class="chat-name">${conv.name}</span>
+                                    <span class="chat-time">${conv.lastTime || ''}</span>
+                                </div>
+                                <div class="chat-last-msg">${lastMsgDisplay}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                chatListEl.innerHTML = html;
+            }
+
+            function escapeHtml(text) {
+                if (!text) return text;
+                const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+                return text.replace(/[&<>"']/g, m => map[m]);
+            }
+
+            function renderMessages() {
+                const currentConv = conversations.find(c => c.id === currentChatId);
+                if (!currentConv) return;
+                updateHeaderAndMoments(currentConv);
+                const messages = currentConv.messages || [];
+                if (messages.length === 0) {
+                    messagesContainer.innerHTML = `<div class="empty-messages">暂无消息，开始聊天吧</div>`;
+                    return;
+                }
+                let msgsHtml = '';
+                messages.forEach(msg => {
+                    if (msg.type === 'divider') {
+                        msgsHtml += `<div class="message-divider"><span class="divider-text">${escapeHtml(msg.text || '···')}</span></div>`;
+                        return;
+                    }
+                    const senderClass = msg.sender === 'me' ? 'me' : 'other';
+                    const timeStr = msg.time || '';
+                    if (msg.type === 'article' && msg.article) {
+                        const art = msg.article;
+                        msgsHtml += `
+                            <div class="message-row ${senderClass}">
+                                <div class="article-card" data-link="${escapeHtml(art.link)}">
+                                    <div class="article-cover" style="background-image: url('${escapeHtml(art.coverUrl || '')}');"></div>
+                                    <div class="article-info">
+                                        <div class="article-title">${escapeHtml(art.title)}</div>
+                                        <div class="article-desc">${escapeHtml(art.desc)}</div>
+                                        <div class="article-meta">
+                                            <i class="fas fa-link"></i> 公众号 · 转发
+                                            <span style="flex:1;"></span>
+                                            <span class="msg-time">${timeStr}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        msgsHtml += `
+                            <div class="message-row ${senderClass}">
+                                <div class="message-bubble">
+                                    <div class="msg-text">${escapeHtml(msg.text)}</div>
+                                    <div class="msg-time">
+                                        ${timeStr}
+                                        ${msg.sender === 'me' ? '<i class="fas fa-check-double" style="font-size:10px; opacity:0.7;"></i>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                messagesContainer.innerHTML = msgsHtml;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            messagesContainer.addEventListener('click', (e) => {
+                const card = e.target.closest('.article-card');
+                if (!card) return;
+                const link = card.getAttribute('data-link');
+                if (link) window.open(link, '_blank');
+            });
+
+            contactAvatar.addEventListener('click', () => {
+                const currentConv = conversations.find(c => c.id === currentChatId);
+                if (currentConv && currentConv.id === 2) {
+                    updateHeaderAndMoments(currentConv);
+                    momentsOverlay.classList.add('show');
+                }
+            });
+
+            function closeMoments() { momentsOverlay.classList.remove('show'); }
+            closeMomentsBtn.addEventListener('click', closeMoments);
+            momentsOverlay.addEventListener('click', (e) => { if (e.target === momentsOverlay) closeMoments(); });
+
+            function updateConversationLastMessage(convId, newLastMsg, newTime) {
+                const conv = conversations.find(c => c.id === convId);
+                if (conv) { conv.lastMessage = newLastMsg; conv.lastTime = newTime; }
+            }
+
+            function handleSendMessage() {
+                const text = messageInput.value.trim();
+                if (!text) return;
+                const currentConv = conversations.find(c => c.id === currentChatId);
+                if (!currentConv) return;
+                const now = new Date();
+                const timeStr = formatTime(now);
+                currentConv.messages.push({ sender: 'me', text, time: timeStr });
+                updateConversationLastMessage(currentChatId, text, timeStr);
+                renderSidebar();
+                renderMessages();
+                messageInput.value = '';
+                messageInput.focus();
+            }
+
+            function switchChat(chatId) {
+                const isSameChat = (currentChatId === chatId);
+                if (!isSameChat) {
+                    currentChatId = chatId;
+                    renderSidebar();
+                    renderMessages();
+                } else {
+                    renderSidebar();
+                }
+                if (isMobileView()) {
+                    enterChatView();
+                    messageInput.focus();
+                } else {
+                    wechatEl.classList.remove('show-chat');
+                }
+                if (!isSameChat) messageInput.value = '';
+                messageInput.focus();
+            }
+
+            chatListEl.addEventListener('click', (e) => {
+                const chatItem = e.target.closest('.chat-item');
+                if (!chatItem) return;
+                const chatId = parseInt(chatItem.getAttribute('data-chat-id'));
+                if (!isNaN(chatId)) switchChat(chatId);
+            });
+
+            sendBtn.addEventListener('click', handleSendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); handleSendMessage(); }
+            });
+            window.addEventListener('resize', handleViewportChange);
+
+            function init() {
+                if (!conversations.find(c => c.id === currentChatId)) currentChatId = conversations[0]?.id || 1;
+                renderSidebar();
+                renderMessages();
+                if (isMobileView()) wechatEl.classList.remove('show-chat');
+                else wechatEl.classList.remove('show-chat');
+                messageInput.focus();
+            }
+            init();
+        })();
+    </script>
+</body>
+</html>

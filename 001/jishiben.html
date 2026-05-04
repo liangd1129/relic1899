@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>记事本</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 30%, #c6e2ff, #a0c8f0, #7eb0e0);
+      background-size: cover;
+      background-color: #b8d4f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 主卡片：笔记本列表 */
+    .notepad-container {
+      width: 560px;
+      max-width: 90vw;
+      max-height: 80vh;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 32px;
+      padding: 28px 24px;
+      box-shadow: 0 25px 40px -10px rgba(0, 20, 40, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notepad-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      color: #153e5c;
+      padding: 0 6px;
+    }
+
+    .notepad-header i {
+      font-size: 32px;
+      background: rgba(255,255,255,0.4);
+      padding: 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .notepad-header h2 {
+      font-weight: 450;
+      font-size: 28px;
+      text-shadow: 0 1px 4px rgba(255,255,255,0.3);
+    }
+
+    .notepad-header .note-count {
+      margin-left: auto;
+      background: rgba(255,255,255,0.3);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #153e5c;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    /* 笔记列表区域（可滚动） */
+    .notes-list {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    /* 单条笔记卡片 */
+    .note-item {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 20px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: background 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .note-item:hover {
+      background: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 14px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 折叠头部：显示标题和时间 */
+    .note-header {
+      display: flex;
+      align-items: center;
+      padding: 16px 18px;
+    }
+
+    .note-icon {
+      margin-right: 14px;
+      color: #1e5a9b;
+      font-size: 20px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .note-title-section {
+      flex: 1;
+    }
+
+    .note-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: #0b2a44;
+      margin-bottom: 4px;
+    }
+
+    .note-time {
+      font-size: 12px;
+      color: #2e577a;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .note-time i {
+      font-size: 11px;
+    }
+
+    .expand-icon {
+      color: #2e577a;
+      font-size: 16px;
+      transition: transform 0.2s;
+      margin-left: 8px;
+    }
+
+    /* 展开的内容区域 */
+    .note-content {
+      padding: 0 18px 18px 56px;  /* 左边距对齐标题文字 */
+      color: #153e5c;
+      font-size: 15px;
+      line-height: 1.5;
+      border-top: 1px dashed rgba(60, 100, 140, 0.15);
+      margin-top: 4px;
+      display: none;  /* 默认隐藏 */
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .note-item.expanded .note-content {
+      display: block;
+    }
+
+    .note-item.expanded .expand-icon {
+      transform: rotate(90deg);
+    }
+
+    /* 底部操作栏 */
+    .notepad-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      padding: 8px 6px 0;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 40px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(8px);
+      color: #153e5c;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.03);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn i {
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.5);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .btn.primary {
+      background: #1e5a9b;
+      color: white;
+      border-color: #1e5a9b;
+      box-shadow: 0 8px 16px rgba(30, 90, 155, 0.2);
+    }
+
+    .btn.primary:hover {
+      background: #1b4e84;
+    }
+
+    /* 右下角页码标识 */
+    .page-indicator {
+      position: absolute;
+      bottom: 20px;
+      right: 30px;
+      color: white;
+      font-size: 14px;
+      font-weight: 400;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 6px 18px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      letter-spacing: 1px;
+      z-index: 50;
+    }
+
+    /* 返回桌面链接 */
+    .back-link {
+      position: absolute;
+      bottom: 20px;
+      left: 30px;
+      color: #153e5c;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      padding: 6px 18px;
+      border-radius: 40px;
+      border: 1px solid rgba(255,255,255,0.25);
+      font-size: 14px;
+      text-decoration: none;
+      transition: background 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.35);
+    }
+
+    /* 空状态提示 */
+    .empty-notes {
+      text-align: center;
+      padding: 40px 20px;
+      color: #2e577a;
+      opacity: 0.7;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 主容器 -->
+<div class="notepad-container">
+  <div class="notepad-header">
+    <i class="fas fa-book"></i>
+    <h2>记事本</h2>
+    <span class="note-count" id="noteCount">3 条笔记</span>
+  </div>
+
+  <!-- 笔记列表 -->
+  <div class="notes-list" id="notesList">
+    <!-- 笔记条目将通过 JavaScript 动态生成，便于维护 -->
+  </div>
+
+  <!-- 底部操作 -->
+  <div class="notepad-footer">
+   
+    <button class="btn primary" id="newNoteBtn"><i class="fas fa-plus"></i> 新建笔记</button>
+  </div>
+</div>
+
+<!-- 右下角页码 -->
+<div class="page-indicator">2/19</div>
+
+<!-- 返回桌面链接 -->
+<a href="window.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回桌面</a>
+
+<script>
+  (function() {
+    // ---------- 预设笔记数据（第一条已按您的要求修改）----------
+    const defaultNotes = [
+      {
+        id: 1,
+        title: '新笔记',
+        time: '2026.04.12 10:23',
+        content: '这是我整理的已知信息。\n我妻子叫做沈沁，01年10月生，同海大学园林设计专业的研究生，毕业后就一直在她导师手下工作。她性格比较孤僻，一直以来没几个朋友。我们是在同大认识，23年11月结了婚，之后我们也一直住在一起。\n25年3月她离世之后，除了整理她的邮箱外，我就只添加了这一篇记事本。另外，她电脑状态栏上的搜索框能搜到更详细的信息。'
+      }
+    ];
+
+    // 强制清除旧缓存，使用最新默认数据（解决修改不显示的问题）
+    localStorage.removeItem('notepad_notes');
+    let notes = defaultNotes.map(n => ({ ...n, expanded: false }));
+
+    const notesListEl = document.getElementById('notesList');
+    const noteCountEl = document.getElementById('noteCount');
+
+    // 渲染所有笔记
+    function renderNotes() {
+      if (!notes.length) {
+        notesListEl.innerHTML = '<div class="empty-notes"><i class="far fa-sticky-note"></i> 暂无笔记</div>';
+        noteCountEl.textContent = '0 条笔记';
+        return;
+      }
+
+      let html = '';
+      notes.forEach(note => {
+        const expandedClass = note.expanded ? 'expanded' : '';
+        html += `
+          <div class="note-item ${expandedClass}" data-id="${note.id}">
+            <div class="note-header">
+              <div class="note-icon"><i class="far fa-file-alt"></i></div>
+              <div class="note-title-section">
+                <div class="note-title">${escapeHtml(note.title) || '无标题'}</div>
+                <div class="note-time">
+                  <i class="far fa-clock"></i> ${escapeHtml(note.time) || '未知时间'}
+                </div>
+              </div>
+              <div class="expand-icon"><i class="fas fa-chevron-right"></i></div>
+            </div>
+            <div class="note-content">${escapeHtml(note.content).replace(/\n/g, '<br>')}</div>
+          </div>
+        `;
+      });
+      notesListEl.innerHTML = html;
+      noteCountEl.textContent = `${notes.length} 条笔记`;
+
+      // 绑定点击展开/折叠事件
+      document.querySelectorAll('.note-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+          const noteId = Number(this.dataset.id);
+          toggleNoteExpand(noteId);
+        });
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function toggleNoteExpand(id) {
+      const note = notes.find(n => n.id === id);
+      if (note) {
+        note.expanded = !note.expanded;
+        renderNotes();
+      }
+    }
+
+
+   
+
+    // 初始化渲染
+    renderNotes();
+
+    // 绑定按钮事件
+    const newNoteBtn = document.getElementById('newNoteBtn');
+    if (newNoteBtn) {
+      newNoteBtn.addEventListener('click', mockAddNote);
+    }
+
+    // 删除不存在的 collapseAllBtn 事件绑定，避免报错
+  })();
+</script>
+</body>
+</html>

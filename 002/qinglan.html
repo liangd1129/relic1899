@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>青岚大事报</title>
+    <!-- 复古风格 · 沿用原样式，但布局调整：无左侧图，内部搜索框，主页跳转Internet.html -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', 'Microsoft Sans Serif', sans-serif;
+        }
+        body {
+            background: #3a6ea5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        .browser-window {
+            width: 1250px;
+            max-width: 100%;
+            background: #ece9d8;
+            border: 2px solid #0a246a;
+            border-radius: 8px 8px 5px 5px;
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), inset 0 0 0 1px #fefefe;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .title-bar {
+            background: linear-gradient(90deg, #0a246a 0%, #3a6ea5 50%, #6ba1d9 100%);
+            padding: 6px 8px 6px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #0a2a5e;
+            color: white;
+            text-shadow: 1px 1px 0 #0a246a;
+        }
+        .window-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .window-title i {
+            font-size: 18px;
+            color: #ffd966;
+            filter: drop-shadow(0 1px 1px #0a246a);
+        }
+        .window-controls {
+            display: flex;
+            gap: 3px;
+        }
+        .win-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            color: #0a246a;
+            width: 26px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-decoration: none;
+        }
+        .win-btn:hover {
+            background: #b8d0e8;
+            box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #606060;
+        }
+        .win-btn.close:hover {
+            background: #d47a7a;
+            color: white;
+            text-shadow: none;
+        }
+        .toolbar {
+            background: #d4d0c8;
+            padding: 5px 8px 3px 8px;
+            border-bottom: 1px solid #a7a7a7;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+        .tb-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            padding: 5px 10px;
+            min-width: 40px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1e1e1e;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: default;
+            line-height: 1;
+        }
+        .tb-btn i {
+            font-size: 15px;
+            color: #1e3a6b;
+        }
+        .tb-btn:hover {
+            background: #b8d0e8;
+            box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #707070;
+        }
+
+        .tb-btn.disabled {
+            opacity: 0.55;
+            filter: grayscale(0.5);
+            cursor: default;
+            pointer-events: none;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a0a0a0;
+            background: #c5c0b5;
+            border-color: #6a6a6a;
+            color: #4a4a4a;
+        }
+        .tb-btn.disabled i {
+            color: #5a5a5a;
+        }
+        .tb-btn.disabled:hover {
+            background: #c5c0b5;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a0a0a0;
+        }
+
+        /* 主页按钮 — 可点，跳转Internet.html */
+        .tb-btn.home-active {
+            cursor: pointer;
+            background: #d4d0c8;
+            opacity: 1;
+            filter: none;
+            pointer-events: auto;
+        }
+        .tb-btn.home-active:hover {
+            background: #b8d0e8;
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background: #a7a7a7;
+            margin: 0 4px;
+            box-shadow: 1px 0 0 #fff;
+        }
+        .address-bar {
+            background: #d4d0c8;
+            padding: 6px 8px 6px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #a7a7a7;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+        .address-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1e3a6b;
+            text-shadow: 1px 0 0 #fff;
+        }
+        .address-input-wrapper {
+            flex: 1;
+            display: flex;
+            background: white;
+            border: 2px inset #e0e0e0;
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 2px #7a7a7a;
+        }
+        #urlInput {
+            width: 100%;
+            padding: 6px 8px;
+            border: none;
+            outline: none;
+            font-size: 13px;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+            color: #0a246a;
+        }
+        .go-btn {
+            background: #d4d0c8;
+            border: 2px outset #f0f0f0;
+            border-radius: 3px;
+            padding: 4px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0a246a;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: default;
+            min-width: 60px;
+            text-align: center;
+        }
+        .go-btn:hover {
+            background: #b8d0e8;
+            border: 2px outset #c0d8f0;
+        }
+        .browser-content {
+            background: #ffffff;
+            border: 2px inset #ece9d8;
+            margin: 0;
+            flex: 1;
+            min-height: 480px;
+            display: flex;
+            padding: 16px;
+        }
+
+        /* 卡片布局 — 左侧图片已移除，卡片内全宽 */
+        .talisman-card {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+            background: #fef9e8;
+            border: 3px ridge #a7a7a7;
+            box-shadow: inset 0 0 0 1px #ffffff, 3px 3px 6px rgba(0,0,0,0.1);
+            padding: 24px 24px;
+            gap: 16px;
+        }
+        /* 右侧内容区占满 */
+        .card-full {
+            flex: 1;
+            min-width: 260px;
+            color: #1e1e1e;
+        }
+        .talisman-title {
+            font-size: 30px;
+            font-weight: 700;
+            color: #1e3a6b;
+            text-shadow: 1px 1px 0 #e6d5b8;
+            border-bottom: 2px solid #b89b6b;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+            font-family: 'Segoe UI', '楷体', 'KaiTi', serif;
+        }
+        .talisman-meta {
+            font-size: 15px;
+            background: #e3d6bf;
+            padding: 8px 14px;
+            border-left: 6px solid #2a5c7a;
+            margin-bottom: 22px;
+            box-shadow: inset 1px 1px 2px #fff, inset -1px -1px 2px #a09b8b;
+            color: #1f3a4e;
+            font-weight: 500;
+        }
+        .desc-text {
+            font-size: 14.5px;
+            line-height: 1.65;
+            margin-bottom: 18px;
+            text-align: justify;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a6b;
+            margin: 24px 0 12px 0;
+            border-bottom: 1px dashed #8b7a5a;
+            padding-bottom: 4px;
+            text-shadow: 1px 1px 0 #f0e8d8;
+        }
+        
+        /* 内部搜索框区域 */
+        .search-container {
+            background: #e3d9c6;
+            padding: 18px 20px;
+            margin: 24px 0 16px;
+            border: 2px inset #c0b29a;
+            box-shadow: inset 1px 1px 4px #fff, inset -1px -1px 4px #9b8f7c;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+        .search-label {
+            font-weight: bold;
+            color: #1e3a5f;
+            font-size: 16px;
+            text-shadow: 1px 1px 0 #f0e8d8;
+        }
+        .search-input-wrapper {
+            flex: 2;
+            min-width: 200px;
+            display: flex;
+            background: white;
+            border: 2px inset #e0e0e0;
+            box-shadow: inset 1px 1px 2px #6f6f6f;
+        }
+        #yearSearchInput {
+            width: 100%;
+            padding: 8px 12px;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+            color: #0a246a;
+        }
+        .search-btn {
+            background: #d4d0c8;
+            border: 2px outset #f0f0f0;
+            border-radius: 3px;
+            padding: 8px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #0a246a;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;
+            transition: 0.05s;
+            min-width: 90px;
+        }
+        .search-btn:hover {
+            background: #b8d0e8;
+            border: 2px outset #c0d8f0;
+        }
+
+        /* 消息区域 */
+        .message-area {
+            margin: 20px 0 8px;
+            padding: 12px 18px;
+            background: #f5efe3;
+            border-left: 6px solid #b33;
+            box-shadow: inset 1px 1px 3px #fff, inset -1px -1px 3px #bcb2a2;
+            font-weight: 500;
+            color: #6b1a1a;
+        }
+        .message-area.info {
+            border-left-color: #2a6b8f;
+            color: #1e3a5f;
+        }
+
+        .quote-block {
+            background: #eae1cf;
+            padding: 14px 18px;
+            border-radius: 0;
+            border: 1px solid #c6b59e;
+            box-shadow: inset 1px 1px 3px #fdf6e7, inset -1px -1px 3px #b8aa96;
+            margin: 20px 0 8px;
+            color: #1f2e1f;
+        }
+
+        .status-bar {
+            background: #d4d0c8;
+            border-top: 1px solid #a7a7a7;
+            padding: 4px 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #1e1e1e;
+            box-shadow: inset 0 2px 3px -2px #808080;
+        }
+        .status-left i {
+            margin-right: 6px;
+            color: #1e3a6b;
+        }
+
+        .page-indicator {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            color: #1e3a5f;
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 0 1px 0 white;
+            letter-spacing: 0.5px;
+            background: linear-gradient(180deg, rgba(242, 247, 252, 0.85), rgba(221, 231, 242, 0.85) 45%, rgba(201, 217, 234, 0.85));
+            border: 1px solid #8ba5c2;
+            border-radius: 20px;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.15);
+            padding: 8px 20px;
+            white-space: nowrap;
+            cursor: default;
+            user-select: none;
+        }
+
+        @media (max-width: 700px) {
+            .browser-window { width: 100%; }
+            .tb-btn span { display: none; }
+            .tb-btn { padding: 6px 8px; }
+            .search-container { flex-direction: column; align-items: stretch; }
+            .search-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-indicator">8/18</div>
+
+<div class="browser-window">
+    <div class="title-bar">
+        <div class="window-title">
+            <i class="fab fa-internet-explorer"></i>
+            <span>Microsoft Internet Explorer</span>
+        </div>
+        <div class="window-controls">
+            <div class="win-btn"><i class="fas fa-minus"></i></div>
+            <div class="win-btn"><i class="far fa-square"></i></div>
+            <div class="win-btn close" onclick="window.location.href='win7.html'" title="关闭并返回Win7风格">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工具栏：主页按钮跳转 Internet.html -->
+    <div class="toolbar">
+        <div class="tb-btn disabled"><i class="fas fa-arrow-left"></i><span>后退</span></div>
+        <div class="tb-btn disabled"><i class="fas fa-arrow-right"></i><span>前进</span></div>
+        <div class="separator"></div>
+        <div class="tb-btn disabled"><i class="fas fa-sync-alt"></i><span>刷新</span></div>
+        <!-- 主页：点击跳转 Internet.html -->
+        <div class="tb-btn home-active" onclick="window.location.href='internet.html'">
+            <i class="fas fa-home"></i><span>主页</span>
+        </div>
+        <div class="separator"></div>
+        <div class="tb-btn disabled"><i class="fas fa-search"></i><span>搜索</span></div>
+    </div>
+
+    <!-- 地址栏：仅作装饰，显示当前页面标识 -->
+    <div class="address-bar">
+        <div class="address-label">地址</div>
+        <div class="address-input-wrapper">
+            <input type="text" id="urlInput" value="青岚大事报" readonly>
+        </div>
+        <div class="go-btn">转到</div>
+    </div>
+
+    <!-- 内容区域：左侧图片已完全移除，内容全宽 -->
+    <div class="browser-content">
+        <div class="talisman-card">
+            <!-- 不再有左侧图片区域，直接全宽内容 -->
+            <div class="card-full">
+                <div class="talisman-title">青岚大事报</div>
+               
+			   <div class="desc-text">
+			       <strong>青岚大事报 · 年份检索</strong>
+			   </div>
+			   
+               
+
+                <!-- 内部搜索框：核心检索功能 -->
+                <div class="search-container">
+                    <span class="search-label"><i class="fas fa-search" style="margin-right: 6px;"></i>检索年份</span>
+                    <div class="search-input-wrapper">
+                        <input type="text" id="yearSearchInput" placeholder="输入年份" value="" autocomplete="off">
+                    </div>
+                    <button class="search-btn" id="searchBtn"><i class="fas fa-arrow-right" style="margin-right: 4px;"></i> 查阅</button>
+                </div>
+				
+				<div class="desc-text">
+				    本馆藏收录青岚市重大新闻。在年份检索框中输入四位公元年份，
+				    点击「查阅」或按回车键，即可跳转至对应年份的档案专页。
+				</div>
+
+
+            </div>
+        </div>
+    </div>
+
+   
+</div>
+
+<script>
+    (function(){
+        "use strict";
+
+        // 获取内部搜索框元素
+        const searchInput = document.getElementById('yearSearchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const messageBox = document.getElementById('messageBox');
+
+        // 默认信息样式
+        const DEFAULT_INFO = '<i class="fas fa-info-circle" style="margin-right: 8px;"></i> 就绪。请输入年份「1978」查阅大事报。';
+
+        // 设置消息函数
+        function setMessage(text, isError = false) {
+            if (!messageBox) return;
+            if (isError) {
+                messageBox.className = 'message-area';
+                messageBox.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i> ${text}`;
+            } else {
+                messageBox.className = 'message-area info';
+                messageBox.innerHTML = `<i class="fas fa-info-circle" style="margin-right: 8px;"></i> ${text}`;
+            }
+        }
+
+        // 重置消息为默认（清空输入后也可调用）
+        function resetMessageToDefault() {
+            setMessage('就绪。请输入年份「1978」查阅大事报。', false);
+        }
+
+        // 检索核心逻辑：仅当输入为 "1978" 时跳转 1978.html
+        function performYearSearch() {
+            if (!searchInput) return;
+            
+            const rawValue = searchInput.value;
+            const trimmed = rawValue.trim();
+            
+            if (trimmed === '') {
+                setMessage('请输入年份。示例：1978', true);
+                return;
+            }
+
+            if (trimmed === '1978') {
+                // 跳转到 1978.html
+                window.location.href = '1978.html';
+            } 
+			if (trimmed === '2002') {
+			    // 跳转到 2002.html
+			    window.location.href = '2002.html';
+			} 
+        }
+
+        // 绑定事件
+        if (searchBtn) {
+            searchBtn.addEventListener('click', performYearSearch);
+        }
+
+        if (searchInput) {
+            // 回车检索
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performYearSearch();
+                }
+            });
+
+            // 输入时如果消息为错误，可以恢复成提示（提升体验）
+            searchInput.addEventListener('input', function() {
+                const val = searchInput.value.trim();
+                if (messageBox && !messageBox.classList.contains('info')) {
+                    if (val === '') {
+                        resetMessageToDefault();
+                    } else {
+                        setMessage(`当前输入：${val}。点击「查阅」或按回车。`, false);
+                    }
+                } else if (messageBox && messageBox.classList.contains('info')) {
+                    // 更新提示
+                    if (val === '') {
+                        resetMessageToDefault();
+                    } else {
+                        setMessage(`当前输入：${val}。点击「查阅」或按回车。`, false);
+                    }
+                }
+            });
+        }
+
+        // 初始化：确保输入框为空，消息默认
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        resetMessageToDefault();
+
+        // 主页按钮已经直接使用 onclick 跳转 Internet.html，无需额外代码。
+        // 地址栏只读，不参与搜索。
+
+        // 附加：如果用户通过地址栏回车不做任何事（已 readonly）
+        const addrInput = document.getElementById('urlInput');
+        if (addrInput) {
+            addrInput.addEventListener('keydown', (e) => e.preventDefault());
+        }
+
+        // 让关闭按钮保持原有跳转 (已在html中定义)
+    })();
+</script>
+
+<!-- 微调样式：让内部搜索框更贴合卡片 -->
+<style>
+    /* 确保消息区域与卡片协调 */
+    .message-area {
+        transition: all 0.1s;
+        border-left-width: 6px;
+    }
+    .message-area.info {
+        border-left-color: #2a6b8f;
+    }
+    #yearSearchInput::placeholder {
+        color: #6f6f6f;
+        font-style: italic;
+    }
+    /* 地址栏只读样式 */
+    #urlInput[readonly] {
+        background-color: #f3f3f3;
+        cursor: default;
+    }
+    /* 卡片内边距优化 */
+    .talisman-card {
+        padding: 28px 26px;
+    }
+    .search-container {
+        border-radius: 2px;
+    }
+    .search-btn i {
+        pointer-events: none;
+    }
+</style>
+
+</body>
+</html>

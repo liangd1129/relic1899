@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>文件夹</title>
+  <!-- Font Awesome 6 (图标库) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ----- 全局重置 & Win7 氛围 ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at 30% 30%, #f0e9de, #b6c8d9, #7f9bb3);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', 'Lucida Grande', Tahoma, sans-serif;
+      font-size: 13px;
+      padding: 20px;
+      margin: 0;
+      position: relative;
+    }
+
+    /* ---------- 主窗口：Aero 玻璃 + 精致阴影 (经典 Win7) ---------- */
+    .win7-window {
+      width: 980px;
+      max-width: 100%;
+      background: rgba(235, 245, 255, 0.68);
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 9px 9px 8px 8px;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1) inset, 0 0 0 2px rgba(255, 255, 255, 0.25) inset;
+      overflow: hidden;
+      transition: all 0.1s;
+    }
+
+    /* ----- 标题栏 (Win7 经典) ----- */
+    .title-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px 6px 12px;
+      background: rgba(220, 234, 248, 0.45);
+      border-bottom: 1px solid rgba(160, 180, 200, 0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .window-icon-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #1e3a5f;
+      text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+      font-weight: 500;
+      font-size: 13.5px;
+    }
+
+    .window-icon-title i {
+      font-size: 17px;
+      color: #2a5a8c;
+      text-shadow: 0 1px 2px white;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* 最小化/最大化/关闭按钮 — 完全仿真Win7光泽 */
+    .win-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 22px;
+      border-radius: 3px;
+      background: rgba(220, 235, 250, 0.55);
+      border: 1px solid rgba(120, 140, 160, 0.35);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7);
+      color: #1e3a5f;
+      font-size: 11px;
+      cursor: pointer;
+      backdrop-filter: blur(2px);
+      transition: all 0.1s;
+    }
+
+    .win-btn i {
+      font-size: 11px;
+      color: #2c4053;
+    }
+
+    .win-btn:hover {
+      background: rgba(210, 230, 255, 0.8);
+      border-color: rgba(90, 130, 190, 0.5);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 white;
+    }
+
+    .win-btn.close-btn:hover {
+      background: #d9534f;
+      border-color: #b52b27;
+    }
+    .win-btn.close-btn:hover i {
+      color: white;
+    }
+
+    /* ----- 地址栏 & 导航 (简洁路径) ----- */
+    .nav-address-bar {
+      display: flex;
+      align-items: center;
+      padding: 8px 14px 6px 14px;
+      gap: 12px;
+      background: rgba(245, 250, 255, 0.35);
+      border-bottom: 1px solid rgba(170, 190, 210, 0.45);
+      backdrop-filter: blur(4px);
+      flex-wrap: wrap;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 3px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 26px;
+      border-radius: 4px;
+      background: rgba(235, 245, 255, 0.65);
+      border: 1px solid rgba(140, 160, 180, 0.45);
+      color: #2b4a6b;
+      font-size: 13px;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.9), 0 1px 1px rgba(0,0,0,0.03);
+      cursor: default;
+      backdrop-filter: blur(2px);
+    }
+
+    .nav-btn i {
+      font-size: 12px;
+    }
+
+    .nav-btn.disabled {
+      opacity: 0.45;
+      background: rgba(220, 230, 240, 0.4);
+      box-shadow: none;
+    }
+
+    /* 地址栏面包屑 — 简洁路径 */
+    .address-breadcrumb {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(130, 160, 190, 0.5);
+      border-radius: 5px;
+      padding: 2px 2px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.02), 0 1px 0 rgba(255,255,255,0.5);
+      height: 30px;
+      min-width: auto;
+    }
+	
+    @media (max-width: 640px) {
+      .address-breadcrumb {
+        padding: 2px 0;
+        height: 26px;
+        font-size: 13px;
+      }
+    }
+
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      padding: 4px 10px;
+      margin: 0 1px;
+      border-radius: 4px;
+      background: transparent;
+      color: #1e3a5f;
+      font-size: 12.5px;
+      white-space: nowrap;
+      cursor: default;
+      border: 1px solid transparent;
+    }
+
+    .breadcrumb-item i {
+      margin-right: 6px;
+      font-size: 12px;
+      color: #3b6e9f;
+    }
+
+    .breadcrumb-item:hover {
+      background: rgba(210, 230, 255, 0.7);
+      border: 1px solid rgba(120, 170, 220, 0.5);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .breadcrumb-arrow {
+      color: #6e8da8;
+      margin: 0 2px;
+      font-size: 10px;
+    }
+
+    .address-icons {
+      display: flex;
+      margin-left: 6px;
+      gap: 5px;
+    }
+
+    .address-icon-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      background: transparent;
+      color: #2a4e6e;
+      cursor: default;
+    }
+
+    /* 搜索框 —— 真实输入 */
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(120, 155, 185, 0.6);
+      border-radius: 18px;
+      padding: 3px 10px 3px 12px;
+      margin-left: 10px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.5);
+      height: 30px;
+      width: 300px;
+      transition: box-shadow 0.1s;
+    }
+
+    .search-box i {
+      color: #4a6e8c;
+      font-size: 12px;
+      margin-right: 8px;
+    }
+
+    .search-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      font-size: 12.5px;
+      width: 100%;
+      color: #1e3a5f;
+      font-style: italic;
+    }
+
+    .search-box input::placeholder {
+      color: #3f5f7a;
+      opacity: 0.8;
+      font-style: italic;
+    }
+
+    /* ----- 命令栏 (组织/共享/新建文件夹) 可响应式折行 ----- */
+    .command-bar {
+      display: flex;
+      align-items: center;
+      padding: 6px 16px;
+      gap: 10px;
+      background: rgba(248, 252, 255, 0.35);
+      border-bottom: 1px solid rgba(160, 185, 210, 0.45);
+      backdrop-filter: blur(4px);
+      flex-wrap: wrap;
+    }
+
+    .cmd-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 5px;
+      color: #1c3c5c;
+      font-size: 13px;
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: default;
+      white-space: nowrap;
+    }
+
+    .cmd-item i {
+      font-size: 13px;
+      color: #3a6a96;
+    }
+
+    .cmd-item:hover {
+      background: rgba(215, 235, 255, 0.6);
+      border: 1px solid rgba(115, 160, 210, 0.5);
+      box-shadow: 0 1px 2px rgba(255,255,255,0.7);
+    }
+
+    .cmd-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(120, 150, 180, 0.35);
+      margin: 0 5px;
+    }
+
+    /* ----- 主体：仅有文件夹内容区域 (无左侧导航) ----- */
+    .folder-content-pane {
+      background: rgba(240, 248, 255, 0.2);
+      backdrop-filter: blur(4px);
+      padding: 12px 12px 8px 12px;
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 列标题 (详细信息视图) — Win7标志性 */
+    .file-columns {
+      display: grid;
+      grid-template-columns: 3.5fr 1.4fr 1.4fr 0.9fr;
+      padding: 8px 10px 6px 12px;
+      background: rgba(225, 240, 255, 0.6);
+      backdrop-filter: blur(2px);
+      border-bottom: 1px solid #b0c7dd;
+      border-top: 1px solid rgba(255,255,255,0.6);
+      font-size: 12px;
+      font-weight: 600;
+      color: #1a3e5c;
+      text-shadow: 0 1px 0 white;
+      letter-spacing: 0.2px;
+      margin-bottom: 2px;
+      border-radius: 2px;
+    }
+
+    .col-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .col-name i {
+      font-size: 10px;
+      color: #547b9c;
+      opacity: 0.8;
+    }
+
+    /* 文件列表 */
+    .file-list {
+      list-style: none;
+    }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: 3.5fr 1.4fr 1.4fr 0.9fr;
+      align-items: center;
+      padding: 7px 10px 7px 12px;
+      border-radius: 4px;
+      margin: 1px 0;
+      border: 1px solid transparent;
+      color: #1e3a5a;
+      font-size: 12.8px;
+      cursor: default;
+      transition: background 0.08s;
+      background: transparent;
+    }
+
+    .file-row:hover {
+      background: rgba(215, 235, 255, 0.7);
+      border: 1px solid rgba(130, 180, 230, 0.55);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.5);
+    }
+
+    /* 可点击条目（有链接或特殊文件） */
+    .file-row.clickable {
+      cursor: pointer;
+    }
+    .file-row.clickable:hover {
+      background: rgba(200, 225, 255, 0.8);
+      border-color: #6ea8d9;
+    }
+
+    .file-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .file-name i {
+      font-size: 18px;
+      width: 22px;
+      text-align: center;
+    }
+
+    .file-name .fa-folder {
+      color: #e5b43c;
+      text-shadow: 0 1px 1px rgba(255,255,200,0.7);
+    }
+
+    .fa-file-alt, .fa-file-image, .fa-file-code, .fa-file, .fa-file-archive, .fa-file-audio {
+      color: #4f7da3;
+    }
+
+    .file-modified, .file-type, .file-size {
+      white-space: nowrap;
+      color: #234a67;
+    }
+
+    /* 底部状态栏 (细节窗格) */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px 8px 16px;
+      background: rgba(235, 245, 255, 0.45);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid rgba(150, 180, 205, 0.5);
+      font-size: 12px;
+      color: #1d3c58;
+      flex-wrap: wrap;
+    }
+
+    .detail-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preview-icon i {
+      font-size: 24px;
+      color: #2a6da8;
+      text-shadow: 0 1px 2px white;
+    }
+
+    .preview-text {
+      line-height: 1.4;
+    }
+
+    .item-count {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .view-icons i {
+      margin: 0 4px;
+      font-size: 15px;
+      color: #385e7e;
+      opacity: 0.85;
+      cursor: default;
+    }
+
+    /* 无搜索结果提示 */
+    .no-results {
+      padding: 20px;
+      text-align: center;
+      color: #2e5577;
+      font-style: italic;
+    }
+
+    /* 微细节 */
+    .win7-window, .title-bar, .nav-address-bar, .command-bar {
+      user-select: none;
+    }
+
+    .current-folder-highlight {
+      background: rgba(200, 225, 255, 0.7);
+      border: 1px solid rgba(100, 160, 220, 0.5);
+    }
+
+    /* 右下角装饰 */
+    .page-indicator {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      color: #1e3a5f;
+      font-size: 14px;
+      font-weight: 500;
+      text-shadow: 0 1px 0 white;
+      letter-spacing: 0.5px;
+      background: linear-gradient(180deg, rgba(242, 247, 252, 0.85), rgba(221, 231, 242, 0.85) 45%, rgba(201, 217, 234, 0.85));
+      border: 1px solid #8ba5c2;
+      border-radius: 20px;
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.15);
+      padding: 8px 20px;
+      white-space: nowrap;
+      cursor: default;
+      user-select: none;
+    }
+
+    /* ----- 手机适配 (屏幕宽度 ≤ 600px) ----- */
+    @media screen and (max-width: 600px) {
+      body {
+        padding: 10px;
+        align-items: center;
+      }
+      .win7-window {
+        border-radius: 6px;
+      }
+      .nav-address-bar {
+        padding: 8px 8px;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .address-breadcrumb {
+        min-width: 140px;
+        overflow-x: auto;
+        flex: 1;
+      }
+      .search-box {
+        flex-basis: 100%;
+        width: 100%;
+        margin-left: 0;
+        margin-top: 6px;
+        margin-bottom: 2px;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .cmd-item.hide-on-mobile {
+        display: none !important;
+      }
+      .command-bar {
+        padding: 6px 10px;
+        gap: 6px;
+        justify-content: flex-start;
+      }
+      .cmd-divider.hide-on-mobile {
+        display: none;
+      }
+      .file-columns, .file-row {
+        grid-template-columns: 2.8fr 1.2fr 1.2fr 0.8fr;
+        font-size: 11.5px;
+        padding-left: 6px;
+      }
+      .file-name {
+        gap: 5px;
+      }
+      .file-name i {
+        font-size: 16px;
+        width: 18px;
+      }
+      .status-bar {
+        padding: 6px 10px;
+      }
+      .detail-preview {
+        gap: 6px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-indicator {
+        bottom: 16px;
+        right: 16px;
+        padding: 6px 16px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-indicator">3/18</div>
+
+  <div class="win7-window">
+    <!-- 标题栏：简洁文件夹名称 -->
+    <div class="title-bar">
+      <div class="window-icon-title">
+        <i class="fas fa-folder-open"></i>
+        <span>文件夹</span>
+      </div>
+      <div class="window-controls">
+        <div class="win-btn"><i class="fas fa-minus"></i></div>
+        <div class="win-btn"><i class="far fa-window-maximize"></i></div>
+        <!-- 关闭按钮：点击跳转 win7.html -->
+        <div class="win-btn close-btn" id="closeWindowBtn"><i class="fas fa-times"></i></div>
+      </div>
+    </div>
+
+    <!-- 地址栏 -->
+    <div class="nav-address-bar">
+      <div class="nav-buttons">
+        <div class="nav-btn disabled"><i class="fas fa-arrow-left"></i></div>
+        <div class="nav-btn"><i class="fas fa-arrow-right"></i></div>
+      </div>
+      <div class="address-breadcrumb">
+        <div class="breadcrumb-item"><i class="fas fa-desktop"></i> 桌面</div>
+        <i class="fas fa-chevron-right breadcrumb-arrow"></i>
+        <div class="breadcrumb-item current-folder-highlight"><i class="fas fa-folder-open"></i> 文件夹</div>
+        <div class="address-icons"></div>
+      </div>
+      <!-- 搜索框：输入指定文字可查看隐藏文件，必须精确匹配关键字 -->
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="输入人名或地名可查看隐藏文件" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- 命令栏 -->
+    <div class="command-bar">
+      <div class="cmd-item essential"><i class="fas fa-folder"></i> 组织 <i class="fas fa-chevron-down" style="font-size: 9px; margin-left: 4px;"></i></div>
+      <div class="cmd-item essential"><i class="fas fa-share-alt"></i> 共享 <i class="fas fa-chevron-down" style="font-size: 9px; margin-left: 4px;"></i></div>
+      <div class="cmd-item hide-on-mobile"><i class="fas fa-burn"></i> 刻录</div>
+      <div class="cmd-item essential"><i class="fas fa-folder-plus"></i> 新建文件夹</div>
+      <span class="cmd-divider hide-on-mobile"></span>
+      <div class="cmd-item hide-on-mobile"><i class="fas fa-sliders-h"></i> 预览窗格</div>
+      <div class="cmd-item essential"><i class="fas fa-info-circle"></i> 属性</div>
+    </div>
+
+    <!-- 文件夹内容区域 -->
+    <div class="folder-content-pane">
+      <!-- 列标题 -->
+      <div class="file-columns">
+        <div class="col-name"><span>名称</span> <i class="fas fa-caret-down"></i></div>
+        <div>修改日期</div>
+        <div>类型</div>
+        <div>大小</div>
+      </div>
+
+      <!-- 文件列表容器 -->
+      <ul class="file-list" id="fileListContainer"></ul>
+      <!-- 无搜索结果时显示 -->
+      <div id="noResultsMsg" class="no-results" style="display: none;">
+        <i class="fas fa-search" style="margin-right: 6px;"></i>没有与搜索条件匹配的项。
+      </div>
+
+      <div style="flex: 1; min-height: 8px;"></div>
+    </div>
+
+    <!-- 底部状态栏 (已更新计数：2个文件夹，7个文件，共9个对象) -->
+    <div class="status-bar">
+      <div class="detail-preview">
+        <div class="preview-icon">
+          <i class="fas fa-folder-open"></i>
+        </div>
+        <div class="preview-text">
+          <div><strong>文件夹</strong></div>
+          <div style="font-size: 11px; opacity: 0.85;">包含: 2个文件夹, 9个文件</div>
+        </div>
+      </div>
+      <div class="item-count">
+        <span><i class="far fa-file" style="margin-right: 5px;"></i> 11个对象</span>
+        <span style="opacity: 0.7;">|</span>
+        <div class="view-icons">
+          <i class="fas fa-th-large"></i>
+          <i class="fas fa-list-ul" style="color:#1e4970;"></i>
+          <i class="fas fa-info-circle"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      "use strict";
+
+      // 隐藏文件链接 (精确匹配关键词)
+      const hiddenLinks = [
+        { 
+          keyword: "赵文舟",
+          name: "老照片",
+          icon: "fa-file-image",
+          type: "JPEG 图像",
+          modified: "2015/4/20 12:00",
+          size: "234 KB",
+          url: "laozhaopian.html"
+        },
+        { 
+          keyword: "徐静远", 
+          name: "日记", 
+          icon: "fa-file-alt", 
+          type: "文本文档", 
+          modified: "2014/4/19 15:30", 
+          size: "124 KB", 
+          url: "riji.html" 
+        },
+        { 
+          keyword: "卡斯奥影院",
+          name: "手写信1.jpg",
+          icon: "fa-file-image",
+          type: "JPEG 图像",
+          modified: "2016/5/20 14:30",
+          size: "342 KB",
+          url: "shouxiexin1.html"
+        },
+        { 
+          keyword: "卡斯奥影院",
+          name: "手写信2.jpg",
+          icon: "fa-file-image",
+          type: "JPEG 图像",
+          modified: "2016/5/21 09:15",
+          size: "345 KB",
+          url: "shouxiexin2.html"
+        },
+		{
+		  keyword: "徐如林",
+		  name: "通话记录备份.m4a",
+		  icon: "fa-file-audio",
+		  type: "M4A 音频",
+		  modified: "2016/7/21 09:15",
+		  size: "2.1 MB",
+		  url: "tonghua.html"
+		},
+		{
+		  keyword: "徐言", 
+		  name: "日记", 
+		  icon: "fa-file-alt", 
+		  type: "文本文档", 
+		  modified: "2016/9/19 15:30", 
+		  size: "124 KB", 
+		  url: "riji2.html" 
+		},
+		{
+		  keyword: "情诗", 
+		  name: "情书", 
+		  icon: "fa-file-image", 
+		  type: "JPEG图像", 
+		  modified: "2014/1/22 07:53", 
+		  size: "87 KB", 
+		  url: "qingshi.html" 
+		}
+      ];
+
+      // 常规文件数据 (已删除“电脑使用说明.txt”)
+      const fileData = [
+        { name: "新建文件夹", icon: "fa-folder", type: "文件夹", modified: "2016/4/15 09:10", size: "", isFolder: true },
+        { name: "新建文件夹1", icon: "fa-folder", type: "文件夹", modified: "2016/4/5 11:07", size: "", isFolder: true },
+        { name: "风景照.jpg", icon: "fa-file-image", type: "JPEG 图像", modified: "2016/4/17 16:30", size: "2.3 MB", isFolder: false },
+        { name: "归档.zip", icon: "fa-file-archive", type: "压缩(zipped)文件夹", modified: "2016/4/14 22:18", size: "5.1 MB", isFolder: false },
+        { name: "录音.m4a", icon: "fa-file-audio", type: "M4A 音频", modified: "2016/4/11 09:30", size: "1.8 MB", isFolder: false }
+      ];
+
+      const container = document.getElementById('fileListContainer');
+      const noResultsMsg = document.getElementById('noResultsMsg');
+      const searchInput = document.getElementById('searchInput');
+
+      // 渲染文件列表 (混合常规文件 + 隐藏链接)
+      function renderFileList(filterText = '') {
+        const filterRaw = filterText.trim();
+        const filterLower = filterRaw.toLowerCase();
+        
+        // 过滤常规文件 (模糊匹配)
+        let filteredFiles = fileData.filter(item => 
+          item.name.toLowerCase().includes(filterLower) || 
+          item.type.toLowerCase().includes(filterLower)
+        );
+
+        // 隐藏链接：必须完全匹配关键词 (不区分大小写)
+        const matchedLinks = hiddenLinks.filter(link => {
+          if (filterLower === '') return false;
+          return link.keyword.toLowerCase() === filterLower;
+        });
+
+        const combinedResults = [...matchedLinks, ...filteredFiles];
+
+        container.innerHTML = '';
+        
+        if (combinedResults.length === 0) {
+          noResultsMsg.style.display = 'block';
+          return;
+        } else {
+          noResultsMsg.style.display = 'none';
+        }
+
+        combinedResults.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'file-row';
+          
+          // 隐藏链接可点击跳转
+          if (item.url) {
+            li.classList.add('clickable');
+            li.addEventListener('click', (e) => {
+              e.stopPropagation();
+              window.location.href = item.url;
+            });
+          }
+          
+          // 名称列
+          const nameDiv = document.createElement('div');
+          nameDiv.className = 'file-name';
+          nameDiv.innerHTML = `<i class="fas ${item.icon}"></i> ${item.name}`;
+          
+          const modifiedDiv = document.createElement('div');
+          modifiedDiv.className = 'file-modified';
+          modifiedDiv.textContent = item.modified;
+          
+          const typeDiv = document.createElement('div');
+          typeDiv.className = 'file-type';
+          typeDiv.textContent = item.type;
+          
+          const sizeDiv = document.createElement('div');
+          sizeDiv.className = 'file-size';
+          sizeDiv.textContent = item.size || '';
+          
+          li.appendChild(nameDiv);
+          li.appendChild(modifiedDiv);
+          li.appendChild(typeDiv);
+          li.appendChild(sizeDiv);
+          
+          container.appendChild(li);
+        });
+      }
+
+      // 初始渲染
+      renderFileList('');
+
+      // 搜索输入
+      searchInput.addEventListener('input', function(e) {
+        renderFileList(e.target.value);
+      });
+
+      // 右上角 X 按钮：跳转到 win7.html
+      const closeBtn = document.getElementById('closeWindowBtn');
+      closeBtn.addEventListener('click', function() {
+        window.location.href = 'win7.html';
+      });
+
+      // 点击搜索框自动全选
+      searchInput.addEventListener('focus', function() {
+        this.select();
+      });
+
+    })();
+  </script>
+</body>
+</html>

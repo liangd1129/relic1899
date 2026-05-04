@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>长夜何往</title>
+    <!-- 复古风格 · 主页跳转/关闭跳转 + 工具栏灰色 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', 'Microsoft Sans Serif', sans-serif;
+        }
+        body {
+            background: #3a6ea5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        .browser-window {
+            width: 1250px;
+            max-width: 100%;
+            background: #ece9d8;
+            border: 2px solid #0a246a;
+            border-radius: 8px 8px 5px 5px;
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), inset 0 0 0 1px #fefefe;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .title-bar {
+            background: linear-gradient(90deg, #0a246a 0%, #3a6ea5 50%, #6ba1d9 100%);
+            padding: 6px 8px 6px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #0a2a5e;
+            color: white;
+            text-shadow: 1px 1px 0 #0a246a;
+        }
+        .window-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .window-title i {
+            font-size: 18px;
+            color: #ffd966;
+            filter: drop-shadow(0 1px 1px #0a246a);
+        }
+        .window-controls {
+            display: flex;
+            gap: 3px;
+        }
+        .win-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            color: #0a246a;
+            width: 26px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;  /* 关闭按钮可点击 */
+            transition: 0.05s linear;
+            text-decoration: none;
+        }
+        .win-btn:hover {
+            background: #b8d0e8;
+            box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #606060;
+        }
+        .win-btn.close:hover {
+            background: #d47a7a;
+            color: white;
+            text-shadow: none;
+        }
+        .toolbar {
+            background: #d4d0c8;
+            padding: 5px 8px 3px 8px;
+            border-bottom: 1px solid #a7a7a7;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+        .tb-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            padding: 5px 10px;
+            min-width: 40px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1e1e1e;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: default;
+            line-height: 1;
+        }
+        .tb-btn i {
+            font-size: 15px;
+            color: #1e3a6b;
+        }
+        .tb-btn:hover {
+            background: #b8d0e8;
+            box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #707070;
+        }
+
+        /* 灰色禁用按钮样式 (除主页外) */
+        .tb-btn.disabled {
+            opacity: 0.55;
+            filter: grayscale(0.5);
+            cursor: default;
+            pointer-events: none;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a0a0a0;
+            background: #c5c0b5;
+            border-color: #6a6a6a;
+            color: #4a4a4a;
+        }
+        .tb-btn.disabled i {
+            color: #5a5a5a;
+        }
+        .tb-btn.disabled:hover {
+            background: #c5c0b5;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a0a0a0;
+        }
+
+        /* 主页按钮保持可点，加强光标提示 */
+        .tb-btn.home-active {
+            cursor: pointer;
+            background: #d4d0c8;
+            opacity: 1;
+            filter: none;
+            pointer-events: auto;
+        }
+        .tb-btn.home-active:hover {
+            background: #b8d0e8;
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background: #a7a7a7;
+            margin: 0 4px;
+            box-shadow: 1px 0 0 #fff;
+        }
+        .address-bar {
+            background: #d4d0c8;
+            padding: 6px 8px 6px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #a7a7a7;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+        .address-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1e3a6b;
+            text-shadow: 1px 0 0 #fff;
+        }
+        .address-input-wrapper {
+            flex: 1;
+            display: flex;
+            background: white;
+            border: 2px inset #e0e0e0;
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 2px #7a7a7a;
+        }
+        #urlInput {
+            width: 100%;
+            padding: 6px 8px;
+            border: none;
+            outline: none;
+            font-size: 13px;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+            color: #0a246a;
+        }
+        .go-btn {
+            background: #d4d0c8;
+            border: 2px outset #f0f0f0;
+            border-radius: 3px;
+            padding: 4px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0a246a;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: default;
+            min-width: 60px;
+            text-align: center;
+        }
+        .go-btn:hover {
+            background: #b8d0e8;
+            border: 2px outset #c0d8f0;
+        }
+        .browser-content {
+            background: #ffffff;
+            border: 2px inset #ece9d8;
+            margin: 0;
+            flex: 1;
+            min-height: 480px;
+            display: flex;
+            padding: 16px;
+        }
+
+        /* 卡片布局 */
+        .talisman-card {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+            background: #fef9e8;
+            border: 3px ridge #a7a7a7;
+            box-shadow: inset 0 0 0 1px #ffffff, 3px 3px 6px rgba(0,0,0,0.1);
+            padding: 20px 18px;
+            gap: 24px;
+        }
+        .card-left {
+            flex: 0 0 280px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .talisman-image {
+            width: 100%;
+            max-width: 280px;
+            border: 4px solid #b89b6b;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.2), inset 0 0 0 1px #f3e7c4;
+            background: #e4cf9f;
+            display: block;
+            border-radius: 2px;
+        }
+        .card-right {
+            flex: 1;
+            min-width: 260px;
+            color: #1e1e1e;
+            padding-right: 6px;
+        }
+        .talisman-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #6b1a1a;
+            text-shadow: 1px 1px 0 #e6d5b8;
+            border-bottom: 2px solid #b89b6b;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+            font-family: 'Segoe UI', '楷体', 'KaiTi', serif;
+        }
+        .talisman-meta {
+            font-size: 15px;
+            background: #e3d6bf;
+            padding: 8px 12px;
+            border-left: 6px solid #7a2e2e;
+            margin-bottom: 18px;
+            box-shadow: inset 1px 1px 2px #fff, inset -1px -1px 2px #a09b8b;
+            color: #2d2416;
+            font-weight: 500;
+        }
+        .desc-text {
+            font-size: 14.5px;
+            line-height: 1.65;
+            margin-bottom: 18px;
+            text-align: justify;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a6b;
+            margin: 20px 0 10px 0;
+            border-bottom: 1px dashed #8b7a5a;
+            padding-bottom: 4px;
+            text-shadow: 1px 1px 0 #f0e8d8;
+        }
+        .quote-block {
+            background: #eae1cf;
+            padding: 14px 18px;
+            border-radius: 0;
+            border: 1px solid #c6b59e;
+            font-style: normal;
+            box-shadow: inset 1px 1px 3px #fdf6e7, inset -1px -1px 3px #b8aa96;
+            margin: 16px 0;
+            color: #1f2e1f;
+        }
+        .status-bar {
+            background: #d4d0c8;
+            border-top: 1px solid #a7a7a7;
+            padding: 4px 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #1e1e1e;
+            box-shadow: inset 0 2px 3px -2px #808080;
+        }
+        .status-left i {
+            margin-right: 6px;
+            color: #1e3a6b;
+        }
+
+        /* 右下角页码 */
+        .page-indicator {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            color: #1e3a5f;
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 0 1px 0 white;
+            letter-spacing: 0.5px;
+            background: linear-gradient(180deg, rgba(242, 247, 252, 0.85), rgba(221, 231, 242, 0.85) 45%, rgba(201, 217, 234, 0.85));
+            border: 1px solid #8ba5c2;
+            border-radius: 20px;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.15);
+            padding: 8px 20px;
+            white-space: nowrap;
+            cursor: default;
+            user-select: none;
+        }
+
+        @media (max-width: 700px) {
+            .browser-window { width: 100%; }
+            .tb-btn span { display: none; }
+            .tb-btn { padding: 6px 8px; }
+            .card-left { flex: 0 0 100%; justify-content: center; }
+            .talisman-image { max-width: 260px; }
+            .talisman-title { font-size: 22px; }
+        }
+        @media (max-width: 640px) {
+            .page-indicator {
+                bottom: 16px;
+                right: 16px;
+                padding: 6px 16px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-indicator">12/18</div>
+
+<div class="browser-window">
+    <div class="title-bar">
+        <div class="window-title">
+            <i class="fab fa-internet-explorer"></i>
+            <span>Microsoft Internet Explorer</span>
+        </div>
+        <div class="window-controls">
+            <div class="win-btn"><i class="fas fa-minus"></i></div>
+            <div class="win-btn"><i class="far fa-square"></i></div>
+            <!-- 关闭按钮：点击跳转到 win7.html -->
+            <div class="win-btn close" onclick="window.location.href='win7.html'" title="关闭并返回Win7风格">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工具栏：除主页外均置灰 disabled -->
+    <div class="toolbar">
+        <div class="tb-btn disabled"><i class="fas fa-arrow-left"></i><span>后退</span></div>
+        <div class="tb-btn disabled"><i class="fas fa-arrow-right"></i><span>前进</span></div>
+        <div class="separator"></div>
+        <div class="tb-btn disabled"><i class="fas fa-sync-alt"></i><span>刷新</span></div>
+        <!-- 主页按钮：亮色 + 点击跳转 Internet.html -->
+        <div class="tb-btn home-active" onclick="window.location.href='internet.html'">
+            <i class="fas fa-home"></i><span>主页</span>
+        </div>
+        <div class="separator"></div>
+        <div class="tb-btn disabled"><i class="fas fa-search"></i><span>搜索</span></div>
+    </div>
+
+    <!-- 地址栏 -->
+    <div class="address-bar">
+        <div class="address-label">地址</div>
+        <div class="address-input-wrapper">
+            <input type="text" id="urlInput" value="长夜何往" readonly>
+        </div>
+        <div class="go-btn">转到</div>
+    </div>
+
+    <!-- 内容卡片 -->
+    <div class="browser-content">
+        <div class="talisman-card">
+            <div class="card-left">
+                <img class="talisman-image" 
+                     src="../img/changyehewang.jpg"
+                     alt="安定形神符 · 黄表纸朱砂符箓">
+            </div>
+            <div class="card-right">
+                <div class="talisman-title">《长夜何往》</div>
+                <div class="talisman-meta">
+                    <i class="fas fa-tag" style="margin-right: 8px; color:#7a2e2e;"></i> 入选20世纪被低估的百部欧洲电影
+                </div>
+               
+               
+                <div class="section-title"></i>基本信息</div>
+                <div class="desc-text">
+                   <strong>外文名：</strong>Where Goes the Long Night（又译：The Night Has No End）<br>
+                    <strong>制片地区：</strong>法大利 / 意国<br>
+                    <strong>上映时间：</strong>1976年（呱纳电影节首映），1978年（青岚市公映）<br>
+					 <strong>导演：</strong>克洛德·费朗<br>
+					  <strong>编剧：</strong>玛格丽特·杜拉斯（改编自本人小说）<br>
+					   <strong>主演：</strong>让-路易·特兰蒂尼昂、阿努克·艾梅、皮埃尔·克莱芒<br>
+					    <strong>片长：</strong>98分钟<br>
+                </div>
+				
+                <div class="section-title"></i>剧情介绍</div>
+                <div class="desc-text">
+                    影片讲述巴黎近郊一所公寓内，青年钢琴教师让（让-路易·特兰蒂尼昂 饰）与远方表弟弗朗索瓦（皮埃尔·克莱芒 饰）同住已有三年。弗朗索瓦因工伤赋闲在家，每日倚窗眺望，神情郁结；让则疲于应对房东催租与琴行杂务，夜夜晚归。两人之间存有一种不曾言明的亲密，既超出寻常兄弟情分，又在白天各自闪避，唯有夜深人静时偶有短暂交谈或无声对坐。<br> 
+                </div>
+                <div class="desc-text">
+                     某日，弗朗索瓦家乡来信托他回去相亲，让沉默整晚后替他整理好行装。弗朗索瓦离去那夜，让独自游荡于塞纳河沿岸的街灯与桥洞之间，无处可去。影片结尾，让回到空无一人的公寓，在窗边站至天色泛白。全片无一句直露台词，人物关系全凭光影、距离与沉默传递，被称为法大利新浪潮早期最隐晦的情感作品之一。某日，弗朗索瓦家乡来信托他回去相亲，让沉默整晚后替他整理好行装。弗朗索瓦离去那夜，让独自游荡于塞纳河沿岸的街灯与桥洞之间，无处可去。影片结尾，让回到空无一人的公寓，在窗边站至天色泛白。全片无一句直露台词，人物关系全凭光影、距离与沉默传递，被称为法大利新浪潮早期最隐晦的情感作品之一。
+                </div>
+				
+				<div class="section-title"></i>观众名单</div>
+				<div class="desc-text">
+				  据悉，本片于1978年仅于青岚市卡斯奥影院上映一场，我们访问了影城员工，获得了这份珍贵的观众名单。<br>
+				</div>
+				
+				<!-- 观众名单表格：名字 · 性别 · 位置号（电影院座位） -->
+				<table style="width:100%; border-collapse: collapse; margin-top: 14px; margin-bottom: 8px; background-color: #fcf6e8; border: 1px solid #b89b6b; font-family: 'Segoe UI', '楷体', 'KaiTi', sans-serif; font-size: 14px; box-shadow: inset 1px 1px 4px #fdf3e0, 2px 2px 6px rgba(0,0,0,0.06);">
+				  <thead>
+				    <tr style="background-color: #e3d6bf; border-bottom: 2px solid #7a2e2e; color: #1e1e1e;">
+				      <th style="padding: 8px 12px; text-align: left; font-weight: bold; border-right: 1px solid #b89b6b;">名字</th>
+				      <th style="padding: 8px 12px; text-align: left; font-weight: bold; border-right: 1px solid #b89b6b;">性别</th>
+				      <th style="padding: 8px 12px; text-align: left; font-weight: bold;">位置号</th>
+				    </tr>
+				  </thead>
+				  <tbody>
+				    <tr style="border-bottom: 1px solid #c6b59e;">
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">王建国</td>
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">男</td>
+				      <td style="padding: 8px 12px;">四排12号</td>
+				    </tr>
+				    <tr style="border-bottom: 1px solid #c6b59e;">
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">陈翠珠</td>
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">女</td>
+				      <td style="padding: 8px 12px;">五排07号</td>
+				    </tr>
+				    <tr style="border-bottom: 1px solid #c6b59e;">
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">张茹律</td>
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">女</td>
+				      <td style="padding: 8px 12px;">一排03号</td>
+				    </tr>
+				    <tr style="border-bottom: 1px solid #c6b59e;">
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">徐教</td>
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">女</td>
+				      <td style="padding: 8px 12px;">三排09号</td>
+				    </tr>
+				    <tr style="border-bottom: 1px solid #c6b59e;">
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">赵文舟</td>
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">女</td>
+				      <td style="padding: 8px 12px;">三排08号</td>
+				    </tr>
+				    <tr style="border-bottom: 1px solid #c6b59e;">
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">徐静远</td>
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">男</td>
+				      <td style="padding: 8px 12px;">三排06号</td>
+				    </tr>
+				    <tr style="border-bottom: 1px solid #c6b59e;">
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">李丽</td>
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">女</td>
+				      <td style="padding: 8px 12px;">二排05号</td>
+				    </tr>
+				    <tr style="border-bottom: 1px solid #c6b59e;">
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">...</td>
+				      <td style="padding: 8px 12px; border-right: 1px solid #dacfb8;">...</td>
+				      <td style="padding: 8px 12px;">...</td>
+				    </tr>
+				  </tbody>
+				</table>
+				
+				<style>
+				  /* 表格偶数行自动添加浅底色，实现深浅交替 */
+				  table tbody tr:nth-child(even) {
+				    background-color: #faf1e2;
+				  }
+				</style>
+				
+            </div>
+        </div>
+    </div>
+	
+	
+
+    <!-- 状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <i class="fas fa-check-circle"></i> 本页面纯属虚构，如有雷同实属偶然。
+        </div>
+        
+    </div>
+</div>
+
+<!-- 仅保留样式及必要的跳转逻辑，其余功能全部省略 -->
+</body>
+</html>

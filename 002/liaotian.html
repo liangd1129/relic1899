@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天 - 女儿</title>
+    <style>
+        :root {
+            --phone-w: 325px;
+            --phone-h: 620px;
+            --green: #34c759;
+            --red: #ff3b30;
+            --blue: #007aff;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a2e;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            padding: 15px;
+        }
+        .phone {
+            width: var(--phone-w);
+            height: var(--phone-h);
+            background: #1c1c1e;
+            border-radius: 28px;
+            padding: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 2px #333;
+            position: relative;
+        }
+        .phone::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 18px;
+            background: #1c1c1e;
+            border-radius: 0 0 12px 12px;
+            z-index: 10;
+        }
+        .phone::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            height: 3px;
+            background: #444;
+            border-radius: 3px;
+            z-index: 10;
+        }
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .nav-bar {
+            display: flex;
+            align-items: center;
+            padding: 5px 8px;
+            border-bottom: 1px solid #eee;
+            gap: 6px;
+            min-height: 40px;
+            background: #f7f7f7;
+        }
+        .back-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+        .back-btn:active {
+            background: #ddd;
+        }
+
+        /* ---------- 语音问答页 ---------- */
+        .page-voice-qa {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #ededed;
+        }
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-area::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .wave-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        .wave-bar {
+            width: 3px;
+            background: #34c759;
+            border-radius: 2px;
+        }
+        .voice-bubble.self .wave-bar {
+            background: #007aff;
+        }
+
+        .voice-bubble {
+            align-self: flex-start;
+            background: #fff;
+            border-radius: 16px 16px 16px 4px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            max-width: 80%;
+        }
+        .voice-bubble.self {
+            align-self: flex-end;
+            background: #fff;
+            border-radius: 16px 16px 4px 16px;
+            flex-direction: row-reverse;
+        }
+        .voice-time {
+            font-size: 11px;
+            color: #999;
+            white-space: nowrap;
+        }
+
+        .transcript-bubble {
+            align-self: flex-end;
+            background: #007aff;
+            color: #fff;
+            border-radius: 16px 16px 4px 16px;
+            padding: 10px 14px;
+            font-size: 13px;
+            line-height: 1.4;
+            max-width: 75%;
+            animation: msgIn 0.3s ease;
+        }
+        @keyframes msgIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .transcript-bubble.left {
+            align-self: flex-start;
+            background: #fff;
+            color: #333;
+            border-radius: 16px 16px 16px 4px;
+            border: 1px solid #ddd;
+        }
+
+        .fill-answer {
+            align-self: flex-end;
+            background: #f0f0f0;
+            border-radius: 16px 16px 4px 16px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #333;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            max-width: 85%;
+            border: 1px solid #ddd;
+        }
+        .fill-input {
+            width: 80px;
+            border: none;
+            border-bottom: 1px solid #666;
+            background: transparent;
+            font-size: 13px;
+            padding: 2px 4px;
+            outline: none;
+            color: #333;
+            font-weight: 600;
+            text-align: center;
+            transition: color 0.2s;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-4px);
+            }
+            75% {
+                transform: translateX(4px);
+            }
+        }
+        .shake {
+            animation: shake 0.3s ease-in-out 2;
+            color: #ff3b30 !important;
+        }
+        .confirm-btn {
+            background: #34c759;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 4px;
+        }
+        .confirm-btn:active {
+            background: #28a745;
+        }
+
+        .submit-btn {
+            background: #34c759;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            display: block;
+            margin: 10px auto 0;
+            transition: background 0.15s;
+        }
+        .submit-btn:active {
+            background: #28a745;
+        }
+
+        .options-area {
+            align-self: flex-start;
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .option-btn {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.15s;
+        }
+        .option-btn:active {
+            background: #f0f0f0;
+        }
+
+        .error-toast {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff3b30;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            animation: fadeInOut 1.5s ease forwards;
+            z-index: 30;
+        }
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                bottom: 80px;
+            }
+            20% {
+                opacity: 1;
+                bottom: 100px;
+            }
+            80% {
+                opacity: 1;
+                bottom: 100px;
+            }
+            100% {
+                opacity: 0;
+                bottom: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="screen">
+            <!-- 语音问答页（聊天页面） -->
+            <div class="page-voice-qa" id="pageVoiceQA">
+                <div class="nav-bar">
+                    <!--
+                        返回按钮：点击后跳转到拨号页面。
+                        如果您将拨号页面保存在其他文件中（如 dianhua.html），
+                        请修改下方 location.href 的值。
+                    -->
+                    <button class="back-btn" onclick="location.href='dianhua.html'">←</button>
+                    <span style="font-weight:600;font-size:13px;">女儿</span>
+                </div>
+                <div class="chat-area" id="chatArea"></div>
+                <div id="toastContainer" style="position:absolute; bottom:0; left:0; right:0; pointer-events:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 语音问答逻辑 ==========
+        function initVoiceQA() {
+            const area = document.getElementById('chatArea');
+            area.innerHTML = '';
+
+            // 延迟1秒后显示客服第一条消息和用户填空区
+            setTimeout(() => {
+                addVoiceMsg('客服', '0:12');
+                addTranscript('你是谁？为什么能用我母亲的手机号码？', '客服');
+
+                const fillDiv = document.createElement('div');
+                fillDiv.className = 'fill-answer';
+                fillDiv.id = 'fillAnswer';
+                fillDiv.innerHTML = `
+                <span>是你女儿 </span>
+                <input type="text" class="fill-input" id="nameInput" placeholder="名字">
+                <span> 邀请我调查你母亲晕倒的原因。</span>
+                <button class="confirm-btn" onclick="submitName()">确认</button>
+            `;
+                area.appendChild(fillDiv);
+                area.scrollTop = area.scrollHeight;
+            }, 1000);
+        }
+
+        // 生成语音气泡
+        function addVoiceMsg(sender, timeText) {
+            const area = document.getElementById('chatArea');
+            const voiceDiv = document.createElement('div');
+            voiceDiv.className = 'voice-bubble' + (sender === '用户' ? ' self' : '');
+            const barHeights = sender === '客服' ? [4, 12, 7] : [5, 14, 6];
+            voiceDiv.innerHTML = `
+            <div class="wave-bars">
+                ${barHeights.map(h => `<div class="wave-bar" style="height:${h}px;"></div>`).join('')}
+            </div>
+            <span class="voice-time">${timeText}</span>
+        `;
+            area.appendChild(voiceDiv);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        // 生成转文字气泡
+        function addTranscript(text, sender) {
+            const area = document.getElementById('chatArea');
+            const transDiv = document.createElement('div');
+            transDiv.className = 'transcript-bubble';
+            if (sender === '客服') {
+                transDiv.classList.add('left');
+            }
+            transDiv.textContent = text;
+            area.appendChild(transDiv);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        // 错误时震动输入框
+        function shakeInputs(...inputs) {
+            inputs.forEach(inp => {
+                inp.classList.add('shake');
+                inp.style.color = '#ff3b30';
+                setTimeout(() => {
+                    inp.classList.remove('shake');
+                    inp.style.color = '';
+                }, 600);
+            });
+        }
+
+        // 提交名字
+        function submitName() {
+            const nameInput = document.getElementById('nameInput');
+            if (!nameInput) return;
+            const name = nameInput.value.trim();
+            if (name === '徐欣然') {
+                const fillArea = document.getElementById('fillAnswer');
+                if (fillArea) fillArea.remove();
+
+                // 用户消息立即发送
+                addVoiceMsg('用户', '0:08');
+                addTranscript('是你女儿徐欣然邀请我调查你母亲晕倒的原因。', '用户');
+
+                // 客服延迟1秒后回复
+                setTimeout(() => {
+                    addVoiceMsg('客服', '0:06');
+                    addTranscript('我不懂你什么意思。', '客服');
+
+                    const fillDiv2 = document.createElement('div');
+                    fillDiv2.className = 'fill-answer';
+                    fillDiv2.id = 'fillDetails';
+                    fillDiv2.innerHTML = `
+                    <span>我知道衣柜里有烧痕的衣服是</span>
+                    <input type="text" class="fill-input" id="clothesInput" placeholder="人名">
+                    <span>的，门上贴的符咒是</span>
+                    <input type="text" class="fill-input" id="charmInput" placeholder="人名">
+                    <span>买的，而你的论坛id是</span>
+                    <input type="text" class="fill-input" id="forumInput" placeholder="ID">
+                    <span>。还需要我继续说吗？</span>
+                    <button class="confirm-btn" onclick="submitDetails()">确认</button>
+                `;
+                    document.getElementById('chatArea').appendChild(fillDiv2);
+                    document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
+                }, 1000);
+            } else {
+                showToast('❌ 名字不正确，请重新输入');
+                shakeInputs(nameInput);
+                nameInput.value = '';
+            }
+        }
+
+        // 检查多填空答案，并触发后续选项
+        function submitDetails() {
+            const clothes = document.getElementById('clothesInput');
+            const charm = document.getElementById('charmInput');
+            const forum = document.getElementById('forumInput');
+            if (!clothes || !charm || !forum) return;
+
+            const cVal = clothes.value.trim();
+            const chVal = charm.value.trim();
+            const fVal = forum.value.trim();
+
+            const correctClothes = '徐静远';
+            const correctCharm = '徐如林';
+            const correctForum = '屋檐下的言';
+
+            if (cVal === correctClothes && chVal === correctCharm && fVal === correctForum) {
+                const fillDetails = document.getElementById('fillDetails');
+                if (fillDetails) fillDetails.remove();
+
+                // 用户消息立即发送
+                addVoiceMsg('用户', '0:06');
+                addTranscript(
+                    `我知道衣柜里有烧痕的衣服是${cVal}的，门上贴的符咒是${chVal}买的，而你的论坛id是${fVal}。还需要我继续说吗？`,
+                    '用户');
+
+                // 客服延迟1秒后回复，并展示选项
+                setTimeout(() => {
+                    addVoiceMsg('客服', '0:05');
+                    addTranscript('这些你都知道了，你打算怎么做？告诉我女儿吗？', '客服');
+
+                    // 添加选项区
+                    const area = document.getElementById('chatArea');
+                    const optionsDiv = document.createElement('div');
+                    optionsDiv.className = 'options-area';
+                    optionsDiv.id = 'optionChoice';
+                    optionsDiv.innerHTML = `
+                    <button class="option-btn" onclick="chooseOption('tell')">告诉她</button>
+                    <button class="option-btn" onclick="chooseOption('notTell')">不告诉她</button>
+                `;
+                    area.appendChild(optionsDiv);
+                    area.scrollTop = area.scrollHeight;
+                }, 1000);
+            } else {
+                showToast('信息不正确');
+                shakeInputs(clothes, charm, forum);
+                clothes.value = '';
+                charm.value = '';
+                forum.value = '';
+            }
+        }
+
+        // 处理选项A或B
+        function chooseOption(choice) {
+            const optDiv = document.getElementById('optionChoice');
+            if (optDiv) optDiv.remove();
+
+            let userText1, voiceTime1, userText2, voiceTime2, csReplyText;
+
+            if (choice === 'tell') {
+                userText1 = '当然是告诉她。我调查到真相了不告诉我的委托人？我脑子没事吧。';
+                voiceTime1 = '0:08';
+                userText2 = '说句题外话，你应该相信你女儿。在她心里，家庭的地位和你与你母亲一样，都排在第一。';
+                voiceTime2 = '0:11';
+                csReplyText = '你身为陌生人都信任我的女儿，我身为她的母亲又怎么能怀疑呢。';
+            } else {
+                userText1 = '我尊重你们的意愿，可以不透露你父亲的私人爱好。尤其是你的母亲，她是个伟大的女性。';
+                voiceTime1 = '0:14';
+                userText2 = '当然了，你女儿给我的报酬是这栋老宅，我唯一的条件是这栋宅子依旧归我。';
+                voiceTime2 = '0:10';
+                csReplyText = '当然可以，我和欣然早就希望母亲搬来和我们一起住了。';
+            }
+
+            // 第一条用户消息立即发送
+            addVoiceMsg('用户', voiceTime1);
+            addTranscript(userText1, '用户');
+
+            // 第二条用户消息延迟1秒发送
+            setTimeout(() => {
+                addVoiceMsg('用户', voiceTime2);
+                addTranscript(userText2, '用户');
+
+                // 客服消息在第二条用户消息后再延迟1秒
+                setTimeout(() => {
+                    addVoiceMsg('客服', '0:05');
+                    addTranscript(csReplyText, '客服');
+
+                    // 添加"提交答复"按钮（不同分支跳转不同页面）
+                    const area = document.getElementById('chatArea');
+                    const btnDiv = document.createElement('div');
+                    btnDiv.style.textAlign = 'center';
+                    const submitBtn = document.createElement('button');
+                    submitBtn.className = 'submit-btn';
+                    submitBtn.textContent = '提交答复';
+
+                    if (choice === 'tell') {
+                        submitBtn.onclick = function() {
+                            location.href = 'jj1.html';
+                        };
+                    } else {
+                        submitBtn.onclick = function() {
+                            location.href = 'jj2.html';
+                        };
+                    }
+
+                    btnDiv.appendChild(submitBtn);
+                    area.appendChild(btnDiv);
+                    area.scrollTop = area.scrollHeight;
+                }, 1000);
+            }, 1000);
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'error-toast';
+            toast.textContent = msg;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 1500);
+        }
+
+        // 页面加载完成后自动初始化聊天
+        document.addEventListener('DOMContentLoaded', () => {
+            initVoiceQA();
+        });
+    </script>
+</body>
+</html>

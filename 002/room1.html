@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>客厅</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+    }
+
+    /* 背景容器 */
+    .bg-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #bgImage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 30% center;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .bg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.25);
+      pointer-events: none;
+    }
+
+    /* 按钮层 */
+    .button-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+    }
+
+    .action-btn {
+      position: absolute;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(46, 58, 70, 0.75);
+      color: #eaeef2;
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0,0,0,0.2);
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 10;
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+    }
+
+    .action-btn i {
+      font-size: 1.2rem;
+      color: #c0ccd8;
+    }
+
+    .action-btn:hover {
+      background: rgba(63, 78, 92, 0.85);
+      box-shadow: 0 10px 18px rgba(0, 0, 0, 0.4);
+      color: #ffffff;
+      transform: translate(-50%, -50%) scale(1.02);
+    }
+
+    .action-btn:active {
+      transform: translate(-50%, -50%) scale(0.98);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      background: #25323c;
+    }
+
+    .secret-btn {
+      background: rgba(58, 46, 42, 0.75);
+      border-left: 3px solid #b09b8b;
+    }
+    .secret-btn i {
+      color: #d4c3b3;
+    }
+    .secret-btn:hover {
+      background: rgba(83, 67, 61, 0.9);
+    }
+
+    /* 新房间按钮 (替换密码锁) 采用同样样式，可加一点点缀 */
+    .goto-room-btn {
+      background: rgba(50, 80, 70, 0.8);
+      border-left: 3px solid #9fcc9f;
+    }
+    .goto-room-btn i {
+      color: #c3e0c3;
+    }
+
+    /* Toast */
+    .toast-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(46, 58, 70, 0.8);
+      color: #f0f4f8;
+      padding: 18px 32px;
+      border-radius: 10px;
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
+      font-size: 1.3rem;
+      font-weight: 400;
+      text-align: center;
+      max-width: 80vw;
+      min-width: 260px;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+      border: 1px solid #4a5a68;
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+
+    .toast-message.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .toast-btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 10px 24px;
+      background: rgba(58, 46, 42, 0.85);
+      border: 1px solid rgba(210, 180, 140, 0.5);
+      border-radius: 8px;
+      color: #f0f4f8;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: 0.2s;
+      pointer-events: auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .toast-btn:hover {
+      background: rgba(83, 67, 61, 0.9);
+      transform: scale(1.02);
+    }
+
+    /* 通用面板 (指纹/密码) */
+    .password-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 85%;
+      max-width: 340px;
+      background: rgba(30, 35, 40, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 22px 18px;
+      box-shadow: 0 25px 40px rgba(0,0,0,0.6);
+      border: 1px solid rgba(200,180,150,0.3);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.2s;
+      color: #f0f4f8;
+      pointer-events: none;
+    }
+
+    .password-panel.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .panel-close {
+      position: absolute;
+      top: 8px;
+      right: 18px;
+      font-size: 30px;
+      cursor: pointer;
+      color: #c0b7a8;
+      line-height: 1;
+      z-index: 5;
+    }
+
+    /* ---------- 指纹视图 ---------- */
+    .fingerprint-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .fingerprint-icon {
+      font-size: 64px;
+      color: #d4c3b3;
+      margin-top: 8px;
+    }
+
+    .fingerprint-title {
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 2px;
+    }
+
+    .verify-finger-btn {
+      background: rgba(70, 90, 110, 0.9);
+      border: 1px solid #9bb7d4;
+      border-radius: 40px;
+      padding: 14px 30px;
+      font-size: 1.2rem;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(4px);
+      transition: 0.15s;
+      font-weight: 500;
+    }
+
+    .verify-finger-btn.error-state {
+      background: rgba(170, 60, 50, 0.9);
+      border-color: #d99;
+      color: #ffe1e1;
+    }
+
+    .verify-finger-btn:active {
+      background: #3a5268;
+      transform: scale(0.98);
+    }
+
+    .use-password-btn {
+      background: transparent;
+      border: 1px dashed #b09b8b;
+      border-radius: 40px;
+      padding: 10px 20px;
+      color: #e6dccb;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 5px;
+      transition: 0.1s;
+      display: none;  /* 默认隐藏 */
+    }
+
+    .use-password-btn.visible {
+      display: inline-block;
+    }
+
+    .use-password-btn:hover {
+      background: rgba(180, 150, 130, 0.2);
+    }
+
+    /* ---------- 密码选择视图 (四色滚轮) ---------- */
+    .code-selector-view {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .digits-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .digit-selector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 22%;
+    }
+
+    .digit-label {
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+      opacity: 0.9;
+    }
+
+    .digit-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .digit-value {
+      font-size: 2.8rem;
+      font-weight: 600;
+      font-family: monospace;
+      line-height: 1.3;
+      text-shadow: 0 0 8px rgba(0,0,0,0.5);
+      width: 100%;
+      text-align: center;
+      border-radius: 12px;
+      padding: 4px 0;
+      margin: 2px 0;
+    }
+
+    .digit-arrow {
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: #f0e6d8;
+      font-size: 1.8rem;
+      cursor: pointer;
+      width: 100%;
+      border-radius: 20px;
+      padding: 2px 0;
+      transition: 0.1s;
+      user-select: none;
+      line-height: 1.2;
+    }
+
+    .digit-arrow:hover {
+      background: rgba(200,180,150,0.3);
+    }
+    .digit-arrow:active {
+      background: #5f6f7f;
+    }
+
+    /* 四色背景 */
+    .color-red .digit-value { background: rgba(180, 60, 50, 0.7); border: 1px solid #c97a6e; }
+    .color-yellow .digit-value { background: rgba(200, 160, 30, 0.7); border: 1px solid #dbbf6e; }
+    .color-green .digit-value { background: rgba(40, 130, 90, 0.7); border: 1px solid #7fb08a; }
+    .color-purple .digit-value { background: rgba(120, 70, 150, 0.7); border: 1px solid #b598d4; }
+
+    .confirm-code-btn {
+      background: rgba(46, 70, 58, 0.9);
+      border: 1px solid #a7c0a3;
+      border-radius: 40px;
+      padding: 14px 10px;
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: #f2eee9;
+      cursor: pointer;
+      margin-top: 8px;
+      backdrop-filter: blur(4px);
+      text-align: center;
+    }
+
+    .confirm-code-btn:active {
+      background: #2e4a3a;
+      transform: scale(0.98);
+    }
+
+    .back-to-finger {
+      color: #bcb09b;
+      text-align: center;
+      margin-top: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* 小屏适配 */
+    @media (max-width: 400px) {
+      .password-panel { padding: 20px 14px; }
+      .digit-value { font-size: 2.3rem; }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <div class="bg-container">
+    <img id="bgImage" src="../img/room1.jpg" alt="秘境背景" crossorigin="anonymous">
+    <div class="bg-overlay"></div>
+  </div>
+
+  <div class="button-layer" id="buttonLayer">
+    <button class="action-btn" data-x="0.25" data-y="0.30" data-message="有些年头的黄符纸,只能看出 <strong>安定形神</strong> 四个字,符纸贴在另一个房间的房门上。">黄符纸</button>
+    <button class="action-btn" data-x="0.75" data-y="0.25" data-message="高档小区的绿化做的真不错。">窗外</button>
+    <button class="action-btn" data-x="0.90" data-y="0.90" data-message="整洁的房间里只有这儿乱放了件衬衫,袖口有焚烧的痕迹,衣领处写着:走失请联系 赵文舟 166327455">沙发</button>
+    <button class="action-btn" data-x="0.70" data-y="0.70" id="computerBtn">电脑</button>
+    <!-- 密码锁按钮 (初始显示) -->
+    <button class="action-btn secret-btn" data-x="0.20" data-y="0.60" id="secretGateBtn">密码锁</button>
+    <!-- 新按钮：前往另一个房间 (初始隐藏，密码正确后显示) -->
+    <button class="action-btn goto-room-btn" data-x="0.20" data-y="0.60" id="gotoRoomBtn" style="display: none;"></i> 前往卧室</button>
+  </div>
+
+  <!-- Toast 提示 -->
+  <div class="toast-message" id="liveToast">
+    <i class="fas fa-quote-left" id="toastIcon"></i>
+    <span id="toastText">提示文本</span>
+    <div id="toastExtraContent" style="margin-top: 10px;"></div>
+  </div>
+
+  <!-- 主面板：包含指纹视图 + 密码选择视图 -->
+  <div class="password-panel" id="passwordPanel">
+    <span class="panel-close" id="closePanelBtn">&times;</span>
+
+    <!-- 指纹锁界面 -->
+    <div id="fingerprintView" class="fingerprint-view">
+      <i class="fas fa-fingerprint fingerprint-icon"></i>
+      <div class="fingerprint-title">指纹锁</div>
+      <button class="verify-finger-btn" id="verifyFingerBtn">验证指纹</button>
+      <button class="use-password-btn" id="usePasswordBtn">使用密码解锁</button>
+    </div>
+
+    <!-- 密码选择界面 (四个滚轮，红黄绿紫) -->
+    <div id="codeSelectView" class="code-selector-view">
+      <div class="digits-row">
+        <div class="digit-selector color-red" data-index="0">
+          <div class="digit-label">①</div>
+          <div class="digit-control">
+            <button class="digit-arrow up" data-dir="up">▲</button>
+            <div class="digit-value" id="digit0">0</div>
+            <button class="digit-arrow down" data-dir="down">▼</button>
+          </div>
+        </div>
+        <div class="digit-selector color-yellow" data-index="1">
+          <div class="digit-label">②</div>
+          <div class="digit-control">
+            <button class="digit-arrow up" data-dir="up">▲</button>
+            <div class="digit-value" id="digit1">0</div>
+            <button class="digit-arrow down" data-dir="down">▼</button>
+          </div>
+        </div>
+        <div class="digit-selector color-green" data-index="2">
+          <div class="digit-label">③</div>
+          <div class="digit-control">
+            <button class="digit-arrow up" data-dir="up">▲</button>
+            <div class="digit-value" id="digit2">0</div>
+            <button class="digit-arrow down" data-dir="down">▼</button>
+          </div>
+        </div>
+        <div class="digit-selector color-purple" data-index="3">
+          <div class="digit-label">④</div>
+          <div class="digit-control">
+            <button class="digit-arrow up" data-dir="up">▲</button>
+            <div class="digit-value" id="digit3">0</div>
+            <button class="digit-arrow down" data-dir="down">▼</button>
+          </div>
+        </div>
+      </div>
+      <button class="confirm-code-btn" id="confirmCodeBtn">确认密码</button>
+      <div class="back-to-finger" id="backToFingerBtn">← 返回指纹</div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      "use strict";
+
+      // ----- 背景与按钮定位 -----
+      const bgImage = document.getElementById('bgImage');
+      const buttonLayer = document.getElementById('buttonLayer');
+      const buttons = document.querySelectorAll('.action-btn');
+      
+      const toast = document.getElementById('liveToast');
+      const toastText = document.getElementById('toastText');
+      const toastIcon = document.getElementById('toastIcon');
+      const toastExtra = document.getElementById('toastExtraContent');
+
+      const panel = document.getElementById('passwordPanel');
+      const closePanelBtn = document.getElementById('closePanelBtn');
+      
+      // 视图元素
+      const fingerprintView = document.getElementById('fingerprintView');
+      const codeSelectView = document.getElementById('codeSelectView');
+      const verifyFingerBtn = document.getElementById('verifyFingerBtn');
+      const usePasswordBtn = document.getElementById('usePasswordBtn');
+      const confirmCodeBtn = document.getElementById('confirmCodeBtn');
+      const backToFingerBtn = document.getElementById('backToFingerBtn');
+
+      // 四位数字显示
+      const digitDisplays = [
+        document.getElementById('digit0'),
+        document.getElementById('digit1'),
+        document.getElementById('digit2'),
+        document.getElementById('digit3')
+      ];
+
+      // 按钮替换相关
+      const secretGateBtn = document.getElementById('secretGateBtn');
+      const gotoRoomBtn = document.getElementById('gotoRoomBtn');
+      
+      let digits = [0, 0, 0, 0];
+      let passwordCorrectOnce = false;   // 标记是否已正确，防止重复替换
+
+      // 图片尺寸
+      let imgNaturalWidth = 1;
+      let imgNaturalHeight = 1;
+
+      // ----- 按钮位置更新 (包括隐藏的goto按钮也要定位) -----
+      function updateButtonPositions() {
+        const containerRect = buttonLayer.getBoundingClientRect();
+        const containerW = containerRect.width;
+        const containerH = containerRect.height;
+        const imgRatio = imgNaturalWidth / imgNaturalHeight;
+        const containerRatio = containerW / containerH;
+        let renderWidth, renderHeight, offsetX, offsetY;
+
+        if (containerRatio > imgRatio) {
+          renderHeight = containerH;
+          renderWidth = containerH * imgRatio;
+          offsetX = (containerW - renderWidth) / 2;
+          offsetY = 0;
+        } else {
+          renderWidth = containerW;
+          renderHeight = containerW / imgRatio;
+          offsetX = 0;
+          offsetY = (containerH - renderHeight) / 2;
+        }
+
+        // 更新所有 .action-btn (包括隐藏的)
+        document.querySelectorAll('.action-btn').forEach(btn => {
+          const xPercent = parseFloat(btn.dataset.x);
+          const yPercent = parseFloat(btn.dataset.y);
+          if (isNaN(xPercent) || isNaN(yPercent)) return;
+          const imgX = renderWidth * xPercent;
+          const imgY = renderHeight * yPercent;
+          const left = offsetX + imgX;
+          const top = offsetY + imgY;
+          btn.style.left = left + 'px';
+          btn.style.top = top + 'px';
+        });
+      }
+
+      function initImageAndPositions() {
+        if (bgImage.complete && bgImage.naturalWidth > 0) {
+          imgNaturalWidth = bgImage.naturalWidth;
+          imgNaturalHeight = bgImage.naturalHeight;
+          updateButtonPositions();
+        } else {
+          bgImage.addEventListener('load', function onLoad() {
+            imgNaturalWidth = bgImage.naturalWidth;
+            imgNaturalHeight = bgImage.naturalHeight;
+            updateButtonPositions();
+            bgImage.removeEventListener('load', onLoad);
+          });
+        }
+      }
+
+      window.addEventListener('resize', () => {
+        if (imgNaturalWidth > 1) updateButtonPositions();
+      });
+      initImageAndPositions();
+
+      // 由于gotoRoomBtn一开始隐藏，但resize时也要更新位置；同时当显示时需要重新定位（因为可能窗口大小变化）
+      // 已经在updateButtonPositions中处理了所有.action-btn
+
+      // ----- Toast 工具 -----
+      let hideTimer = null;
+      function showToast(message, iconClass = 'fas fa-quote-left', extraHtml = '', keepOpen = false) {
+        if (hideTimer) clearTimeout(hideTimer);
+        toastText.innerHTML = message;
+        toastIcon.className = iconClass;
+        toastExtra.innerHTML = extraHtml || '';
+        toast.classList.add('show');
+        if (!keepOpen) {
+          hideTimer = setTimeout(() => {
+            toast.classList.remove('show');
+            hideTimer = null;
+          }, 3000);
+        }
+      }
+
+      function hideToast() {
+        if (hideTimer) clearTimeout(hideTimer);
+        toast.classList.remove('show');
+        toastExtra.innerHTML = '';
+      }
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.action-btn') && !e.target.closest('.toast-btn') && !e.target.closest('.password-panel')) {
+          hideToast();
+        }
+      });
+
+      // ----- 重置面板为指纹视图 -----
+      function resetToFingerprintView() {
+        fingerprintView.style.display = 'flex';
+        codeSelectView.style.display = 'none';
+        usePasswordBtn.classList.remove('visible');
+        // 重置验证按钮文字和样式（如果之前变红）
+        verifyFingerBtn.textContent = '验证指纹';
+        verifyFingerBtn.classList.remove('error-state');
+        digits = [0, 0, 0, 0];
+        updateDigitDisplays();
+      }
+
+      function updateDigitDisplays() {
+        for (let i = 0; i < 4; i++) {
+          digitDisplays[i].textContent = digits[i];
+        }
+      }
+
+      function changeDigit(index, delta) {
+        let val = digits[index] + delta;
+        if (val > 9) val = 0;
+        if (val < 0) val = 9;
+        digits[index] = val;
+        digitDisplays[index].textContent = val;
+      }
+
+      // 箭头事件委托
+      document.querySelector('.digits-row').addEventListener('click', (e) => {
+        const arrow = e.target.closest('.digit-arrow');
+        if (!arrow) return;
+        const selector = arrow.closest('.digit-selector');
+        if (!selector) return;
+        const index = parseInt(selector.dataset.index);
+        const dir = arrow.dataset.dir;
+        if (dir === 'up') changeDigit(index, 1);
+        else if (dir === 'down') changeDigit(index, -1);
+      });
+
+      // 密码正确后的处理：替换按钮，关闭面板，显示成功toast
+      function onPasswordCorrect() {
+        if (passwordCorrectOnce) return;
+        passwordCorrectOnce = true;
+        
+        // 将解锁状态保存到 sessionStorage，从 room2 返回时无需再次输入密码
+        sessionStorage.setItem('room1_unlocked', 'true');
+
+        panel.classList.remove('show');
+        showToast('密码正确！门锁已开');
+        
+        // 隐藏密码锁按钮，显示前往房间按钮
+        secretGateBtn.style.display = 'none';
+        gotoRoomBtn.style.display = 'inline-flex';
+        // 确保新按钮位置正确 (可能窗口大小变化，调用更新)
+        updateButtonPositions();
+        
+        // 重置面板状态
+        resetToFingerprintView();
+      }
+
+      // 确认密码
+      function checkPasswordAndProceed() {
+        const codeStr = digits.join('');
+        if (codeStr === '2190') {
+          onPasswordCorrect();
+        } else {
+          showToast('❌ 密码错误', 'fas fa-times-circle');
+        }
+      }
+
+      confirmCodeBtn.addEventListener('click', checkPasswordAndProceed);
+
+      // 返回指纹
+      backToFingerBtn.addEventListener('click', () => {
+        resetToFingerprintView();
+      });
+
+      // 验证指纹：点击后文字变红“验证错误”，并显示使用密码按钮
+      verifyFingerBtn.addEventListener('click', () => {
+        verifyFingerBtn.textContent = '验证错误';
+        verifyFingerBtn.classList.add('error-state');
+        showToast('⚠️ 指纹错误', 'fas fa-fingerprint');
+        usePasswordBtn.classList.add('visible');
+      });
+
+      // 使用密码解锁
+      usePasswordBtn.addEventListener('click', () => {
+        fingerprintView.style.display = 'none';
+        codeSelectView.style.display = 'flex';
+        updateDigitDisplays();
+      });
+
+      // 关闭面板
+      closePanelBtn.addEventListener('click', () => {
+        panel.classList.remove('show');
+        resetToFingerprintView();
+        hideToast();
+      });
+
+      // 点击外部关闭
+      document.addEventListener('click', (e) => {
+        if (panel.classList.contains('show') && !e.target.closest('.password-panel') && !e.target.closest('#secretGateBtn')) {
+          panel.classList.remove('show');
+          resetToFingerprintView();
+        }
+      });
+
+      // 打开面板 (只有密码锁按钮可见时才能打开)
+      secretGateBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (passwordCorrectOnce) return; // 密码正确后不再打开面板（按钮已隐藏，但以防万一）
+        resetToFingerprintView();
+        panel.classList.add('show');
+        hideToast();
+      });
+
+      // 前往另一个房间按钮点击跳转
+      gotoRoomBtn.addEventListener('click', () => {
+        window.location.href = 'room2.html';
+      });
+
+      // ----- 普通按钮 (除电脑、密码锁、goto) -----
+      buttons.forEach(btn => {
+        if (btn.id === 'secretGateBtn' || btn.id === 'computerBtn' || btn.id === 'gotoRoomBtn') return;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const msg = btn.getAttribute('data-message');
+          if (msg) {
+            const iconElem = btn.querySelector('i');
+            let iconClass = 'fas fa-quote-left';
+            if (iconElem) iconClass = iconElem.className;
+            showToast(msg, iconClass, '', false);
+          }
+        });
+      });
+
+      // ----- 电脑按钮 -----
+      const computerBtn = document.getElementById('computerBtn');
+      computerBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const msg = '桌子上放着一台很老的电脑。';
+        const iconElem = computerBtn.querySelector('i');
+        let iconClass = iconElem ? iconElem.className : 'fas fa-computer';
+        const btnHtml = '<button class="toast-btn" id="openComputerBtn">打开电脑</button>';
+        showToast(msg, iconClass, btnHtml, true);
+        
+        setTimeout(() => {
+          const openBtn = document.getElementById('openComputerBtn');
+          if (openBtn) {
+            openBtn.addEventListener('click', (ev) => {
+              ev.stopPropagation();
+              window.open('win7.html', '_blank');
+            });
+          }
+        }, 20);
+      });
+
+      // ----- 根据 sessionStorage 恢复解锁状态（从 room2 返回时无需密码）-----
+      if (sessionStorage.getItem('room1_unlocked') === 'true') {
+        passwordCorrectOnce = true;
+        secretGateBtn.style.display = 'none';
+        gotoRoomBtn.style.display = 'inline-flex';
+        updateButtonPositions();
+      }
+
+      // 初始化
+      resetToFingerprintView();
+      
+      console.log('✅ 房间·增强版指纹密锁已加载。');
+    })();
+  </script>
+</body>
+</html>

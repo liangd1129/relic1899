@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>浏览器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', 'Microsoft Sans Serif', sans-serif;
+        }
+        body {
+            background: #3a6ea5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        .browser-window {
+            width: 1250px;
+            max-width: 100%;
+            background: #ece9d8;
+            border: 2px solid #0a246a;
+            border-radius: 8px 8px 5px 5px;
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), inset 0 0 0 1px #fefefe;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .title-bar {
+            background: linear-gradient(90deg, #0a246a 0%, #3a6ea5 50%, #6ba1d9 100%);
+            padding: 6px 8px 6px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #0a2a5e;
+            color: white;
+            text-shadow: 1px 1px 0 #0a246a;
+        }
+        .window-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .window-title i {
+            font-size: 18px;
+            color: #ffd966;
+            filter: drop-shadow(0 1px 1px #0a246a);
+        }
+        .window-controls {
+            display: flex;
+            gap: 3px;
+        }
+        .win-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            color: #0a246a;
+            width: 26px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-decoration: none;
+        }
+        .win-btn:hover {
+            background: #b8d0e8;
+            box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #606060;
+        }
+        .win-btn.close:hover {
+            background: #d47a7a;
+            color: white;
+            text-shadow: none;
+        }
+        .toolbar {
+            background: #d4d0c8;
+            padding: 5px 8px 3px 8px;
+            border-bottom: 1px solid #a7a7a7;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+        .tb-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            padding: 5px 10px;
+            min-width: 40px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1e1e1e;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .tb-btn i {
+            font-size: 15px;
+            color: #1e3a6b;
+        }
+        .tb-btn:hover {
+            background: #b8d0e8;
+            box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #707070;
+        }
+
+        /* 灰色禁用按钮样式 —— 用于五个工具栏按钮 */
+        .tb-btn.disabled {
+            opacity: 0.55;
+            filter: grayscale(0.6);
+            cursor: default;
+            pointer-events: none;
+            background: #c5c0b5;
+            border-color: #6a6a6a;
+            color: #4a4a4a;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a0a0a0;
+        }
+        .tb-btn.disabled i {
+            color: #5a5a5a;
+        }
+        .tb-btn.disabled:hover {
+            background: #c5c0b5;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a0a0a0;
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background: #a7a7a7;
+            margin: 0 4px;
+            box-shadow: 1px 0 0 #fff;
+        }
+        .address-bar {
+            background: #d4d0c8;
+            padding: 6px 8px 6px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #a7a7a7;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+        .address-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1e3a6b;
+            text-shadow: 1px 0 0 #fff;
+        }
+        .address-input-wrapper {
+            flex: 1;
+            display: flex;
+            background: white;
+            border: 2px inset #e0e0e0;
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 2px #7a7a7a;
+        }
+        #urlInput {
+            width: 100%;
+            padding: 6px 8px;
+            border: none;
+            outline: none;
+            font-size: 13px;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+            color: #0a246a;
+        }
+        .go-btn {
+            background: #d4d0c8;
+            border: 2px outset #f0f0f0;
+            border-radius: 3px;
+            padding: 4px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0a246a;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;
+            min-width: 60px;
+            text-align: center;
+        }
+        .go-btn:hover {
+            background: #b8d0e8;
+            border: 2px outset #c0d8f0;
+        }
+        .browser-content {
+            background: #ffffff;
+            border: 2px inset #ece9d8;
+            margin: 0;
+            flex: 1;
+            min-height: 420px;
+            display: flex;
+        }
+        #browserFrame {
+            width: 100%;
+            height: 100%;
+            min-height: 420px;
+            border: none;
+            background: white;
+        }
+        .status-bar {
+            background: #d4d0c8;
+            border-top: 1px solid #a7a7a7;
+            padding: 4px 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #1e1e1e;
+            box-shadow: inset 0 2px 3px -2px #808080;
+        }
+        .status-left i {
+            margin-right: 6px;
+            color: #1e3a6b;
+        }
+        .retro-hint {
+            background: #ffffe1;
+            border-bottom: 1px solid #c0c0a0;
+            padding: 3px 10px;
+            font-size: 11px;
+            color: #3a3a00;
+        }
+        @media (max-width: 700px) {
+            .browser-window { width: 100%; }
+            .tb-btn span { display: none; }
+            .tb-btn { padding: 6px 8px; }
+        }
+		
+		/* 右下角固定装饰 */
+		.page-indicator {
+		  position: fixed;
+		  bottom: 24px;
+		  right: 24px;
+		  z-index: 1000;
+		  
+		  color: #1e3a5f;
+		  font-size: 14px;
+		  font-weight: 500;
+		  text-shadow: 0 1px 0 white;
+		  letter-spacing: 0.5px;
+		  
+		  background: linear-gradient(180deg, rgba(242, 247, 252, 0.85), rgba(221, 231, 242, 0.85) 45%, rgba(201, 217, 234, 0.85));
+		  border: 1px solid #8ba5c2;
+		  border-radius: 20px;
+		  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.15);
+		  
+		  padding: 8px 20px;
+		  white-space: nowrap;
+		  cursor: default;
+		  user-select: none;
+		}
+		
+		/* 移动端适配 */
+		@media (max-width: 640px) {
+		  .page-indicator {
+		    bottom: 16px;
+		    right: 16px;
+		    padding: 6px 16px;
+		    font-size: 13px;
+		  }
+		}
+    </style>
+</head>
+<body>
+	
+	<div class="page-indicator">4/18</div>
+	
+<div class="browser-window">
+    <div class="title-bar">
+        <div class="window-title">
+            <i class="fab fa-internet-explorer"></i>
+            <span>Microsoft Internet Explorer</span>
+        </div>
+        <div class="window-controls">
+            <div class="win-btn"><i class="fas fa-minus"></i></div>
+            <div class="win-btn"><i class="far fa-square"></i></div>
+            <a href="win7.html" class="win-btn close" title="关闭并返回 Win7 风格"><i class="fas fa-times"></i></a>
+        </div>
+    </div>
+
+    <!-- 工具栏：五个按钮全部添加 disabled 类，变灰且不可点击 -->
+    <div class="toolbar">
+        <div class="tb-btn disabled" title="后退"><i class="fas fa-arrow-left"></i><span>后退</span></div>
+        <div class="tb-btn disabled" title="前进"><i class="fas fa-arrow-right"></i><span>前进</span></div>
+        <div class="separator"></div>
+        <div class="tb-btn disabled" id="refreshButton" title="刷新"><i class="fas fa-sync-alt"></i><span>刷新</span></div>
+        <div class="tb-btn disabled" id="homeButton" title="主页"><i class="fas fa-home"></i><span>主页</span></div>
+        <div class="separator"></div>
+        <div class="tb-btn disabled" id="searchButton" title="搜索"><i class="fas fa-search"></i><span>搜索</span></div>
+    </div>
+
+    <div class="address-bar">
+        <div class="address-label">地址</div>
+        <div class="address-input-wrapper">
+            <input type="text" id="urlInput" placeholder="输入完整名词" value="">
+        </div>
+        <div class="go-btn" id="goButton">转到</div>
+    </div>
+
+    <!-- 简洁提示条，列出可用关键词 -->
+   
+
+    <div class="browser-content">
+        <iframe id="browserFrame" title="网页浏览区" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-left">
+            <i class="fas fa-check-circle"></i> 完成
+        </div>
+        <div class="status-right">
+            <span><i class="fas fa-lock-open"></i> Internet</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        "use strict";
+
+        // ----- DOM 元素 -----
+        const iframe = document.getElementById('browserFrame');
+        const urlInput = document.getElementById('urlInput');
+        const goBtn = document.getElementById('goButton');
+        const homeBtn = document.getElementById('homeButton');
+        const refreshBtn = document.getElementById('refreshButton');
+        const searchBtn = document.getElementById('searchButton');
+
+        // ========== 搜索数据源 (精确匹配) ==========
+        const searchData = [
+            { title: "安定形神",url: "huangfuzhi.html", target: "_blank" },
+			 { title: "青岚",url: "qinglan.html", target: "_blank" },
+			 { title: "长夜何往",url: "changye.html", target: "_blank" },
+			 { title: "钱家符纸铺",url: "fuzhipu.html", target: "_blank" },
+			  { title: "同海建园工学院",url: "tonghaijianyuan.html", target: "_blank" }
+        ];
+
+        // 默认欢迎页 (iframe内显示)
+        const DEFAULT_PAGE_HTML = `
+            <!DOCTYPE html>
+            <html style="height:100%;">
+            <head><meta charset="UTF-8"><title>旧版IE仿真 · 欢迎</title>
+            <style>
+                body {
+                    margin: 20px;
+                    background: #c0c0c0;
+                    font-family: 'Tahoma', sans-serif;
+                }
+                .win-box {
+                    background: #d4d0c8;
+                    border: 3px ridge #ffffff;
+                    padding: 25px;
+                    box-shadow: inset -1px -1px 0 #404040;
+                }
+                h2 {
+                    background: #0a246a;
+                    color: white;
+                    padding: 6px 12px;
+                    margin-top: 0;
+                }
+                .info {
+                    background: #ffffe1;
+                    border: 1px solid #808080;
+                    padding: 15px;
+                    margin: 15px 0;
+                }
+                code {
+                    background: #eee;
+                    padding: 2px 5px;
+                    border: 1px solid #888;
+                }
+                ul { margin-left: 20px; }
+            </style>
+            </head>
+            <body>
+                <div class="win-box">
+                    <h2><i class="fab fa-internet-explorer"></i> 精确搜索浏览器</h2>
+                    <p>在地址栏输入<strong>完整名词</strong>，点击「转到」或按回车。</p>
+                
+                    <p>点击右上角<i class="fas fa-times"></i>可返回桌面。</p>
+                </div>
+            </body>
+            </html>
+        `;
+
+        // 错误页：当输入不匹配时显示
+        const ERROR_PAGE_HTML = (wrongInput) => `
+            <!DOCTYPE html>
+            <html style="height:100%;">
+            <head><meta charset="UTF-8"><title>无法找到 · IE</title>
+            <style>
+                body { margin: 30px; background: #c0c0c0; font-family: 'Tahoma'; }
+                .error-container {
+                    background: #d4d0c8;
+                    border: 3px ridge #ff0000;
+                    padding: 25px;
+                }
+                h3 { color: #800000; }
+                .keyword { background: #ffffc0; border:1px solid #aa0; padding:2px 6px; }
+            </style>
+            </head>
+            <body>
+                <div class="error-container">
+                    <h3><i class="fas fa-exclamation-triangle" style="color:#cc0000;"></i> 未找到匹配项</h3>
+                    <p>您输入了 “<strong>${wrongInput}</strong>” ，请确保与可用名词完全一致（不区分大小写）。</p>
+                    <hr>
+                    <p><a href="#" onclick="window.parent.postMessage('back-to-home','*'); return false;">返回主页</a></p>
+                </div>
+            </body>
+            </html>
+        `;
+
+        // 初始化默认页
+        function setDefaultPage() {
+            iframe.srcdoc = DEFAULT_PAGE_HTML;
+            urlInput.value = '';
+        }
+
+        // 核心跳转逻辑：精确匹配，直接打开外部页面
+        function handleNavigation() {
+            const inputVal = urlInput.value.trim();
+            if (inputVal === '') {
+                setDefaultPage();
+                return;
+            }
+
+            // 精确匹配（忽略大小写）
+            const lowerInput = inputVal.toLowerCase();
+            const matched = searchData.find(item => item.title.toLowerCase() === lowerInput);
+
+            if (matched) {
+                // 匹配成功：新窗口打开目标URL
+                const target = matched.target || '_blank';
+                window.open(matched.url, target);
+                // 可选：在地址栏保留输入内容，iframe保持当前不变或显示成功提示（这里保留原样）
+                // 但为了反馈，可以在状态栏显示（非必须）
+            } else {
+                // 不匹配：在iframe显示错误提示
+                const safeInput = inputVal.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                iframe.srcdoc = ERROR_PAGE_HTML(safeInput);
+            }
+        }
+
+        // ----- 事件绑定 -----
+        goBtn.addEventListener('click', handleNavigation);
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleNavigation();
+            }
+        });
+
+        // 注意：主页、刷新、搜索按钮虽然绑定了事件，但因为 CSS 的 pointer-events: none 而无法触发
+        // 为保持代码整洁，依然保留原有绑定（无影响）
+        homeBtn.addEventListener('click', setDefaultPage);
+        refreshBtn.addEventListener('click', () => {
+            const current = iframe.srcdoc;
+            if (current) {
+                iframe.srcdoc = current;
+            } else {
+                setDefaultPage();
+            }
+        });
+        searchBtn.addEventListener('click', handleNavigation);
+
+        // 监听来自iframe的返回主页消息
+        window.addEventListener('message', (e) => {
+            if (e.data === 'back-to-home') {
+                setDefaultPage();
+            }
+        });
+
+        // 设置初始页面
+        setDefaultPage();
+
+        // 后退/前进按钮仅作装饰
+    })();
+</script>
+</body>
+</html>

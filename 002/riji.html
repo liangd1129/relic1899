@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>日记</title>
+  <!-- Font Awesome 6 (图标库) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ----- 全局重置 & Win7 氛围 (完全沿用参考样式) ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at 30% 30%, #f0e9de, #b6c8d9, #7f9bb3);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', 'Lucida Grande', Tahoma, sans-serif;
+      font-size: 13px;
+      padding: 20px;
+      margin: 0;
+    }
+
+    /* ---------- 主窗口：Aero 玻璃 + 精致阴影 ---------- */
+    .win7-window {
+      width: 700px;
+      max-width: 100%;
+      background: rgba(235, 245, 255, 0.68);
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 9px 9px 8px 8px;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1) inset, 0 0 0 2px rgba(255, 255, 255, 0.25) inset;
+      overflow: hidden;
+      transition: all 0.1s;
+    }
+
+    /* ----- 标题栏 (Win7 经典) ----- */
+    .title-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px 6px 12px;
+      background: rgba(220, 234, 248, 0.45);
+      border-bottom: 1px solid rgba(160, 180, 200, 0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .window-icon-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #1e3a5f;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      font-size: 13.5px;
+    }
+
+    .window-icon-title i {
+      font-size: 17px;
+      color: #2a5a8c;
+      text-shadow: 0 1px 2px white;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .win-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 22px;
+      border-radius: 3px;
+      background: rgba(220, 235, 250, 0.55);
+      border: 1px solid rgba(120, 140, 160, 0.35);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      color: #1e3a5f;
+      font-size: 11px;
+      cursor: pointer;
+      backdrop-filter: blur(2px);
+      transition: all 0.1s;
+    }
+
+    .win-btn i {
+      font-size: 11px;
+      color: #2c4053;
+    }
+
+    .win-btn:hover {
+      background: rgba(210, 230, 255, 0.8);
+      border-color: rgba(90, 130, 190, 0.5);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), inset 0 1px 0 white;
+    }
+
+    .win-btn.close-btn:hover {
+      background: #d9534f;
+      border-color: #b52b27;
+    }
+    .win-btn.close-btn:hover i {
+      color: white;
+    }
+
+    /* ----- 记事本内容区域 (保留玻璃层次) ----- */
+    .notepad-content {
+      padding: 20px 20px 16px 20px;
+      background: rgba(240, 248, 255, 0.15);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 仿记事本纸张 — 略带米白，内阴影，有书写感 */
+    .notepad-paper {
+      background: #fefcf5;
+      background: linear-gradient(145deg, #fffcf7 0%, #f9f6ef 100%);
+      border-radius: 8px;
+      padding: 24px 24px 22px 24px;
+      box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.02), 0 6px 12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(210, 190, 160, 0.3);
+      border: 1px solid rgba(255, 250, 240, 0.8);
+      margin-bottom: 16px;
+      min-height: 300px;
+      max-height: 440px;
+      overflow-y: auto;
+      /* 内容较多时可滚动，不破坏玻璃感 */
+      transition: background 0.2s;
+    }
+
+    /* 笔记标题 — 日期风格 */
+    .note-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e3a5f;
+      margin-bottom: 16px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #b0c7de;
+      text-shadow: 0 1px 0 white;
+      letter-spacing: -0.1px;
+      font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    }
+
+    /* 笔记正文 — 保留空白，像手写 */
+    .note-body {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #1f2e3f;
+      font-family: 'Segoe UI', 'Consolas', 'Monaco', 'Microsoft YaHei', monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+      text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    /* 左右切换栏 — 完全玻璃风格 */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin: 8px 0 4px 0;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 26px;
+      background: rgba(230, 242, 255, 0.7);
+      backdrop-filter: blur(10px) saturate(180%);
+      -webkit-backdrop-filter: blur(10px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 30px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(160, 190, 220, 0.3) inset, 0 1px 2px rgba(255, 255, 255, 0.7) inset;
+      color: #1e3a5f;
+      font-weight: 500;
+      font-size: 14px;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      cursor: pointer;
+      border: 1px solid rgba(140, 170, 200, 0.5);
+      transition: all 0.15s;
+      text-shadow: 0 1px 1px white;
+      letter-spacing: 0.3px;
+      min-width: 120px;
+    }
+
+    .nav-btn i {
+      font-size: 14px;
+      color: #2a5a8c;
+      text-shadow: 0 1px 1px white;
+    }
+
+    .nav-btn:hover {
+      background: rgba(215, 235, 255, 0.9);
+      border-color: rgba(100, 160, 220, 0.8);
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+      transform: scale(1.02);
+    }
+
+    .nav-btn:active {
+      background: rgba(190, 220, 250, 0.9);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.5);
+      transform: scale(0.99);
+    }
+
+    .page-indicator-inline {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1d3c58;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 6px 16px;
+      border-radius: 30px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: inset 0 1px 2px white, 0 1px 3px rgba(0, 0, 0, 0.05);
+      text-shadow: 0 1px 0 white;
+      letter-spacing: 0.5px;
+    }
+
+    /* ----- 底部状态栏 — 完全保留 Win7 细节 ----- */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px 8px 16px;
+      background: rgba(235, 245, 255, 0.45);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid rgba(150, 180, 205, 0.5);
+      font-size: 12px;
+      color: #1d3c58;
+      flex-wrap: wrap;
+    }
+
+    .detail-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preview-icon i {
+      font-size: 24px;
+      color: #2a6da8;
+      text-shadow: 0 1px 2px white;
+    }
+
+    .preview-text {
+      line-height: 1.4;
+    }
+
+    .item-count {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .view-icons i {
+      margin: 0 4px;
+      font-size: 15px;
+      color: #385e7e;
+      opacity: 0.85;
+      cursor: default;
+    }
+
+    /* 右下角固定装饰 */
+    .page-indicator {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      color: #1e3a5f;
+      font-size: 14px;
+      font-weight: 500;
+      text-shadow: 0 1px 0 white;
+      letter-spacing: 0.5px;
+      background: linear-gradient(180deg, rgba(242, 247, 252, 0.85), rgba(221, 231, 242, 0.85) 45%, rgba(201, 217, 234, 0.85));
+      border: 1px solid #8ba5c2;
+      border-radius: 20px;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.15);
+      padding: 8px 20px;
+      white-space: nowrap;
+      cursor: default;
+      user-select: none;
+    }
+
+    /* 响应式 */
+    @media screen and (max-width: 600px) {
+      body {
+        padding: 10px;
+        align-items:center;
+      }
+      .win7-window {
+        border-radius: 6px;
+      }
+      .notepad-content {
+        padding: 14px;
+      }
+      .notepad-paper {
+        padding: 18px 16px;
+        max-height: 380px;
+      }
+      .pagination-bar {
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .nav-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+        min-width: 100px;
+      }
+      .page-indicator-inline {
+        padding: 4px 12px;
+        font-size: 13px;
+      }
+      .status-bar {
+        padding: 6px 12px;
+      }
+      .page-indicator {
+        bottom: 16px;
+        right: 16px;
+        padding: 6px 16px;
+        font-size: 13px;
+      }
+    }
+
+    @media screen and (max-width: 400px) {
+      .nav-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-width: 90px;
+      }
+    }
+
+    .win7-window,
+    .title-bar,
+    .status-bar {
+      user-select: none;
+    }
+    .note-body {
+      user-select: text;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 右下角固定指示器 — 固定显示 13/18 -->
+  <div class="page-indicator" id="globalPageIndicator">13/18</div>
+
+  <div class="win7-window">
+    <!-- 标题栏：静远手记 -->
+    <div class="title-bar">
+      <div class="window-icon-title">
+        <i class="far fa-file-alt"></i>
+        <span>日记</span>
+      </div>
+      <div class="window-controls">
+        <div class="win-btn"><i class="fas fa-minus"></i></div>
+        <div class="win-btn"><i class="far fa-window-maximize"></i></div>
+        <div class="win-btn close-btn"><i class="fas fa-times"></i></div>
+      </div>
+    </div>
+
+    <!-- 记事本主内容区 -->
+    <div class="notepad-content">
+      <div class="notepad-paper">
+        <div class="note-title" id="noteTitle">一九六〇年四月十二日 晴</div>
+        <div class="note-body" id="noteBody">正在翻开手稿……</div>
+      </div>
+
+      <!-- 左右切换按钮 (前一篇/后一篇) -->
+      <div class="pagination-bar">
+        <button class="nav-btn" id="prevNoteBtn" title="上一篇 (←)">
+          <i class="fas fa-chevron-left"></i> 前一篇
+        </button>
+
+        <span class="page-indicator-inline" id="inlinePageIndicator">1 / 5</span>
+
+        <button class="nav-btn" id="nextNoteBtn" title="下一篇 (→)">
+          后一篇 <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- 底部状态栏 -->
+    <div class="status-bar">
+      <div class="detail-preview">
+        <div class="preview-icon">
+          <i class="far fa-calendar-alt"></i>
+        </div>
+        <div class="preview-text">
+          <div><strong id="statusNoteTitle">一九六〇年四月十二日</strong></div>
+          <div style="font-size: 11px; opacity: 0.85;" id="statusNoteMeta">晴 · 南坡点豆</div>
+        </div>
+      </div>
+      <div class="item-count">
+        <span style="opacity: 0.7;">|</span>
+        <div class="view-icons">
+          <i class="far fa-bookmark"></i>
+          <i class="fas fa-undo-alt"></i>
+          <i class="far fa-clock"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // ---------- 五篇日记，一字不差 ----------
+      const notes = [
+        {
+          date: '一九六〇年四月十二日 晴',
+          titleShort: '一九六〇年四月十二日',
+          metaDesc: '晴 · 南坡点豆',
+          body: `今天跟文舟去南坡点豆子。她蹲在地垄那头，我在这头，隔一会儿就喊一声"到了没"，喊得嗓子发干。歇晌的时候她从兜里摸出两块白薯，分我一块。她咬了一口，<span style="color: red;">歪</span>头看看我的手，说："静远你手真白，不像干活的。"
+
+我低头看了看，不知怎么的就把手缩回袖子里去了。心里虚了一下，像做错了什么事似的。
+
+傍晚收工往回走，她辫子上沾了片草叶子，我伸手替她摘了。她回头冲我笑了笑，牙很白。
+
+回到家洗完脸，对着镜子站了一会儿。镜子里的人也在看我。没什么不对，可就是觉得哪里不对。想了半天，也没想出个名堂。
+
+大概是累了吧。`
+        },
+        {
+          date: '一九六〇年七月十九日 热',
+          titleShort: '一九六〇年七月十九日',
+          metaDesc: '热 · 文舟中暑',
+          body: `文舟中暑了。她妈上午过来敲门，说烧了一宿没退。我撂下手里的活儿就过去了。
+
+她躺在床上，脸红红的，头发湿答答地贴在额头上。看见我进来，眼睛睁开一点，嘴里嘟囔了一句什么，没听清。我搬了把椅子坐到床边，拧了湿毛巾给她擦脸。毛巾敷上去的时候，她眉头松开了一点，轻轻哼了一声。
+
+我就这么一遍一遍地换水，一遍一遍地敷。她妈进来看了一眼，说："小远你倒是比姑娘还细心。"
+
+我手停了一下，没搭话。后来她睡着了，呼吸匀了。我坐在那儿看着她，外头蝉叫得人心慌。
+
+忽然想，要是能这样安安静静地守着一个人过一辈子，好像也不错。可这话一冒出来，又觉得哪里别扭。到底是哪里，说不上来。
+
+傍晚她醒了，冲我笑了笑，说："你还在啊。"
+
+嗯。还在。`
+        },
+        {
+          date: '一九六〇年十月六日 阴',
+          titleShort: '一九六〇年十月六日',
+          metaDesc: '阴 · 爹娘提亲',
+          body: `吃晚饭的时候，爹忽然放下筷子，说："老赵家那丫头不错。"
+
+我愣了一下才明白他说的是文舟。娘在旁边接话，说那孩子模样周正，脾性也好，从小看着长大的，知根知底。爹点点头，说明儿就让<span style="color: green;">吴</span>婶过去探探口风。
+
+我端着碗没吭声。回屋以后坐在床沿上，心里翻腾得厉害。按说该高兴的——文舟是我最熟的人，跟她在一块儿从来不用绷着。可高兴底下好像还压着点什么，沉沉的，闷闷的，像阴天里压在屋顶上的云。
+
+月亮出来了，照在被面上。娘去年扯的布，花色有点鲜亮。我盯着那些花看了很久，心里那个问题又浮上来了，跟月亮一样明晃晃的，就是答不上来。
+
+算了。不想了。`
+        },
+        {
+          date: '一九六〇年十月二十日 晴',
+          titleShort: '一九六〇年十月二十日',
+          metaDesc: '晴 · 婚事应了',
+          body: `那边回话了。应了。
+
+爹高兴，娘高兴，街坊邻居见了都道喜。文舟她娘拉着我的手说，小远啊，舟舟交给你我们放心。我点点头，点了好几下。
+
+下午文舟来找我。两人站在院门口那棵槐树底下，半天没说话。后来她先笑了，说："咱俩怎么跟不认识似的。"
+
+我也笑了，说可不是么。
+
+她从兜里掏出两颗糖递过来。我剥了一颗放进嘴里，甜的。她低着头，拿鞋尖蹭地上的土，说："静远，以后咱们就长长<span style="color: orange;">久</span>久的。"
+
+我说嗯。
+
+她抬起头看我，眼睛亮亮的。我赶紧转头去看那棵槐树。树皮裂了好些缝，缝里蚂蚁排着队往上爬。
+
+没什么。挺好的。`
+        },
+        {
+          date: '一九六一年三月十六日 阴转小雨',
+          titleShort: '一九六一年三月十六日',
+          metaDesc: '阴转小雨 · 婚后一月',
+          body: `天没亮就醒了。文舟睡在旁边，呼吸轻轻的，一只手搭在被沿上。我躺着没动，看屋顶那根梁，看了很久。
+
+外头下起小雨来，打在瓦片上，细碎细碎的声音。
+
+文舟说，今天是结婚满一个月，是回门礼的日子。
+
+日子是好的。早晨她做饭我劈柴，晚上一块儿坐在灯底下，她缝衣裳我看书。街坊都说这小两口和和美美的。我听了也笑。
+
+可有时候一个人待着，心里头就泛起那个东西来。说不清是什么，像雾，像水底下的影子，捞不着也看不清。薄薄的一层，隔在我和日子中间。不敢去碰它，怕一碰就破了。
+
+我应该高兴的。我确实是高兴的。可高兴底下那个东西，我合<span style="color: violet;">计</span>不出来是什么。
+
+文舟翻了个身，迷迷糊糊问几点了。我说还早，睡吧。
+
+雨还在下。她往我这边靠了靠，身上热乎乎的。我把被角掖了掖，闭上了眼。`
+        }
+      ];
+
+      const totalNotes = notes.length; // 5
+      let currentIndex = 0;
+
+      // DOM 元素
+      const noteTitleEl = document.getElementById('noteTitle');
+      const noteBodyEl = document.getElementById('noteBody');
+      const statusNoteTitle = document.getElementById('statusNoteTitle');
+      const statusNoteMeta = document.getElementById('statusNoteMeta');
+      const inlineIndicator = document.getElementById('inlinePageIndicator');
+      const prevBtn = document.getElementById('prevNoteBtn');
+      const nextBtn = document.getElementById('nextNoteBtn');
+
+      // 更新全部界面（右下角 globalPageIndicator 不再更新，保持固定的 13/18）
+      function updateNoteDisplay(index) {
+        const note = notes[index];
+
+        noteTitleEl.textContent = note.date; // 完整日期+天气
+        noteBodyEl.innerHTML = note.body; // 改成 innerHTML
+
+        statusNoteTitle.textContent = note.titleShort; // 仅日期
+        statusNoteMeta.textContent = note.metaDesc;
+
+        const pageString = `${index + 1} / ${totalNotes}`;
+        // 只更新中间的 inline 指示器，右下角固定不变
+        inlineIndicator.textContent = pageString;
+      }
+
+      // 上一篇 (左)
+      function goToPrev() {
+        currentIndex = (currentIndex - 1 + totalNotes) % totalNotes;
+        updateNoteDisplay(currentIndex);
+      }
+
+      // 下一篇 (右)
+      function goToNext() {
+        currentIndex = (currentIndex + 1) % totalNotes;
+        updateNoteDisplay(currentIndex);
+      }
+
+      // 绑定按钮
+      prevBtn.addEventListener('click', goToPrev);
+      nextBtn.addEventListener('click', goToNext);
+
+      // 键盘左右键支持
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          goToPrev();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          goToNext();
+        }
+      });
+
+      // 初始化第一篇
+      updateNoteDisplay(0);
+
+      // 关闭按钮仅装饰，不做跳转（符合参考样式要求）
+      const closeBtn = document.querySelector('.close-btn');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = 'wenjian.html'; // 👈 改成这一行
+        });
+      }
+
+      // 附加：滚动条美化 (不影响功能)
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>手写信2</title>
+  <!-- Font Awesome 6 (图标库) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ----- 全局重置 & Win7 氛围 (完全沿用参考样式) ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at 30% 30%, #f0e9de, #b6c8d9, #7f9bb3);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', 'Lucida Grande', Tahoma, sans-serif;
+      font-size: 13px;
+      padding: 20px;
+      margin: 0;
+    }
+
+    /* ---------- 主窗口：Aero 玻璃 + 精致阴影 ---------- */
+    .win7-window {
+      width: 700px;
+      max-width: 100%;
+      background: rgba(235, 245, 255, 0.68);
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 9px 9px 8px 8px;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1) inset, 0 0 0 2px rgba(255, 255, 255, 0.25) inset;
+      overflow: hidden;
+      transition: all 0.1s;
+    }
+
+    /* ----- 标题栏 (Win7 经典) ----- */
+    .title-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px 6px 12px;
+      background: rgba(220, 234, 248, 0.45);
+      border-bottom: 1px solid rgba(160, 180, 200, 0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .window-icon-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #1e3a5f;
+      text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+      font-weight: 500;
+      font-size: 13.5px;
+    }
+
+    .window-icon-title i {
+      font-size: 17px;
+      color: #2a5a8c;
+      text-shadow: 0 1px 2px white;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .win-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 22px;
+      border-radius: 3px;
+      background: rgba(220, 235, 250, 0.55);
+      border: 1px solid rgba(120, 140, 160, 0.35);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7);
+      color: #1e3a5f;
+      font-size: 11px;
+      cursor: pointer;
+      backdrop-filter: blur(2px);
+      transition: all 0.1s;
+    }
+
+    .win-btn i {
+      font-size: 11px;
+      color: #2c4053;
+    }
+
+    .win-btn:hover {
+      background: rgba(210, 230, 255, 0.8);
+      border-color: rgba(90, 130, 190, 0.5);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 white;
+    }
+
+    .win-btn.close-btn:hover {
+      background: #d9534f;
+      border-color: #b52b27;
+    }
+    .win-btn.close-btn:hover i {
+      color: white;
+    }
+
+    /* ----- 图片展示区域 (取代原有文件夹内容) ----- */
+    .photo-viewer-content {
+      padding: 20px 20px 16px 20px;
+      background: rgba(240, 248, 255, 0.15);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 图片容器 — 相对定位，按钮悬浮其上 */
+    .photo-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+      background: rgba(20, 30, 40, 0.08);
+      backdrop-filter: blur(2px);
+    }
+
+    /* 修改此处：object-fit 改为 contain，让照片完整显示，保持原始比例 */
+    .photo-wrapper img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 420px;
+      object-fit: contain;       /* 完整显示图片，不裁剪，可能留白但符合要求 */
+      border-radius: 6px;
+      transition: opacity 0.2s ease;
+    }
+
+   /* 按钮样式保留，但由于按钮已删除，以下样式不会影响页面，保留以备后续可能使用 */
+   .switch-btn {
+     position: absolute;
+     top: 16px;                     /* ← 新位置：顶部 */
+     left: 16px;                    /* ← 新位置：左侧 */
+     transform: none;               /* ← 移除水平居中偏移 */
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+     gap: 8px;
+     padding: 10px 24px;
+     background: rgba(230, 242, 255, 0.75);
+     backdrop-filter: blur(10px) saturate(180%);
+     -webkit-backdrop-filter: blur(10px) saturate(180%);
+     border: 1px solid rgba(255, 255, 255, 0.8);
+     border-radius: 30px;
+     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(160, 190, 220, 0.3) inset, 0 1px 2px rgba(255,255,255,0.7) inset;
+     color: #1e3a5f;
+     font-weight: 500;
+     font-size: 14px;
+     font-family: 'Segoe UI', Tahoma, sans-serif;
+     cursor: pointer;
+     border: 1px solid rgba(140, 170, 200, 0.5);
+     transition: all 0.15s;
+     text-shadow: 0 1px 1px white;
+     white-space: nowrap;
+     z-index: 10;
+     letter-spacing: 0.3px;
+   }
+
+    .switch-btn i {
+      font-size: 14px;
+      color: #2a5a8c;
+      text-shadow: 0 1px 1px white;
+    }
+
+    .switch-btn:hover {
+      background: rgba(215, 235, 255, 0.9);
+      border-color: rgba(100, 160, 220, 0.8);
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255,255,255,0.9) inset;
+      transform: translateX(-50%) scale(1.02);
+    }
+
+    .switch-btn:active {
+      background: rgba(190, 220, 250, 0.9);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.5);
+      transform: translateX(-50%) scale(0.99);
+    }
+
+    /* 底部状态栏 — 完全保留 Win7 细节 */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px 8px 16px;
+      background: rgba(235, 245, 255, 0.45);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid rgba(150, 180, 205, 0.5);
+      font-size: 12px;
+      color: #1d3c58;
+      flex-wrap: wrap;
+    }
+
+    .detail-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preview-icon i {
+      font-size: 24px;
+      color: #2a6da8;
+      text-shadow: 0 1px 2px white;
+    }
+
+    .preview-text {
+      line-height: 1.4;
+    }
+
+    .item-count {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .view-icons i {
+      margin: 0 4px;
+      font-size: 15px;
+      color: #385e7e;
+      opacity: 0.85;
+      cursor: default;
+    }
+
+    /* 右下角固定装饰 (修改为显示当前照片序号) */
+    .page-indicator {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      color: #1e3a5f;
+      font-size: 14px;
+      font-weight: 500;
+      text-shadow: 0 1px 0 white;
+      letter-spacing: 0.5px;
+      background: linear-gradient(180deg, rgba(242, 247, 252, 0.85), rgba(221, 231, 242, 0.85) 45%, rgba(201, 217, 234, 0.85));
+      border: 1px solid #8ba5c2;
+      border-radius: 20px;
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.15);
+      padding: 8px 20px;
+      white-space: nowrap;
+      cursor: default;
+      user-select: none;
+    }
+
+    /* 图片描述文字（状态栏辅助） */
+    .photo-meta {
+      opacity: 0.9;
+    }
+
+    /* 响应式 */
+    @media screen and (max-width: 600px) {
+      body {
+        padding: 10px;
+        align-items: center;
+      }
+      .win7-window {
+        border-radius: 6px;
+      }
+      .photo-viewer-content {
+        padding: 12px;
+      }
+      .switch-btn {
+        padding: 8px 18px;
+        font-size: 13px;
+        bottom: 16px;
+      }
+      .status-bar {
+        padding: 6px 12px;
+      }
+      .page-indicator {
+        bottom: 16px;
+        right: 16px;
+        padding: 6px 16px;
+        font-size: 13px;
+      }
+    }
+
+    @media screen and (max-width: 400px) {
+      .switch-btn {
+        padding: 6px 14px;
+        font-size: 12px;
+      }
+    }
+
+    /* 移除所有文件列表相关样式（未使用，但保留无影响） */
+    .win7-window, .title-bar, .status-bar {
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 右下角指示器 — 固定显示 9999 -->
+<div class="page-indicator" id="photoIndicator">11/18</div>
+
+<div class="win7-window">
+  <!-- 标题栏：照片查看器 -->
+  <div class="title-bar">
+    <div class="window-icon-title">
+      <i class="fas fa-image"></i>
+      <span>照片查看器</span>
+    </div>
+    <div class="window-controls">
+      <div class="win-btn"><i class="fas fa-minus"></i></div>
+      <div class="win-btn"><i class="far fa-window-maximize"></i></div>
+      <!-- 关闭按钮：点击跳转 wenjian.html -->
+      <div class="win-btn close-btn"><i class="fas fa-times"></i></div>
+    </div>
+  </div>
+
+  <!-- 照片展示区域 (不包含任何切换按钮) -->
+  <div class="photo-viewer-content">
+    <div class="photo-wrapper">
+      <!-- 图片元素，初始显示第一张 -->
+      <img id="mainPhoto" src="../img/zhengmian.png" alt="风景照片">
+    </div>
+  </div>
+
+  <!-- 底部状态栏 (Win7风格，显示照片信息) -->
+  <div class="status-bar">
+    <div class="detail-preview">
+      <div class="preview-icon">
+        <i class="fas fa-camera-retro"></i>
+      </div>
+      <div class="preview-text">
+        <div><strong id="photoTitle">山水之间</strong></div>
+        <div style="font-size: 11px; opacity: 0.85;" id="photoDesc">Picsum · 自然风光</div>
+      </div>
+    </div>
+    <div class="item-count">
+      <span style="opacity: 0.7;">|</span>
+      <div class="view-icons">
+        <i class="fas fa-image"></i>
+        <i class="fas fa-expand"></i>
+        <i class="fas fa-info-circle"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    // 照片数据：只保留一张用于显示（因为不再切换，但保留数组结构方便日后扩展）
+    const photos = [
+      {
+        id: 1,
+        src: '../img/shouxiexin2.jpg',
+        title: '手写信2',
+        desc: '照片'
+      }
+    ];
+
+    // DOM 元素
+    const imgElement = document.getElementById('mainPhoto');
+    const photoTitle = document.getElementById('photoTitle');
+    const photoDesc = document.getElementById('photoDesc');
+
+    // 直接显示第一张照片（固定，无切换功能）
+    function displayFirstPhoto() {
+      const photo = photos[0];
+      imgElement.src = photo.src;
+      imgElement.alt = photo.title;
+      photoTitle.textContent = photo.title;
+      photoDesc.textContent = photo.desc;
+    }
+
+    // 关闭按钮：点击跳转 wenjian.html（保留原有功能）
+    const closeBtn = document.querySelector('.close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'wenjian.html';
+      });
+    }
+
+    // 初始化显示第一张照片
+    displayFirstPhoto();
+
+    // 所有切换相关的代码均已移除，按钮不再存在。
+  })();
+</script>
+
+<!-- 说明：此版本已删除“反转照片”按钮及切换功能，仅展示固定图片。右下角指示器保持不变。 -->
+</body>
+</html>

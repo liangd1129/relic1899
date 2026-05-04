@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>钱家符纸铺</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', 'Microsoft Sans Serif', sans-serif;
+        }
+
+        body {
+            background: #3a6ea5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .browser-window {
+            width: 1250px;
+            max-width: 100%;
+            background: #ece9d8;
+            border: 2px solid #0a246a;
+            border-radius: 8px 8px 5px 5px;
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), inset 0 0 0 1px #fefefe;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title-bar {
+            background: linear-gradient(90deg, #0a246a 0%, #3a6ea5 50%, #6ba1d9 100%);
+            padding: 6px 8px 6px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #0a2a5e;
+            color: white;
+            text-shadow: 1px 1px 0 #0a246a;
+        }
+
+        .window-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .window-title i {
+            font-size: 18px;
+            color: #ffd966;
+            filter: drop-shadow(0 1px 1px #0a246a);
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 3px;
+        }
+
+        .win-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            color: #0a246a;
+            width: 26px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-decoration: none;
+        }
+
+        .win-btn:hover {
+            background: #b8d0e8;
+            box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #606060;
+        }
+
+        .win-btn.close:hover {
+            background: #d47a7a;
+            color: white;
+            text-shadow: none;
+        }
+
+        .toolbar {
+            background: #d4d0c8;
+            padding: 5px 8px 3px 8px;
+            border-bottom: 1px solid #a7a7a7;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+
+        .tb-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            padding: 5px 10px;
+            min-width: 40px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1e1e1e;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: default;
+            line-height: 1;
+        }
+
+        .tb-btn i {
+            font-size: 15px;
+            color: #1e3a6b;
+        }
+
+        .tb-btn:hover {
+            background: #b8d0e8;
+            box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #707070;
+        }
+
+        /* 灰色禁用按钮样式 */
+        .tb-btn.disabled {
+            opacity: 0.55;
+            filter: grayscale(0.5);
+            cursor: default;
+            pointer-events: none;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a0a0a0;
+            background: #c5c0b5;
+            border-color: #6a6a6a;
+            color: #4a4a4a;
+        }
+
+        .tb-btn.disabled i {
+            color: #5a5a5a;
+        }
+
+        .tb-btn.disabled:hover {
+            background: #c5c0b5;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a0a0a0;
+        }
+
+        /* 主页按钮保持可点 */
+        .tb-btn.home-active {
+            cursor: pointer;
+            background: #d4d0c8;
+            opacity: 1;
+            filter: none;
+            pointer-events: auto;
+        }
+
+        .tb-btn.home-active:hover {
+            background: #b8d0e8;
+        }
+
+        /* 搜索按钮激活 */
+        .tb-btn.search-active {
+            cursor: pointer;
+            background: #d4d0c8;
+            opacity: 1;
+            filter: none;
+            pointer-events: auto;
+        }
+
+        .tb-btn.search-active:hover {
+            background: #b8d0e8;
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background: #a7a7a7;
+            margin: 0 4px;
+            box-shadow: 1px 0 0 #fff;
+        }
+
+        .address-bar {
+            background: #d4d0c8;
+            padding: 6px 8px 6px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #a7a7a7;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+
+        .address-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1e3a6b;
+            text-shadow: 1px 0 0 #fff;
+        }
+
+        .address-input-wrapper {
+            flex: 1;
+            display: flex;
+            background: white;
+            border: 2px inset #e0e0e0;
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 2px #7a7a7a;
+        }
+
+        #urlInput {
+            width: 100%;
+            padding: 6px 8px;
+            border: none;
+            outline: none;
+            font-size: 13px;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+            color: #0a246a;
+        }
+
+        .go-btn {
+            background: #d4d0c8;
+            border: 2px outset #f0f0f0;
+            border-radius: 3px;
+            padding: 4px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0a246a;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: default;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .go-btn:hover {
+            background: #b8d0e8;
+            border: 2px outset #c0d8f0;
+        }
+
+        .browser-content {
+            background: #ffffff;
+            border: 2px inset #ece9d8;
+            margin: 0;
+            flex: 1;
+            min-height: 480px;
+            display: flex;
+            padding: 16px;
+        }
+
+        /* 卡片布局 */
+        .talisman-card {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+            background: #fef9e8;
+            border: 3px ridge #a7a7a7;
+            box-shadow: inset 0 0 0 1px #ffffff, 3px 3px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px 18px;
+            gap: 24px;
+        }
+
+        .card-left {
+            flex: 0 0 280px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .talisman-image-placeholder {
+            width: 100%;
+            max-width: 280px;
+            height: 340px;
+            border: 4px solid #8b3a3a;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2), inset 0 0 0 1px #f3e7c4;
+            background: linear-gradient(180deg, #f7e8c4 0%, #e8d39a 30%, #f2e0b5 60%, #e6cf94 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .talisman-image-placeholder .fu-char {
+            font-size: 100px;
+            color: #8b1a1a;
+            font-family: '楷体', 'KaiTi', 'STKaiti', 'SimSun', serif;
+            text-shadow: 2px 2px 4px rgba(139, 26, 26, 0.3);
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .talisman-image-placeholder .seal {
+            position: absolute;
+            bottom: 40px;
+            right: 30px;
+            width: 55px;
+            height: 55px;
+            border: 3px solid #c41e1e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #c41e1e;
+            font-weight: bold;
+            font-family: '楷体', 'KaiTi', 'STKaiti', serif;
+            transform: rotate(-15deg);
+            opacity: 0.75;
+            user-select: none;
+        }
+
+        .card-right {
+            flex: 1;
+            min-width: 260px;
+            color: #1e1e1e;
+            padding-right: 6px;
+        }
+
+        .talisman-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #6b1a1a;
+            text-shadow: 1px 1px 0 #e6d5b8;
+            border-bottom: 2px solid #b89b6b;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+            font-family: 'Segoe UI', '楷体', 'KaiTi', serif;
+        }
+
+        .talisman-meta {
+            font-size: 15px;
+            background: #e3d6bf;
+            padding: 8px 12px;
+            border-left: 6px solid #7a2e2e;
+            margin-bottom: 18px;
+            box-shadow: inset 1px 1px 2px #fff, inset -1px -1px 2px #a09b8b;
+            color: #2d2416;
+            font-weight: 500;
+        }
+
+        .desc-text {
+            font-size: 14.5px;
+            line-height: 1.65;
+            margin-bottom: 14px;
+            text-align: justify;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a6b;
+            margin: 16px 0 10px 0;
+            border-bottom: 1px dashed #8b7a5a;
+            padding-bottom: 4px;
+            text-shadow: 1px 1px 0 #f0e8d8;
+        }
+
+        /* 搜索区域 */
+        .search-area {
+            background: #eae1cf;
+            padding: 14px 18px;
+            border-radius: 0;
+            border: 1px solid #c6b59e;
+            box-shadow: inset 1px 1px 3px #fdf6e7, inset -1px -1px 3px #b8aa96;
+            margin: 16px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-area label {
+            font-weight: bold;
+            color: #1e3a6b;
+            font-size: 14px;
+            white-space: nowrap;
+            text-shadow: 1px 1px 0 #fff;
+        }
+
+        .search-area .search-input {
+            flex: 1;
+            min-width: 180px;
+            padding: 8px 12px;
+            border: 2px inset #d4d0c8;
+            border-radius: 2px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            background: #fffef9;
+            color: #1e1e1e;
+            outline: none;
+            box-shadow: inset 1px 1px 3px #c0c0c0;
+        }
+
+        .search-area .search-input:focus {
+            border-color: #3a6ea5;
+            box-shadow: inset 1px 1px 3px #a0b8d0, 0 0 4px rgba(58, 110, 165, 0.3);
+        }
+
+        .search-btn {
+            background: #d4d0c8;
+            border: 2px outset #f0f0f0;
+            border-radius: 3px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0a246a;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.08s linear;
+        }
+
+        .search-btn:hover {
+            background: #b8d0e8;
+            border: 2px outset #c0d8f0;
+        }
+
+        .search-btn:active {
+            border: 2px inset #c0c0c0;
+            box-shadow: inset 1px 1px 2px #808080;
+            background: #c5c0b5;
+        }
+
+        .search-hint {
+            font-size: 12px;
+            color: #8b5a2b;
+            margin-top: 2px;
+            font-style: italic;
+        }
+
+        .search-error {
+            font-size: 13px;
+            color: #b22222;
+            font-weight: bold;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* 商品小卡片 */
+        .product-mini-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .product-mini {
+            background: #fdf6e7;
+            border: 1px solid #c6b59e;
+            padding: 10px 14px;
+            border-radius: 2px;
+            flex: 1;
+            min-width: 120px;
+            box-shadow: inset 1px 1px 2px #fff, 1px 1px 3px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .product-mini .prod-name {
+            font-weight: bold;
+            color: #6b1a1a;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .product-mini .prod-price {
+            color: #b8860b;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .product-mini .prod-tag {
+            font-size: 11px;
+            color: #5a7a5a;
+            font-style: italic;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            background: #d4d0c8;
+            border-top: 1px solid #a7a7a7;
+            padding: 4px 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #1e1e1e;
+            box-shadow: inset 0 2px 3px -2px #808080;
+        }
+
+        .status-left i {
+            margin-right: 6px;
+            color: #1e3a6b;
+        }
+
+        /* 右下角页码 */
+        .page-indicator {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            color: #1e3a5f;
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 0 1px 0 white;
+            letter-spacing: 0.5px;
+            background: linear-gradient(180deg, rgba(242, 247, 252, 0.85), rgba(221, 231, 242, 0.85) 45%, rgba(201, 217, 234, 0.85));
+            border: 1px solid #8ba5c2;
+            border-radius: 20px;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.15);
+            padding: 8px 20px;
+            white-space: nowrap;
+            cursor: default;
+            user-select: none;
+        }
+
+        /* ========== 弹窗/模态层 ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-dialog {
+            background: #ece9d8;
+            border: 2px solid #0a246a;
+            border-radius: 6px 6px 4px 4px;
+            box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.5), inset 0 0 0 1px #fefefe;
+            width: 420px;
+            max-width: 100%;
+            overflow: hidden;
+            animation: modalIn 0.2s ease-out;
+        }
+
+        @keyframes modalIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-title-bar {
+            background: linear-gradient(90deg, #0a246a 0%, #3a6ea5 50%, #6ba1d9 100%);
+            padding: 7px 10px 7px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #0a2a5e;
+            color: white;
+            text-shadow: 1px 1px 0 #0a246a;
+        }
+
+        .modal-title-bar span {
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .modal-title-bar span i {
+            color: #ffd966;
+            font-size: 16px;
+        }
+
+        .modal-close-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            color: #0a246a;
+            width: 26px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;
+            transition: 0.05s linear;
+        }
+
+        .modal-close-btn:hover {
+            background: #d47a7a;
+            color: white;
+            text-shadow: none;
+        }
+
+        .modal-body {
+            padding: 20px 22px;
+            background: #fefefe;
+            border: 2px inset #ece9d8;
+            margin: 0;
+        }
+
+        .modal-body .order-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background: #fef9e8;
+            border: 1px solid #b89b6b;
+            box-shadow: inset 1px 1px 4px #fdf3e0, 2px 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .modal-body .order-info-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #dacfb8;
+            vertical-align: top;
+        }
+
+        .modal-body .order-info-table td.label-col {
+            font-weight: bold;
+            color: #1e3a6b;
+            background: #e3d6bf;
+            width: 38%;
+            white-space: nowrap;
+            border-right: 1px solid #b89b6b;
+            text-shadow: 1px 1px 0 #fdf6e7;
+            font-size: 13px;
+        }
+
+        .modal-body .order-info-table td.value-col {
+            color: #1e1e1e;
+            font-family: 'Courier New', 'Segoe UI', monospace;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+
+        .modal-body .order-highlight {
+            color: #8b1a1a;
+            font-weight: bold;
+        }
+
+        .modal-footer {
+            background: #d4d0c8;
+            border-top: 1px solid #a7a7a7;
+            padding: 8px 14px;
+            text-align: right;
+            box-shadow: inset 0 2px 3px -2px #808080;
+        }
+
+        .modal-footer .ok-btn {
+            background: #d4d0c8;
+            border: 2px outset #f0f0f0;
+            border-radius: 3px;
+            padding: 6px 22px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0a246a;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;
+            transition: 0.08s linear;
+        }
+
+        .modal-footer .ok-btn:hover {
+            background: #b8d0e8;
+            border: 2px outset #c0d8f0;
+        }
+
+        .modal-footer .ok-btn:active {
+            border: 2px inset #c0c0c0;
+            box-shadow: inset 1px 1px 2px #808080;
+            background: #c5c0b5;
+        }
+
+        @media (max-width: 700px) {
+            .browser-window {
+                width: 100%;
+            }
+            .tb-btn span {
+                display: none;
+            }
+            .tb-btn {
+                padding: 6px 8px;
+            }
+            .card-left {
+                flex: 0 0 100%;
+                justify-content: center;
+                align-items: center;
+            }
+            .talisman-image-placeholder {
+                max-width: 220px;
+                height: 270px;
+            }
+            .talisman-image-placeholder .fu-char {
+                font-size: 70px;
+            }
+            .talisman-title {
+                font-size: 22px;
+            }
+            .modal-dialog {
+                width: 95%;
+            }
+            .search-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-area .search-input {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .page-indicator {
+                bottom: 16px;
+                right: 16px;
+                padding: 6px 16px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 右下角页码 -->
+    <div class="page-indicator">15/18</div>
+
+    <!-- ==================== 订单详情弹窗 ==================== -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal-dialog">
+            <div class="modal-title-bar">
+                <span><i class="fas fa-file-invoice"></i> 订单详情</span>
+                <div class="modal-close-btn" onclick="closeModal()" title="关闭">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <table class="order-info-table">
+                    <tbody>
+                        <tr>
+                            <td class="label-col"><i class="fas fa-user-edit" style="margin-right:6px;color:#7a2e2e;"></i>下单人</td>
+                            <td class="value-col order-highlight" id="modalOrderer">张明远</td>
+                        </tr>
+                        <tr>
+                            <td class="label-col"><i class="fas fa-calendar-alt" style="margin-right:6px;color:#7a2e2e;"></i>下单日期</td>
+                            <td class="value-col" id="modalDate">2024年10月15日</td>
+                        </tr>
+                        <tr>
+                            <td class="label-col"><i class="fas fa-user-check" style="margin-right:6px;color:#7a2e2e;"></i>收货人</td>
+                            <td class="value-col" id="modalReceiver">张明远</td>
+                        </tr>
+                        <tr>
+                            <td class="label-col"><i class="fas fa-mobile-alt" style="margin-right:6px;color:#7a2e2e;"></i>收货人手机号</td>
+                            <td class="value-col order-highlight" id="modalPhone">13812345678</td>
+                        </tr>
+                        <tr>
+                            <td class="label-col"><i class="fas fa-hashtag" style="margin-right:6px;color:#7a2e2e;"></i>订单号</td>
+                            <td class="value-col" id="modalOrderId" style="color:#0a246a;font-weight:bold;">QJ20241015-008</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="ok-btn" onclick="closeModal()">确 定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 浏览器窗口 ==================== -->
+    <div class="browser-window">
+        <!-- 标题栏 -->
+        <div class="title-bar">
+            <div class="window-title">
+                <i class="fab fa-internet-explorer"></i>
+                <span>Microsoft Internet Explorer</span>
+            </div>
+            <div class="window-controls">
+                <div class="win-btn"><i class="fas fa-minus"></i></div>
+                <div class="win-btn"><i class="far fa-square"></i></div>
+                <div class="win-btn close" onclick="window.location.href='win7.html'" title="关闭并返回Win7风格">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <div class="tb-btn disabled"><i class="fas fa-arrow-left"></i><span>后退</span></div>
+            <div class="tb-btn disabled"><i class="fas fa-arrow-right"></i><span>前进</span></div>
+            <div class="separator"></div>
+            <div class="tb-btn disabled"><i class="fas fa-sync-alt"></i><span>刷新</span></div>
+            <div class="tb-btn home-active" onclick="window.location.href='internet.html'">
+                <i class="fas fa-home"></i><span>主页</span>
+            </div>
+            <div class="separator"></div>
+            <!-- 搜索按钮：点击聚焦到页面内搜索框 -->
+            <div class="tb-btn search-active" onclick="document.getElementById('phoneSearchInput').focus();" title="查询订单">
+                <i class="fas fa-search"></i><span>搜索</span>
+            </div>
+        </div>
+
+        <!-- 地址栏 -->
+        <div class="address-bar">
+            <div class="address-label">地址</div>
+            <div class="address-input-wrapper">
+                <input type="text" id="urlInput" value="钱家符纸铺" readonly>
+            </div>
+            <div class="go-btn">转到</div>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="browser-content">
+            <div class="talisman-card">
+               
+
+                <!-- 右侧：店铺信息 -->
+                <div class="card-right">
+                    <div class="talisman-title">🏮 钱家符纸铺</div>
+                    <div class="talisman-meta">
+                        <i class="fas fa-tag" style="margin-right: 8px; color:#7a2e2e;"></i> 百年传承 · 正宗符纸 · 手工绘制
+                    </div>
+
+                    <div class="desc-text">
+                        <strong>钱家符纸铺</strong>始创于清光绪年间，世代传承符箓绘制技艺。本店符纸均选用上等黄表纸，以朱砂、松烟墨手绘而成，经七七四十九日供奉加持，灵验非凡。无论是镇宅平安、招财纳福，还是姻缘和合，皆有对应符箓可供请取。
+                    </div>
+
+                    <div class="section-title"><i class="fas fa-star" style="margin-right: 6px; color:#b8860b;"></i>热销符纸</div>
+                    <div class="product-mini-list">
+                        <div class="product-mini">
+                            <div class="prod-name">🏠 镇宅平安符</div>
+                            <div class="prod-price">¥88</div>
+                            <div class="prod-tag">保家宅平安</div>
+                        </div>
+                        <div class="product-mini">
+                            <div class="prod-name">💰 招财进宝符</div>
+                            <div class="prod-price">¥128</div>
+                            <div class="prod-tag">财源广进</div>
+                        </div>
+                        <div class="product-mini">
+                            <div class="prod-name">💕 姻缘和合符</div>
+                            <div class="prod-price">¥99</div>
+                            <div class="prod-tag">促进姻缘</div>
+                        </div>
+                        <div class="product-mini">
+                            <div class="prod-name">🛡️ 驱邪护身符</div>
+                            <div class="prod-price">¥156</div>
+                            <div class="prod-tag">辟邪护体</div>
+                        </div>
+                    </div>
+
+                    <!-- 订单查询搜索区域 -->
+                    <div class="section-title"><i class="fas fa-search" style="margin-right: 6px; color:#1e3a6b;"></i>订单查询</div>
+                    <div class="search-area">
+                        <label for="phoneSearchInput"><i class="fas fa-mobile-alt"></i> 收货人手机号：</label>
+                        <input
+                        type="text"
+                        id="phoneSearchInput"
+                        class="search-input"
+                        placeholder="请输入收货人手机号查询订单"
+                        maxlength="15"
+                        onkeydown="if(event.key==='Enter'){searchOrder();}"
+                        >
+                        <button class="search-btn" onclick="searchOrder()">
+                            <i class="fas fa-search"></i> 查询订单
+                        </button>
+                    </div>
+                   
+                    <div class="search-error" id="searchError"><i class="fas fa-exclamation-circle"></i> 未找到相关订单，请检查手机号是否正确</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="status-left">
+                <i class="fas fa-check-circle"></i> 钱家符纸铺 · 诚信经营 · 本页面纯属虚构，如有雷同实属偶然。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 指定手机号及对应订单数据
+        const TARGET_PHONE = '166327455';
+        const orderData = {
+            orderer: '徐如林',
+            date: '2003年10月15日',
+            receiver: '赵文舟',
+            phone: '166327455',
+            orderId: 'QJ20031015-008'
+        };
+
+        // 额外可匹配的手机号（可选扩展）
+        const extraPhones = {
+            '13987654321': {
+                orderer: '李秀兰',
+                date: '2024年11月2日',
+                receiver: '王建国',
+                phone: '13987654321',
+                orderId: 'QJ20241102-015'
+            },
+            '13611112222': {
+                orderer: '赵文舟',
+                date: '2024年9月28日',
+                receiver: '赵文舟',
+                phone: '13611112222',
+                orderId: 'QJ20240928-003'
+            }
+        };
+
+        // 合并所有可查询的手机号
+        const allOrders = { ...extraPhones };
+        allOrders[TARGET_PHONE] = orderData;
+
+        /**
+         * 搜索订单
+         */
+        function searchOrder() {
+            const inputEl = document.getElementById('phoneSearchInput');
+            const errorEl = document.getElementById('searchError');
+            const hintEl = document.getElementById('searchHint');
+            const rawPhone = inputEl.value.trim();
+
+            // 隐藏之前的错误提示
+            errorEl.style.display = 'none';
+
+            if (!rawPhone) {
+                errorEl.textContent = '⚠️ 请输入手机号再进行查询';
+                errorEl.style.display = 'block';
+                inputEl.focus();
+                return;
+            }
+
+            // 检查是否匹配任一手机号
+            if (allOrders[rawPhone]) {
+                // 匹配成功，显示弹窗
+                const order = allOrders[rawPhone];
+                document.getElementById('modalOrderer').textContent = order.orderer;
+                document.getElementById('modalDate').textContent = order.date;
+                document.getElementById('modalReceiver').textContent = order.receiver;
+                document.getElementById('modalPhone').textContent = order.phone;
+                document.getElementById('modalOrderId').textContent = order.orderId;
+                document.getElementById('orderModal').classList.add('show');
+                errorEl.style.display = 'none';
+                // 同时隐藏提示
+                hintEl.style.display = 'none';
+            } else {
+                // 不匹配
+                errorEl.textContent = '🔍 未找到相关订单，请检查手机号是否正确';
+                errorEl.style.display = 'block';
+                hintEl.style.display = 'block';
+                // 抖动输入框提示
+                inputEl.style.borderColor = '#b22222';
+                setTimeout(() => {
+                    inputEl.style.borderColor = '';
+                }, 600);
+            }
+        }
+
+        /**
+         * 关闭弹窗
+         */
+        function closeModal() {
+            document.getElementById('orderModal').classList.remove('show');
+            document.getElementById('searchError').style.display = 'none';
+            document.getElementById('searchHint').style.display = 'block';
+        }
+
+        // 点击弹窗遮罩层关闭弹窗
+        document.getElementById('orderModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // ESC 键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('orderModal');
+                if (modal.classList.contains('show')) {
+                    closeModal();
+                }
+            }
+        });
+
+        // 页面加载完成后，自动聚焦搜索框（可选）
+        // document.getElementById('phoneSearchInput').focus();
+    </script>
+</body>
+</html>

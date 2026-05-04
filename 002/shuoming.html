@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>电脑使用说明 · 记事本</title>
+  <!-- Font Awesome 图标库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ----- 全局 Win7 氛围背景 (与文件夹页面一致) ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at 30% 30%, #f0e9de, #b6c8d9, #7f9bb3);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', 'Lucida Grande', Tahoma, sans-serif;
+      font-size: 14px;
+      padding: 20px;
+      margin: 0;
+      position: relative;
+    }
+
+    /* ---------- 记事本窗口 —— 完整 Aero 玻璃效果 ---------- */
+    .notepad-window {
+      width: 650px;
+      max-width: 100%;
+      background: rgba(245, 250, 255, 0.92);
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 9px 9px 8px 8px;
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1) inset, 0 0 0 2px rgba(255, 255, 255, 0.25) inset;
+      overflow: hidden;
+      transition: all 0.1s;
+    }
+
+    /* 标题栏 (完全仿真 Win7 记事本标题栏) */
+    .notepad-title-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px 8px 14px;
+      background: rgba(220, 234, 248, 0.6);
+      border-bottom: 1px solid rgba(160, 180, 200, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .notepad-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #1e3a5f;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .notepad-title i {
+      font-size: 18px;
+      color: #2a5a8c;
+      text-shadow: 0 1px 2px white;
+    }
+
+    /* 窗口控制按钮 (X) */
+    .win-controls {
+      display: flex;
+      gap: 5px;
+    }
+
+    .win-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 24px;
+      border-radius: 4px;
+      background: rgba(220, 235, 250, 0.6);
+      border: 1px solid rgba(120, 140, 160, 0.4);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8);
+      color: #1e3a5f;
+      font-size: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(2px);
+      transition: all 0.1s;
+    }
+
+    .win-btn i {
+      font-size: 13px;
+      color: #2c4053;
+    }
+
+    .win-btn:hover {
+      background: rgba(210, 230, 255, 0.9);
+      border-color: rgba(90, 130, 190, 0.5);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 white;
+    }
+
+    .win-btn.close-btn:hover {
+      background: #d9534f;
+      border-color: #b52b27;
+    }
+    .win-btn.close-btn:hover i {
+      color: white;
+    }
+
+    /* 菜单栏 (模拟记事本菜单，不可点击但保留视觉) */
+    .notepad-menu {
+      display: flex;
+      align-items: center;
+      padding: 6px 10px 6px 14px;
+      background: rgba(240, 248, 255, 0.35);
+      border-bottom: 1px solid rgba(170, 190, 210, 0.45);
+      backdrop-filter: blur(2px);
+      gap: 20px;
+      font-size: 13px;
+      color: #1e3a5f;
+    }
+
+    .menu-item {
+      cursor: default;
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid transparent;
+    }
+
+    .menu-item:hover {
+      background: rgba(215, 235, 255, 0.6);
+      border: 1px solid rgba(115, 160, 210, 0.4);
+    }
+
+    /* 内容区域 —— 纯文本只读，保留经典 Consolas 字体 */
+    .notepad-content {
+      padding: 18px 16px 22px 16px;
+      background: #ffffff;
+      min-height: 320px;
+      max-height: 60vh;
+      overflow: auto;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+    }
+
+    .notepad-text {
+      font-family: 'Consolas', 'Monaco', 'Lucida Console', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.65;
+      color: #1e1e1e;
+      white-space: pre-wrap;       /* 保留换行和空格，自动换行 */
+      word-break: break-word;
+      background: transparent;
+      border: none;
+      outline: none;
+      width: 100%;
+      resize: none;
+      margin: 0;
+      padding: 2px;
+    }
+
+    /* 可选: 底部状态栏 (Win7 记事本有状态栏，我们简化但保留氛围) */
+    .notepad-status {
+      padding: 6px 16px;
+      background: rgba(235, 245, 255, 0.5);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid rgba(150, 180, 205, 0.5);
+      font-size: 12px;
+      color: #1d3c58;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .status-left i, .status-right i {
+      margin-right: 6px;
+      opacity: 0.7;
+    }
+
+    /* 右下角页码装饰 (保留原来风格，但稍作调整) */
+    .page-indicator {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      color: #1e3a5f;
+      font-size: 14px;
+      font-weight: 500;
+      text-shadow: 0 1px 0 white;
+      letter-spacing: 0.5px;
+      background: linear-gradient(180deg, rgba(242, 247, 252, 0.85), rgba(221, 231, 242, 0.85) 45%, rgba(201, 217, 234, 0.85));
+      border: 1px solid #8ba5c2;
+      border-radius: 20px;
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.15);
+      padding: 8px 20px;
+      white-space: nowrap;
+      cursor: default;
+      user-select: none;
+    }
+
+    /* ----- 移动端适配 (宽度 ≤ 600px) ----- */
+    @media screen and (max-width: 600px) {
+      body {
+        padding: 10px;
+        align-items: center;  /* 靠上，避免键盘遮挡时更好 */
+      }
+
+      .notepad-window {
+        width: 100%;
+        border-radius: 8px;
+      }
+
+      .notepad-title-bar {
+        padding: 6px 10px;
+      }
+
+      .notepad-title {
+        font-size: 13px;
+        gap: 6px;
+      }
+
+      .notepad-menu {
+        padding: 5px 10px;
+        gap: 12px;
+        font-size: 12px;
+        flex-wrap: wrap;
+      }
+
+      .notepad-content {
+        padding: 14px 12px;
+        max-height: 70vh;         /* 手机端给更多可视空间 */
+        min-height: 260px;
+      }
+
+      .notepad-text {
+        font-size: 13.5px;
+        line-height: 1.6;
+      }
+
+      .notepad-status {
+        padding: 5px 12px;
+        font-size: 11px;
+      }
+
+      .page-indicator {
+        bottom: 12px;
+        right: 12px;
+        padding: 5px 14px;
+        font-size: 12px;
+      }
+
+      .win-btn {
+        width: 32px;
+        height: 28px;
+      }
+    }
+
+    /* 小屏微调 */
+    @media screen and (max-width: 380px) {
+      .notepad-menu {
+        gap: 8px;
+      }
+      .menu-item {
+        padding: 2px 2px;
+      }
+    }
+
+    /* 保留滚动条样式 (与win7接近) */
+    .notepad-content::-webkit-scrollbar {
+      width: 12px;
+      background: #eef3f9;
+    }
+    .notepad-content::-webkit-scrollbar-thumb {
+      background: #b0c4de;
+      border-radius: 6px;
+      border: 2px solid #eef3f9;
+    }
+    .notepad-content::-webkit-scrollbar-thumb:hover {
+      background: #8fadce;
+    }
+  </style>
+</head>
+<body>
+<div class="page-indicator">2/18</div>
+
+  <!-- 记事本主窗口 -->
+  <div class="notepad-window">
+    <!-- 标题栏：图标 + 标题 + 关闭按钮 -->
+    <div class="notepad-title-bar">
+      <div class="notepad-title">
+        <i class="fas fa-file-alt"></i>
+        <span>电脑使用说明 - 记事本</span>
+      </div>
+      <div class="win-controls">
+        <!-- 关闭按钮：点击返回 win7.html -->
+        <div class="win-btn close-btn" id="closeNotepadBtn" title="关闭 (返回桌面)">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 菜单栏 (仅视觉装饰，不可操作) -->
+    <div class="notepad-menu">
+      <span class="menu-item">文件(F)</span>
+      <span class="menu-item">编辑(E)</span>
+      <span class="menu-item">格式(O)</span>
+      <span class="menu-item">查看(V)</span>
+      <span class="menu-item">帮助(H)</span>
+    </div>
+
+    <!-- 文本内容区 (只读展示，带滚动) -->
+    <div class="notepad-content">
+      <div class="notepad-text" id="notepadTextDisplay">
+电脑基本使用说明：
+使用电脑时，点击左下角菜单后再点击关机键，可以关闭电脑。
+使用文件夹时，点击右上角×可以关闭页面。
+使用Internet时，点击右上角×可以关闭页面。
+
+祝您使用愉快。^_^
+
+此电脑专门用于存档家人们的各种文件。
+
+      </div>
+    </div>
+
+    <!-- 状态栏 (经典Win7记事本风格，显示行/列和编码) -->
+    <div class="notepad-status">
+      <div class="status-left">
+        <i class="fas fa-arrows-alt-v"></i> 第1行，第1列
+      </div>
+      <div class="status-right">
+        <i class="fas fa-font"></i> Windows (CRLF) &nbsp; | &nbsp; UTF-8
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      "use strict";
+
+      // 获取关闭按钮
+      const closeBtn = document.getElementById('closeNotepadBtn');
+
+      // 点击 X 返回 win7.html (文件夹桌面)
+      closeBtn.addEventListener('click', function() {
+        window.location.href = 'win7.html';
+      });
+
+      // 可选：如果希望点击菜单/状态栏没有实际功能，就这样保持。
+      // 移动端触摸友好，不需要额外处理。
+
+      // 如果需要在状态栏模拟一下“行/列”，仅作为装饰。
+      // 为了更有记事本感觉，简单模拟一下 (静态即可，用户无需编辑)
+
+      // 完全适配手机，文字可选取但不会意外编辑 (因为是div只读)
+
+      // 也可以增加一个细节：双击标题栏或空白无效果，保持简洁。
+    })();
+  </script>
+</body>
+</html>

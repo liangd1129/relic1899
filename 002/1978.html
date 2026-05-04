@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>青岚大事报 · 1978</title>
+    <!-- 复古风格 · 1978年大事报，四篇报道布局（第四篇留空） -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', 'Microsoft Sans Serif', sans-serif;
+        }
+        body {
+            background: #3a6ea5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        .browser-window {
+            width: 1250px;
+            max-width: 100%;
+            background: #ece9d8;
+            border: 2px solid #0a246a;
+            border-radius: 8px 8px 5px 5px;
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), inset 0 0 0 1px #fefefe;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .title-bar {
+            background: linear-gradient(90deg, #0a246a 0%, #3a6ea5 50%, #6ba1d9 100%);
+            padding: 6px 8px 6px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #0a2a5e;
+            color: white;
+            text-shadow: 1px 1px 0 #0a246a;
+        }
+        .window-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .window-title i {
+            font-size: 18px;
+            color: #ffd966;
+            filter: drop-shadow(0 1px 1px #0a246a);
+        }
+        .window-controls {
+            display: flex;
+            gap: 3px;
+        }
+        .win-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            color: #0a246a;
+            width: 26px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-decoration: none;
+        }
+        .win-btn:hover {
+            background: #b8d0e8;
+            box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #606060;
+        }
+        .win-btn.close:hover {
+            background: #d47a7a;
+            color: white;
+            text-shadow: none;
+        }
+        .toolbar {
+            background: #d4d0c8;
+            padding: 5px 8px 3px 8px;
+            border-bottom: 1px solid #a7a7a7;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+        .tb-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            padding: 5px 10px;
+            min-width: 40px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1e1e1e;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: default;
+            line-height: 1;
+        }
+        .tb-btn i {
+            font-size: 15px;
+            color: #1e3a6b;
+        }
+        .tb-btn:hover {
+            background: #b8d0e8;
+            box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #707070;
+        }
+
+        .tb-btn.disabled {
+            opacity: 0.55;
+            filter: grayscale(0.5);
+            cursor: default;
+            pointer-events: none;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a0a0a0;
+            background: #c5c0b5;
+            border-color: #6a6a6a;
+            color: #4a4a4a;
+        }
+        .tb-btn.disabled i {
+            color: #5a5a5a;
+        }
+        .tb-btn.disabled:hover {
+            background: #c5c0b5;
+        }
+
+        /* 主页按钮跳转Internet.html */
+        .tb-btn.home-active {
+            cursor: pointer;
+            background: #d4d0c8;
+            opacity: 1;
+            filter: none;
+            pointer-events: auto;
+        }
+        .tb-btn.home-active:hover {
+            background: #b8d0e8;
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background: #a7a7a7;
+            margin: 0 4px;
+            box-shadow: 1px 0 0 #fff;
+        }
+        .address-bar {
+            background: #d4d0c8;
+            padding: 6px 8px 6px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #a7a7a7;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+        .address-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1e3a6b;
+            text-shadow: 1px 0 0 #fff;
+        }
+        .address-input-wrapper {
+            flex: 1;
+            display: flex;
+            background: white;
+            border: 2px inset #e0e0e0;
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 2px #7a7a7a;
+        }
+        #urlInput {
+            width: 100%;
+            padding: 6px 8px;
+            border: none;
+            outline: none;
+            font-size: 13px;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+            color: #0a246a;
+        }
+        .go-btn {
+            background: #d4d0c8;
+            border: 2px outset #f0f0f0;
+            border-radius: 3px;
+            padding: 4px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0a246a;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: default;
+            min-width: 60px;
+            text-align: center;
+        }
+        .go-btn:hover {
+            background: #b8d0e8;
+            border: 2px outset #c0d8f0;
+        }
+        .browser-content {
+            background: #ffffff;
+            border: 2px inset #ece9d8;
+            margin: 0;
+            flex: 1;
+            min-height: 520px;
+            display: flex;
+            padding: 16px;
+        }
+
+        /* 报纸卡片容器 */
+        .newspaper-card {
+            width: 100%;
+            background: #fef9e8;
+            border: 3px ridge #a7a7a7;
+            box-shadow: inset 0 0 0 1px #ffffff, 3px 3px 6px rgba(0,0,0,0.1);
+            padding: 24px 22px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 报头区域 */
+        .newspaper-header {
+            text-align: center;
+            border-bottom: 3px double #6b4f2c;
+            margin-bottom: 22px;
+            padding-bottom: 12px;
+        }
+        .newspaper-name {
+            font-size: 42px;
+            font-weight: 800;
+            font-family: 'Segoe UI', '楷体', 'KaiTi', serif;
+            color: #1e2f4b;
+            text-shadow: 2px 2px 0 #e0cfb0;
+            letter-spacing: 8px;
+        }
+        .newspaper-sub {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #3a2e1e;
+            border-top: 1px solid #b89b6b;
+            padding-top: 6px;
+        }
+
+        /* 报道网格：双栏布局，更像报纸 */
+        .news-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px 24px;
+            margin: 10px 0 20px;
+        }
+
+        /* 单篇报道卡片 */
+        .news-article {
+            background: #fdf7ec;
+            border: 1px solid #cfbc9c;
+            box-shadow: inset 0 0 0 1px #fff8e7, 2px 2px 4px rgba(0,0,0,0.05);
+            padding: 16px 18px;
+            break-inside: avoid;
+        }
+        .article-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e3a6b;
+            border-bottom: 1px solid #a28b6f;
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+            font-family: 'Segoe UI', '楷体', serif;
+        }
+        .article-meta {
+            font-size: 12px;
+            color: #5a4a32;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 16px;
+        }
+        .article-body {
+            font-size: 14px;
+            line-height: 1.65;
+            text-align: justify;
+            color: #1f1f1f;
+        }
+        .article-body p {
+            margin-bottom: 12px;
+            text-indent: 2em;
+        }
+        .article-body p:first-of-type {
+            margin-top: 0;
+        }
+        /* 占位报道样式 */
+        .placeholder-article {
+            background: #ede7db;
+            border: 1px dashed #8b7a5a;
+            opacity: 0.9;
+        }
+        .placeholder-article .article-title {
+            color: #5a4a32;
+        }
+
+        /* 状态栏与页码 */
+        .status-bar {
+            background: #d4d0c8;
+            border-top: 1px solid #a7a7a7;
+            padding: 4px 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #1e1e1e;
+            box-shadow: inset 0 2px 3px -2px #808080;
+        }
+        .status-left i {
+            margin-right: 6px;
+            color: #1e3a6b;
+        }
+
+        .page-indicator {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            color: #1e3a5f;
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 0 1px 0 white;
+            background: linear-gradient(180deg, rgba(242, 247, 252, 0.85), rgba(221, 231, 242, 0.85) 45%, rgba(201, 217, 234, 0.85));
+            border: 1px solid #8ba5c2;
+            border-radius: 20px;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.15);
+            padding: 8px 20px;
+            white-space: nowrap;
+            cursor: default;
+        }
+
+        @media (max-width: 750px) {
+            .news-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+            .newspaper-name {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+            .tb-btn span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-indicator">9/18</div>
+
+<div class="browser-window">
+    <div class="title-bar">
+        <div class="window-title">
+           <i class="fab fa-internet-explorer"></i>
+           <span>Microsoft Internet Explorer</span>
+        </div>
+        <div class="window-controls">
+            <div class="win-btn"><i class="fas fa-minus"></i></div>
+            <div class="win-btn"><i class="far fa-square"></i></div>
+            <div class="win-btn close" onclick="window.location.href='win7.html'" title="关闭返回">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工具栏：主页跳转 Internet.html -->
+    <div class="toolbar">
+        <div class="tb-btn disabled"><i class="fas fa-arrow-left"></i><span>后退</span></div>
+        <div class="tb-btn disabled"><i class="fas fa-arrow-right"></i><span>前进</span></div>
+        <div class="separator"></div>
+        <div class="tb-btn disabled"><i class="fas fa-sync-alt"></i><span>刷新</span></div>
+        <div class="tb-btn home-active" onclick="window.location.href='internet.html'">
+            <i class="fas fa-home"></i><span>主页</span>
+        </div>
+        <div class="separator"></div>
+        <div class="tb-btn disabled"><i class="fas fa-search"></i><span>搜索</span></div>
+    </div>
+
+    <!-- 地址栏显示当前档案 -->
+    <div class="address-bar">
+        <div class="address-label">地址</div>
+        <div class="address-input-wrapper">
+            <input type="text" id="urlInput" value="青岚大事报 · 1978年刊" readonly>
+        </div>
+        <div class="go-btn">转到</div>
+    </div>
+
+    <!-- 内容区：报纸版面 -->
+    <div class="browser-content">
+        <div class="newspaper-card">
+            <!-- 报头 -->
+            <div class="newspaper-header">
+                <div class="newspaper-name">青岚大事报</div>
+                <div class="newspaper-sub">
+                    <span>一九七八年十二月 汇编</span>
+                    <span>定价：四分</span>
+                </div>
+            </div>
+
+            <!-- 四篇报道网格（前三篇有内容，第四篇留空占位） -->
+            <div class="news-grid">
+                <!-- 报道一：一部引起议论的影片匆匆收场 -->
+                <div class="news-article">
+                    <div class="article-title">一部引起议论的影片匆匆收场</div>
+                    <div class="article-meta">
+                        <span><i class="far fa-calendar-alt"></i> 七月·文化简讯</span>
+                        <span><i class="far fa-eye"></i> 本报记者</span>
+                    </div>
+                    <div class="article-body">
+                        <p>本年七月间，本市的<strong>卡斯奥影院</strong>上映了部外国影片，内容涉及同性之间的暧昧关系。影片本身倒也没有露骨镜头，只是那种调子和趣味，实在让人不敢恭维。剧中人物整日纠缠于个人的奇特情感，和咱们正常人的生活观念差得太远。</p>
+                        <p>不少观众看了一半就离场，有的直言：这种东西有什么看头？放了一场以后，获得大规模差评抗议，院方也就悄悄把片子撤了。这事倒也说明，不合大众口味的玩意儿，在青岚是站不住脚的。</p>
+                    </div>
+                </div>
+
+                <!-- 报道二：同海建园工学院正式成立 -->
+                <div class="news-article">
+                    <div class="article-title">同海建园工学院正式成立</div>
+                    <div class="article-meta">
+                        <span><i class="far fa-calendar-alt"></i> 九月·教育要闻</span>
+                        <span><i class="far fa-building"></i> 东郊通讯</span>
+                    </div>
+                    <div class="article-body">
+                        <p>本市东郊今年添了一所新学校——同海建园工学院。校名里的“建园”二字，点明了它的办学方向：既要教工程，也要教园林。学生不光得学会造房子、弄机械，还要懂树木花草、庭院布置。</p>
+                        <p>按照学校的设想，将来咱们的城市建设，不能光有厂房大楼，也得有绿荫花木陪衬。眼下学校一边盖房子一边开课，师生们下了课堂就去平地栽苗，倒也算得上知行合一。</p>
+                    </div>
+                </div>
+
+                <!-- 报道三：外国脑病专家访问本市 -->
+                <div class="news-article">
+                    <div class="article-title">外国脑病专家访问本市</div>
+                    <div class="article-meta">
+                        <span><i class="far fa-calendar-alt"></i> 十月·医学交流</span>
+                        <span><i class="fas fa-user-md"></i> 市医学研究所</span>
+                    </div>
+                    <div class="article-body">
+                        <p>市医学科学研究所最近接待了一位外国专家，此人多年研究老年人脑力衰退、健忘糊涂这类病症。据了解，这种病在国外被称为“阿尔茨海默症”，眼下还没有根治的办法。</p>
+                        <p>专家在青岚期间，和本市的大夫们开了座谈会，又到市第一医院看了看几个病例。虽说是走马观花，但也给咱们带来了一些国外的研究动向，同行们觉得还是有点用处的。</p>
+                    </div>
+                </div>
+
+               
+            </div>
+
+            <!-- 报纸下方装饰线及年份注记 -->
+            <div style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 12px; border-top: 1px solid #b89b6b; font-size: 12px; color: #4a3a2a;">
+                <span><i class="far fa-newspaper"></i> 青岚大事报</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <i class="fas fa-check-circle"></i> 青岚文献馆
+        </div>
+       
+    </div>
+</div>
+
+<script>
+    // 极简交互：地址栏只读，关闭按钮已有跳转，主页跳Internet.html，其余禁用。
+    (function(){
+        const addrInput = document.getElementById('urlInput');
+        if(addrInput) {
+            addrInput.addEventListener('keydown', (e) => e.preventDefault());
+        }
+        // 工具栏按钮保持风格即可
+    })();
+</script>
+
+<!-- 微调样式，让报纸更像 -->
+<style>
+    .news-article {
+        transition: all 0.1s;
+        background: #fcf5e8;
+    }
+    .article-body p:last-child {
+        margin-bottom: 0;
+    }
+    .newspaper-name {
+        font-family: 'Times New Roman', '楷体', 'KaiTi', serif;
+    }
+    .browser-content {
+        background: #d6d2c4; /* 稍微深一点衬纸色 */
+    }
+    .newspaper-card {
+        background: #fbf3e0;
+    }
+    .placeholder-article .article-body p {
+        text-indent: 0;
+    }
+    /* 模拟老报纸分栏线 */
+    .news-grid {
+        position: relative;
+    }
+    /* 让标题更醒目 */
+    .article-title i {
+        color: #5a3e1e;
+    }
+</style>
+
+</body>
+</html>

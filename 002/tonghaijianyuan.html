@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="同海大学（原同海建园工学院）——同天下共海内，园艺设计为优势学科，设博士点和硕士点。">
+    <title>同海大学 · 更名公告</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', 'Microsoft Sans Serif', '微软雅黑', sans-serif;
+        }
+        body {
+            background: #3a6ea5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .browser-window {
+            width: 900px;
+            max-width: 100%;
+            background: #ece9d8;
+            border: 2px solid #0a246a;
+            border-radius: 6px 6px 4px 4px;
+            box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.35), inset 0 0 0 1px #fff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .title-bar {
+            background: linear-gradient(90deg, #0a246a 0%, #3a6ea5 50%, #6ba1d9 100%);
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #08214e;
+            color: #fff;
+            text-shadow: 1px 1px 0 #0a246a;
+            font-size: 14px;
+        }
+        .window-title i {
+            margin-right: 6px;
+            color: #ffd966;
+        }
+        .win-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            color: #0a246a;
+            width: 24px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 3px;
+            cursor: pointer;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            text-decoration: none;
+        }
+        /* 关闭按钮红色强调 */
+        .win-btn.close-btn {
+            background: #d47a7a;
+            color: #fff;
+            border-color: #8b2a2a;
+        }
+        .win-btn.close-btn:hover {
+            background: #c45a5a;
+        }
+        .toolbar {
+            background: #d4d0c8;
+            padding: 5px 8px;
+            border-bottom: 1px solid #a7a7a7;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: inset 0 1px 2px #fff;
+        }
+        .tb-btn {
+            background: #d4d0c8;
+            border: 1px solid #003399;
+            border-radius: 3px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1e1e1e;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+            cursor: default;
+            opacity: 0.7;
+            text-decoration: none;
+        }
+        .tb-btn i {
+            font-size: 14px;
+            color: #1e3a6b;
+        }
+        .tb-btn.disabled {
+            opacity: 0.55;
+            filter: grayscale(0.5);
+            cursor: default;
+            pointer-events: none;
+            background: #c5c0b5;
+            border-color: #6a6a6a;
+            color: #4a4a4a;
+        }
+        .tb-btn.disabled i {
+            color: #5a5a5a;
+        }
+
+        /* 主页按钮：灰色凸起可点击，与青岚大事报风格一致 */
+        .tb-btn.home-active {
+            cursor: pointer;
+            background: #d4d0c8;
+            opacity: 1;
+            filter: none;
+            pointer-events: auto;
+        }
+        .tb-btn.home-active i {
+            color: #1e3a6b;
+        }
+        .tb-btn.home-active:hover {
+            background: #b8d0e8;
+        }
+
+        .address-bar {
+            background: #d4d0c8;
+            padding: 5px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #a7a7a7;
+        }
+        .address-bar input {
+            flex: 1;
+            border: 2px inset #e0e0e0;
+            padding: 5px 8px;
+            font-size: 13px;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+        }
+        .go-btn {
+            background: #d4d0c8;
+            border: 2px outset #f0f0f0;
+            padding: 4px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0a246a;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+        }
+        .content-area {
+            background: #ffffff;
+            border: 2px inset #ece9d8;
+            padding: 24px 28px;
+            flex: 1;
+            min-height: 420px;
+        }
+        .paper-card {
+            background: #fef9e8;
+            border: 1px solid #c0b89a;
+            padding: 24px 26px;
+            box-shadow: inset 0 0 0 1px #fdfaf0, 2px 2px 6px rgba(0,0,0,0.05);
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3a5f;
+            border-bottom: 2px solid #b89b6b;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h1 i {
+            color: #0a4b7a;
+            font-size: 26px;
+        }
+        .badge {
+            display: inline-block;
+            background: #e3d6bf;
+            color: #5a3e1a;
+            padding: 3px 14px;
+            border: 1px solid #b89b6b;
+            font-weight: 600;
+            font-size: 13px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a09b8b;
+        }
+        .section-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin: 24px 0 8px 0;
+            border-left: 5px solid #2f7a4c;
+            padding-left: 12px;
+        }
+        p,
+        li {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #2d2d2d;
+            margin-bottom: 10px;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 6px;
+        }
+        ul li::before {
+            content: "●";
+            color: #2f7a4c;
+            font-weight: bold;
+            display: inline-block;
+            width: 1.2em;
+            margin-left: -1em;
+        }
+        .teacher-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .teacher-item {
+            background: #f6f2e4;
+            border: 1px solid #d4c9a8;
+            padding: 10px 12px;
+            border-radius: 0;
+            font-size: 13px;
+        }
+        .teacher-item strong {
+            color: #0a4b7a;
+        }
+        .status-bar {
+            background: #d4d0c8;
+            border-top: 1px solid #a7a7a7;
+            padding: 4px 10px;
+            font-size: 11px;
+            color: #1e1e1e;
+            display: flex;
+            justify-content: space-between;
+            box-shadow: inset 0 2px 3px -2px #808080;
+        }
+
+        /* 右下角页码标识 */
+        .page-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 24px;
+            z-index: 1000;
+            color: #1e3a5f;
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 0 1px 0 white;
+            letter-spacing: 0.5px;
+            background: linear-gradient(180deg, rgba(242, 247, 252, 0.85), rgba(221, 231, 242, 0.85) 45%, rgba(201, 217, 234, 0.85));
+            border: 1px solid #8ba5c2;
+            border-radius: 20px;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.15);
+            padding: 6px 18px;
+            white-space: nowrap;
+            cursor: default;
+            user-select: none;
+        }
+
+        @media (max-width: 600px) {
+            .teacher-grid {
+                grid-template-columns: 1fr;
+            }
+            .content-area {
+                padding: 14px 12px;
+            }
+            .page-indicator {
+                bottom: 14px;
+                right: 14px;
+                padding: 5px 14px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 右下角页码标识 8/18 -->
+    <div class="page-indicator">ex1</div>
+
+    <div class="browser-window">
+        <!-- 标题栏 -->
+        <div class="title-bar">
+            <span class="window-title"><i class="fab fa-internet-explorer"></i> 同海大学 · 官方公告</span>
+            <div>
+                <span class="win-btn"><i class="fas fa-minus"></i></span>
+                <span class="win-btn"><i class="far fa-square"></i></span>
+                <!-- 关闭按钮：点击跳转到 win7.html -->
+                <a href="win7.html" class="win-btn close-btn" title="关闭并返回Win7风格"><i class="fas fa-times"></i></a>
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <span class="tb-btn disabled"><i class="fas fa-arrow-left"></i> 后退</span>
+            <span class="tb-btn disabled"><i class="fas fa-arrow-right"></i> 前进</span>
+            <span class="tb-btn disabled"><i class="fas fa-sync-alt"></i> 刷新</span>
+            <!-- 主页按钮：灰色凸起，可点击，风格与青岚大事报一致 -->
+            <a href="internet.html" class="tb-btn home-active"><i class="fas fa-home"></i> 主页</a>
+        </div>
+
+        <!-- 地址栏 -->
+        <div class="address-bar">
+            <span style="font-weight:bold; font-size:13px; color:#1e3a6b;">地址</span>
+            <input type="text" value="https://www.tonghai.edu.cn/announcement" readonly>
+            <span class="go-btn">转到</span>
+        </div>
+
+        <!-- 主体内容 -->
+        <div class="content-area">
+            <div class="paper-card">
+                <h1>
+                    <i class="fas fa-university"></i> 同海大学更名公告
+                </h1>
+                <p><span class="badge"><i class="fas fa-bullhorn"></i> 重要通知</span> 
+                经教育部批准，<strong>原“同海建园工学院”</strong>正式升格更名为<strong>“同海大学”</strong>（Tonghai University）。学校办学层次由本专科院校提升为综合性大学，标志着学校发展迈入全新阶段。</p>
+
+                <div class="section-title">历史沿革</div>
+                <p>同海大学前身为同海建园工学院，始建于上世纪中叶，以建筑工程与园林设计起家。经过数十年建设，已发展成为涵盖理、工、文、管、艺、农等多学科的综合性大学。校名虽改，校训“<strong>同天下 · 共海内</strong>”的精神始终如一。</p>
+
+                <div class="section-title">优势学科 · 园艺设计（博士点）</div>
+                <p>同海大学园艺设计学院是国内较早设立<strong>园林植物与观赏园艺博士点</strong>的学院之一，拥有园艺设计一级学科博士点、风景园林学硕士点及设计学硕士点。近五年获省部级科研奖励12项，多项设计作品成为青岚市地标。</p>
+                <ul>
+                    <li><strong>博士学位授权一级学科</strong> · 园艺设计</li>
+                    <li><strong>硕士专业学位授权点7个</strong> · 覆盖风景园林、设计学等</li>
+                    <li><strong>博士后科研流动站</strong> · 园林植物种质创新方向</li>
+                    <li><strong>专任教师82人</strong> · 在读博士96人 · 国际项目30+</li>
+                </ul>
+
+                <div class="section-title">同海大学核心建树</div>
+                <ul>
+                    <li><strong>学科实力：</strong>园艺设计一级学科博士点，博士后流动站，本硕博贯通培养。</li>
+                    <li><strong>科研成就：</strong>近五年获省部级科研奖励12项，主持多项国家自然科学基金重点项目。</li>
+                    <li><strong>国际交流：</strong>与30余所海外高校合作，学生可参与联合培养与国际设计竞赛。</li>
+                    <li><strong>实践平台：</strong>拥有园艺实践基地、滨海湿地生态修复基地、智慧农业产学研平台。</li>
+                    <li><strong>社会影响：</strong>多项景观设计方案成为青岚市城市名片，服务地方经济绿色发展。</li>
+                </ul>
+
+                <p style="margin-top:20px; color:#5a5a5a; font-style:italic;">
+                    <i class="fas fa-map-marker-alt"></i> 校址：青岚市青岚区学府路2号 ｜ 电话：0532-8888-6688 ｜ 邮编：266000
+                </p>
+            </div>
+        </div>
+
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span><i class="fas fa-check-circle"></i> 本页面纯属虚构 · 同海大学（原同海建园工学院）</span>
+            <span>© 2026 同海大学</span>
+        </div>
+    </div>
+</body>
+</html>

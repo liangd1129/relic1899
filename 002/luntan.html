@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论坛</title>
+    <style>
+        :root {
+            --phone-w: 325px;
+            --phone-h: 620px;
+            --weibo-color: #e6162d;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 100vh; background: #1a1a2e;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            -webkit-tap-highlight-color: transparent; user-select: none; padding: 15px;
+        }
+        .phone {
+            width: var(--phone-w); height: var(--phone-h); background: #1c1c1e; border-radius: 28px;
+            padding: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 0 0 2px #333; position: relative;
+        }
+        .phone::before {
+            content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            width: 70px; height: 18px; background: #1c1c1e; border-radius: 0 0 12px 12px; z-index: 10;
+        }
+        .phone::after {
+            content: ''; position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+            width: 35px; height: 3px; background: #444; border-radius: 3px; z-index: 10;
+        }
+        .screen { width: 100%; height: 100%; background: #fff; border-radius: 20px; overflow: hidden; position: relative; }
+        .page { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; }
+        .page.active { display: flex; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .nav-bar {
+            display: flex; align-items: center; padding: 5px 8px; border-bottom: 1px solid #eee;
+            gap: 6px; min-height: 40px; background: #fff;
+        }
+        .back-btn {
+            width: 28px; height: 28px; border-radius: 50%; border: none; background: #f0f0f0;
+            cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center;
+            color: #333; flex-shrink: 0; transition: background 0.15s;
+        }
+        .back-btn:active { background: #ddd; }
+
+        /* 论坛搜索页 */
+        .page-weibo-search { background: #fff; }
+        .search-area {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 25px 15px; flex-direction: column; gap: 10px;
+        }
+        .search-box {
+            width: 100%; max-width: 250px; display: flex;
+            border: 2px solid #e0e0e0; border-radius: 24px; overflow: hidden;
+            background: #f9f9f9; transition: border-color 0.2s;
+        }
+        .search-box:focus-within { border-color: #e6162d; }
+        .search-box input {
+            flex: 1; border: none; outline: none; padding: 8px 12px;
+            font-size: 13px; background: transparent; color: #333;
+        }
+        .search-box input::placeholder { color: #aaa; }
+        .search-box .search-btn {
+            border: none; background: #e6162d; color: #fff; padding: 8px 14px;
+            cursor: pointer; font-size: 12px; font-weight: 500;
+        }
+        .search-box .search-btn:active { background: #c41025; }
+
+        /* 聊天记录页 */
+        .page-chat { background: #ededed; }
+        .chat-messages {
+            flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .chat-messages::-webkit-scrollbar { width: 0; }
+
+        /* 消息行：根据发送/接收决定对齐方式 */
+        .msg-row {
+            display: flex; align-items: flex-end; gap: 6px;
+        }
+        .msg-row.sent { justify-content: flex-end; }
+        .msg-row.received { justify-content: flex-start; }
+
+        /* 头像（可点击） */
+        .chat-avatar {
+            width: 30px; height: 30px; border-radius: 50%; background: #ddd;
+            flex-shrink: 0; cursor: pointer; overflow: hidden;
+        }
+        .chat-avatar:active { opacity: 0.7; }
+
+        /* 消息气泡 */
+        .msg-bubble {
+            max-width: 75%; padding: 7px 10px; border-radius: 14px;
+            font-size: 12px; line-height: 1.4; word-break: break-word;
+            animation: msgIn 0.3s ease;
+            position: relative;
+        }
+        @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .sent .msg-bubble {
+            background: #007aff; color: #fff; border-bottom-right-radius: 4px;
+        }
+        .received .msg-bubble {
+            background: #fff; color: #333; border-bottom-left-radius: 4px;
+        }
+        .msg-bubble .time-tag {
+            font-size: 8px; opacity: 0.7; display: block; margin-top: 3px;
+        }
+
+        /* 论坛用户主页 */
+        .page-user-weibo { background: #f2f2f2; }
+        .user-header {
+            background: #fff; padding: 18px 15px 12px; display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .user-avatar {
+            width: 55px; height: 55px; border-radius: 50%; background: #ddd;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: #999;
+        }
+        .user-info { display: flex; flex-direction: column; }
+        .user-id { font-size: 16px; font-weight: 600; color: #333; }
+        .user-bio { font-size: 11px; color: #999; margin-top: 2px; }
+
+        .weibo-posts {
+            flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 12px;
+        }
+        .weibo-posts::-webkit-scrollbar { width: 0; }
+
+        /* 单条论坛卡片 */
+        .post-card {
+            background: #fff; border-radius: 10px; padding: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); animation: msgIn 0.3s ease;
+            display: flex; gap: 10px;
+        }
+        .post-avatar {
+            width: 36px; height: 36px; border-radius: 50%; background: #ddd; flex-shrink: 0;
+        }
+        .post-body { flex: 1; display: flex; flex-direction: column; }
+        .post-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
+        }
+        .post-username { font-size: 13px; font-weight: 600; color: #333; }
+        .post-time { font-size: 10px; color: #aaa; }
+        .post-text { font-size: 13px; color: #333; line-height: 1.5; margin-bottom: 6px; }
+
+        /* 操作栏：转发、评论、点赞 */
+        .post-actions {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 6px; border-top: 1px solid #f0f0f0;
+            font-size: 11px; color: #999;
+        }
+        .post-actions span {
+            display: flex; align-items: center; gap: 3px; white-space: nowrap;
+        }
+        .action-icon { font-size: 12px; }
+
+        /* 评论区 */
+        .comments-section {
+            margin-top: 8px; padding-top: 6px; border-top: 1px solid #f0f0f0;
+            font-size: 12px; color: #555;
+        }
+        .comment-item {
+            margin-bottom: 4px; line-height: 1.4;
+        }
+        .comment-user { color: #e6162d; margin-right: 4px; }
+
+        .return-home-btn {
+            display: inline-block; margin-top: 20px; padding: 12px 36px;
+            background: #007aff; color: #fff; border-radius: 30px; text-decoration: none;
+            font-size: 15px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: background 0.2s, transform 0.1s;
+        }
+        .return-home-btn:active { background: #0059b3; transform: scale(0.95); }
+    </style>
+</head>
+<body>
+<div class="phone">
+    <div class="screen">
+        <!-- 论坛搜索页 -->
+        <div class="page page-weibo-search active" id="pageWeiboSearch">
+            <div class="nav-bar">
+                <button class="back-btn" onclick="location.href='shouji.html'">←</button>
+                <span style="font-weight:600;font-size:13px;">论坛搜索</span>
+            </div>
+            <div class="search-area">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索论坛内容..." autocomplete="off">
+                    <button class="search-btn" onclick="doSearch()">搜索</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天记录页（改进布局：右侧消息外部显示头像） -->
+        <div class="page page-chat" id="pageChat">
+            <div class="nav-bar">
+                <button class="back-btn" onclick="openPage('weiboSearch')">←</button>
+                <span style="font-weight:600;font-size:13px;">聊天记录</span>
+            </div>
+            <div class="chat-messages">
+                <!-- 自己的消息（右侧 + 头像） -->
+                <div class="msg-row sent">
+                    <div class="msg-bubble">
+                        您好，请问您那篇城北长宁街病人的文章中，说那位老人为老不尊和老变态的言论是否能够删除？
+                        <span class="time-tag">2002年9月30日</span>
+                    </div>
+                    <div class="chat-avatar" onclick="openPage('userWeibo')" title="查看我的论坛"></div>
+                </div>
+				
+                <!-- 对方消息（左侧，无头像） -->
+                <div class="msg-row received">
+                    <div class="msg-bubble">
+                        你什么意思？
+                        <span class="time-tag">2002年9月30日</span>
+                    </div>
+                </div>
+				
+                <div class="msg-row sent">
+                    <div class="msg-bubble">
+                        我是那位病人的妻子，您可以看我的论坛主页，他患有阿尔兹海默症，一直以来都是位合格的丈夫与父亲，你不该这样写他。
+                        <span class="time-tag">2002年9月30日</span>
+                    </div>
+                    <div class="chat-avatar" onclick="openPage('userWeibo')" title="查看我的论坛"></div>
+                </div>
+				
+				<div class="msg-row sent">
+				    <div class="msg-bubble">
+				        我俩打小就认识，小时候他就是个懂得体贴人的孩子。我们婚后，他会在农闲时节他会教我读书写字，会对孩子循循善诱，会为了家人放弃自己的喜好。我说这些就是为了向你证明，他并不是你文章中形容的那样，更不是老变态。
+				        <span class="time-tag">2002年9月30日</span>
+				    </div>
+				    <div class="chat-avatar" onclick="openPage('userWeibo')" title="查看我的论坛"></div>
+				</div>
+				
+                <div class="msg-row received">
+                    <div class="msg-bubble">
+						文章中的不实内容我已删除并更改了病人真实情况，很抱歉对您的丈夫造成误解。
+                        <span class="time-tag">2002年9月30日</span>
+                    </div>
+                </div>
+				
+				<div class="msg-row sent">
+				    <div class="msg-bubble">
+				        感谢您的理解，祝您心境愉乐，诸事顺遂。
+				        <span class="time-tag">2002年9月30日</span>
+				    </div>
+				    <div class="chat-avatar" onclick="openPage('userWeibo')" title="查看我的论坛"></div>
+				</div>
+				
+            </div>
+            <div style="padding:6px 10px;background:#f7f7f7;border-top:1px solid #ddd;text-align:center;font-size:10px;color:#aaa;">
+                —— 以上为历史聊天记录 ——
+            </div>
+        </div>
+
+        <!-- 用户论坛主页（仿真） -->
+        <div class="page page-user-weibo" id="pageUserWeibo">
+            <div class="nav-bar">
+                <button class="back-btn" onclick="openPage('chat')">←</button>
+                <span style="font-weight:600;font-size:13px;">默认用户2789</span>
+            </div>
+            <div class="user-header">
+                <div class="user-avatar">👤</div>
+                <div class="user-info">
+                    <span class="user-id">默认用户2789</span>
+                    <span class="user-bio">论坛个人主页</span>
+                </div>
+            </div>
+            <div class="weibo-posts">
+				
+				<!-- 帖子2：无评论 -->
+				<div class="post-card">
+				    <div class="post-avatar"></div>
+				    <div class="post-body">
+				        <div class="post-header">
+				            <span class="post-username">默认用户2789</span>
+				            <span class="post-time">2005年6月3日</span>
+				        </div>
+				        <div class="post-text">今天阿言带着欣然来了，还送了我部手机，之前的电脑坏了之后我就没有登录过论坛了，还是欣然帮我找到了这个账号，这里也是一段美好的回忆。</div>
+				        <div class="post-actions">
+				            <span><span class="action-icon">🔄</span> 转发 0</span>
+				            <span><span class="action-icon">💬</span> 评论 0</span>
+				            <span><span class="action-icon">❤️</span> 赞 1</span>
+				        </div>
+				        <!-- 无评论 -->
+				    </div>
+				</div>
+				
+				<!-- 帖子1：有评论 -->
+				<div class="post-card">
+				    <div class="post-avatar"></div>
+				    <div class="post-body">
+				        <div class="post-header">
+				            <span class="post-username">默认用户2789</span>
+				            <span class="post-time">2002年9月30日</span>
+				        </div>
+				        <div class="post-text">大家好，我是今天城北长宁街那位病人的妻子，我丈夫并不是变态，他是一位患有阿尔兹海默症的病人。请大家不要再辱骂他了。</div>
+				        <div class="post-actions">
+				            <span><span class="action-icon">🔄</span> 转发 21</span>
+				            <span><span class="action-icon">💬</span> 评论 1</span>
+				            <span><span class="action-icon">❤️</span> 赞 30</span>
+				        </div>
+				        <div class="comments-section">
+				            <div class="comment-item"><span class="comment-user">阳光小明</span>：点了！我建议你去私信原贴主，告诉他事情真相。</div>
+				        </div>
+				    </div>
+				</div>
+				
+                <!-- 帖子1：有评论 -->
+                <div class="post-card">
+                    <div class="post-avatar"></div>
+                    <div class="post-body">
+                        <div class="post-header">
+                            <span class="post-username">默认用户2789</span>
+                            <span class="post-time">2002年8月18日</span>
+                        </div>
+                        <div class="post-text">今天天气真好，带静远在屋外晒太阳，他看着路人穿着裙子突然走到屋里，找出那件又烧痕的衣服。那是我在他决意烧掉自己的衣服时，从火堆里抢出来的。看他现在这样天真快乐，也好。</div>
+                        <div class="post-actions">
+                            <span><span class="action-icon">🔄</span> 转发 2</span>
+                            <span><span class="action-icon">💬</span> 评论 1</span>
+                            <span><span class="action-icon">❤️</span> 赞 2</span>
+                        </div>
+                        <div class="comments-section">
+                            <div class="comment-item"><span class="comment-user">屋檐下的言</span>：妈妈，这件事连我都不知道，下次不要再这么冲动了！</div>
+                        </div>
+                    </div>
+                </div>
+				
+				<!-- 帖子2：无评论 -->
+				<div class="post-card">
+				    <div class="post-avatar"></div>
+				    <div class="post-body">
+				        <div class="post-header">
+				            <span class="post-username">默认用户2789</span>
+				            <span class="post-time">2002年7月7日</span>
+				        </div>
+				        <div class="post-text">静远不知道从哪儿翻出来一封情诗，我都忘了是他什么时候写的了，我只记得他写完我缠着他念给我听，他不肯，说等我认识了自己看，后来太忙我俩就忘了。幸好，现在我们有的是时间，他可以慢慢念给我听了。</div>
+				        <div class="post-actions">
+				            <span><span class="action-icon">🔄</span> 转发 1</span>
+				            <span><span class="action-icon">💬</span> 评论 0</span>
+				            <span><span class="action-icon">❤️</span> 赞 3</span>
+				        </div>
+				        <!-- 无评论 -->
+				    </div>
+				</div>
+				
+				
+                <!-- 帖子2：无评论 -->
+                <div class="post-card">
+                    <div class="post-avatar"></div>
+                    <div class="post-body">
+                        <div class="post-header">
+                            <span class="post-username">默认用户2789</span>
+                            <span class="post-time">2002年6月3日</span>
+                        </div>
+                        <div class="post-text">静远今天走丢了，阿言找了很多地方，后来是我去我家的田里才找到的他，我问他为什么到这里，他说他要把这块田打理好，早早回家教他的文舟学认字。静远哥哥，当初我去帮你去田里干活，你非说家里的书比田更重要，要我在家里守着，原来是你在骗我。</div>
+                        <div class="post-actions">
+                            <span><span class="action-icon">🔄</span> 转发 1</span>
+                            <span><span class="action-icon">💬</span> 评论 0</span>
+                            <span><span class="action-icon">❤️</span> 赞 3</span>
+                        </div>
+                        <!-- 无评论 -->
+                    </div>
+                </div>
+				
+                <!-- 帖子3：有评论 -->
+                <div class="post-card">
+                    <div class="post-avatar"></div>
+                    <div class="post-body">
+                        <div class="post-header">
+                            <span class="post-username">默认用户2789</span>
+                            <span class="post-time">2002年5月31日</span>
+                        </div>
+                        <div class="post-text">前些天，阿言买了台叫电脑的东西回来，说是新兴物件，今天又教我用论坛，要是静远没生病，他一定会对这个大铁块头很感兴趣。</div>
+                        <div class="post-actions">
+                            <span><span class="action-icon">🔄</span> 转发 3</span>
+                            <span><span class="action-icon">💬</span> 评论 2</span>
+                            <span><span class="action-icon">❤️</span> 赞 2</span>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openPage(pageName) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const map = {
+            'weiboSearch': 'pageWeiboSearch',
+            'chat': 'pageChat',
+            'userWeibo': 'pageUserWeibo'
+        };
+        const target = map[pageName];
+        if (target) document.getElementById(target).classList.add('active');
+    }
+
+    function doSearch() {
+        const input = document.getElementById('searchInput');
+        const keyword = input.value.trim();
+        if (keyword === '我就这样写了') {
+            openPage('chat');
+        } else if (keyword === '') {
+            input.style.borderColor = '#ff3b30';
+            input.placeholder = '请输入搜索内容';
+            setTimeout(() => {
+                input.style.borderColor = '';
+                input.placeholder = '搜索论坛内容...';
+            }, 600);
+        } else {
+            input.value = '';
+            input.placeholder = '请搜索「我就这样写了」';
+            setTimeout(() => {
+                input.placeholder = '搜索论坛内容...';
+            }, 1500);
+        }
+    }
+    document.getElementById('searchInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') doSearch();
+    });
+</script>
+</body>
+</html>

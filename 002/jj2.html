@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=1.5">
+  <title>来信 · 渡鸦信使</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #12100e;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(160, 120, 100, 0.03) 0%, transparent 30%),
+        radial-gradient(circle at 75% 60%, rgba(140, 100, 80, 0.02) 0%, transparent 35%),
+        repeating-linear-gradient(45deg, rgba(70, 50, 40, 0.015) 0px, rgba(70, 50, 40, 0.015) 2px, 
+          transparent 2px, transparent 8px);
+      font-family: 'Inter', sans-serif;
+      color: #e4ddd6;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page-header {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      color: #9e8a7c;
+      text-align: center;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .page-header i {
+      color: #b28264;
+      margin: 0 6px;
+      font-size: 0.7rem;
+    }
+
+    .scene-container {
+      perspective: 1200px;
+      perspective-origin: 50% 45%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hint-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      color: #8d7869;
+      text-align: center;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      pointer-events: none;
+    }
+    .hint-text i {
+      color: #b28264;
+      margin: 0 6px;
+      animation: hintPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes hintPulse {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 1; }
+    }
+    .hint-text.faded {
+      opacity: 0.25;
+      transform: translateY(4px);
+    }
+
+    /* 信封外层 */
+    .envelope-wrapper {
+      position: relative;
+      width: 500px;
+      max-width: 90vw;
+      cursor: pointer;
+      transition: transform 0.25s ease;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .envelope-wrapper:hover {
+      transform: translateY(-4px);
+    }
+    .envelope-wrapper.opened {
+      cursor: default;
+    }
+    .envelope-wrapper.opened:hover {
+      transform: none;
+    }
+
+    /* 信封主体 */
+    .envelope-body {
+      position: relative;
+      width: 100%;
+      height: 360px;
+      max-height: 62vw;
+      background: linear-gradient(175deg, #1f1814 0%, #241c17 30%, #1c1511 60%, #1a1310 100%);
+      border-radius: 10px 10px 14px 14px;
+      border: 1px solid #463b34;
+      box-shadow: 0 2px 0 0 rgba(90, 70, 58, 0.25), 0 8px 28px -6px rgba(0,0,0,0.55), 0 20px 50px -12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(160,130,110,0.06);
+      overflow: hidden;
+      z-index: 1;
+    }
+    .envelope-body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(ellipse at 35% 25%, rgba(180,140,110,0.04) 0%, transparent 55%), radial-gradient(ellipse at 70% 60%, rgba(150,110,85,0.03) 0%, transparent 50%), repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(120,95,75,0.012) 3px, rgba(120,95,75,0.012) 4px);
+      pointer-events: none;
+    }
+
+    .envelope-decor {
+      position: absolute;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    .decor-line {
+      width: 180px;
+      max-width: 36vw;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(160,130,110,0.5) 15%, rgba(160,130,110,0.5) 85%, transparent 100%);
+    }
+    .decor-line:nth-child(2) { width: 140px; max-width: 28vw; }
+    .decor-line:nth-child(3) { width: 100px; max-width: 20vw; }
+
+    .stamp-area {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      width: 48px;
+      height: 56px;
+      border: 1.5px dashed rgba(140,110,90,0.35);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+    .stamp-area i { font-size: 1.35rem; color: #7a6253; opacity: 0.7; }
+
+    /* 封盖 */
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 170px;
+      max-height: 30vw;
+      z-index: 3;
+      transform-origin: 50% 0%;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0.0, 0.2, 1);
+      pointer-events: none;
+    }
+    .flap-inner {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(175deg, #1c1511 0%, #1f1713 40%, #19120f 100%);
+      clip-path: polygon(0 0, 50% 100%, 100% 0);
+      border-radius: 0 0 2px 2px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.35), inset 0 -1px 0 rgba(140,110,90,0.2);
+    }
+    .flap-inner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 70%, rgba(170,130,100,0.05) 0%, transparent 60%);
+      clip-path: polygon(0 0, 50% 100%, 100% 0);
+      pointer-events: none;
+    }
+    .envelope-wrapper.opened .envelope-flap {
+      transform: rotateX(-175deg);
+      transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.15, 1);
+    }
+
+    /* 封蜡 */
+    .seal {
+      position: absolute;
+      bottom: -27px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 54px;
+      height: 54px;
+      background: radial-gradient(ellipse at 38% 32%, #d4a88c 0%, #b87d5f 30%, #9a5f40 60%, #7a4530 85%, #5c3020 100%);
+      border-radius: 44% 56% 48% 52% / 52% 46% 54% 48%;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,220,190,0.3), inset 0 -2px 4px rgba(0,0,0,0.3);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.55s cubic-bezier(0.4, 0.0, 0.2, 1), box-shadow 0.55s ease;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .seal::before {
+      content: '';
+      position: absolute;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(90,50,30,0.5);
+      pointer-events: none;
+    }
+    .seal i {
+      font-size: 1.2rem;
+      color: rgba(40,20,10,0.7);
+      z-index: 1;
+      text-shadow: 0 1px 0 rgba(255,200,160,0.25);
+      pointer-events: none;
+    }
+    .seal::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 10px;
+      background: rgba(255,230,200,0.25);
+      border-radius: 50%;
+      top: 10px;
+      left: 28%;
+      pointer-events: none;
+      filter: blur(4px);
+    }
+    .envelope-wrapper.opened .seal {
+      transform: translateX(-50%) translateY(-130px) rotateX(175deg);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
+      transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.15, 1), box-shadow 0.6s ease;
+    }
+    .seal-pulse {
+      animation: sealGlow 2.8s ease-in-out infinite;
+    }
+    @keyframes sealGlow {
+      0%, 100% { box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3), 0 0 0 0 rgba(180,120,80,0.35); }
+      50% { box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3), 0 0 0 16px rgba(180,120,80,0); }
+    }
+    .envelope-wrapper.opened .seal-pulse {
+      animation: none;
+    }
+
+    /* 信纸 · 从上滑入，可滚动 */
+    .letter {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100%);
+      width: 86%;
+      max-width: 430px;
+      max-height: 100%;
+      background: linear-gradient(180deg, #f0e6dc 0%, #ece0d4 8%, #e8dbce 30%, #e5d7c9 100%);
+      border-radius: 3px 3px 6px 6px;
+      padding: 28px 26px 24px;
+      z-index: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 10px 30px -8px rgba(0,0,0,0.35);
+      transition: transform 0.6s cubic-bezier(0.35, 0.0, 0.2, 1);
+      color: #2a221e;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      overflow-y: auto;
+      pointer-events: none;
+      scrollbar-width: thin;
+      scrollbar-color: #b28264 #e5d7c9;
+    }
+    .letter::-webkit-scrollbar {
+      width: 4px;
+    }
+    .letter::-webkit-scrollbar-track {
+      background: #e5d7c9;
+      border-radius: 4px;
+    }
+    .letter::-webkit-scrollbar-thumb {
+      background: #b28264;
+      border-radius: 4px;
+    }
+    .letter::before {
+      content: '';
+      position: absolute;
+      top: 33%;
+      left: 8px;
+      right: 8px;
+      height: 1px;
+      background: rgba(180,150,120,0.3);
+      pointer-events: none;
+    }
+    .letter::after {
+      content: '';
+      position: absolute;
+      top: 66%;
+      left: 8px;
+      right: 8px;
+      height: 1px;
+      background: rgba(180,150,120,0.25);
+      pointer-events: none;
+    }
+    .letter-header-decor {
+      text-align: center;
+      margin-bottom: 16px;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      color: #8b6f5a;
+      opacity: 0.6;
+    }
+    .letter-header-decor i {
+      font-size: 0.55rem;
+      vertical-align: middle;
+      margin: 0 8px;
+      color: #b28264;
+    }
+    .letter-body-text p {
+      margin-bottom: 10px;
+      text-indent: 1.5em;
+    }
+    .letter-signature {
+      text-align: right;
+      margin-top: 18px;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: #5c3f2e;
+      letter-spacing: 1px;
+    }
+    .envelope-wrapper.opened .letter {
+      transform: translateX(-50%) translateY(0);
+      transition: transform 0.65s cubic-bezier(0.2, 0.0, 0.15, 1);
+      pointer-events: auto;
+      z-index: 1;
+    }
+
+    /* 操作按钮区域 */
+    .action-buttons {
+      display: flex;
+      gap: 20px;
+      margin-top: 28px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      pointer-events: none;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .envelope-wrapper.opened .action-buttons {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      transition-delay: 0.1s;
+    }
+    .action-btn {
+      background: transparent;
+      border: 1.5px solid #7a6253;
+      color: #dfcec2;
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-weight: 400;
+      font-size: 0.9rem;
+      text-decoration: none;
+      letter-spacing: 1px;
+      transition: 0.2s;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .action-btn i {
+      color: #b28264;
+    }
+    .action-btn.primary {
+      background: #573f32;
+      border-color: #846b5a;
+      color: #f2e5dc;
+    }
+    .action-btn.primary:hover {
+      background: #6f5241;
+      border-color: #a5836e;
+      color: #fff6ef;
+      box-shadow: 0 0 12px #5f403010;
+    }
+    .action-btn.outline:hover {
+      background: #2a221e;
+      border-color: #a5836e;
+    }
+
+    .footer-tag {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: #6b5a4e;
+      text-align: center;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .footer-tag i { color: #8f735f; margin: 0 5px; font-size: 0.6rem; }
+
+    @media (max-width: 600px) {
+      .envelope-body { height: 280px; max-height: 56vw; }
+      .envelope-flap { height: 130px; max-height: 28vw; }
+      .seal { width: 42px; height: 42px; bottom: -21px; }
+      .seal i { font-size: 1rem; }
+      .seal::before { width: 28px; height: 28px; }
+      .letter { width: 88%; padding: 20px 16px 18px; font-size: 0.8rem; }
+      .stamp-area { width: 36px; height: 42px; top: 12px; right: 14px; }
+      .stamp-area i { font-size: 1rem; }
+      .decor-line { width: 120px; max-width: 30vw; }
+      .decor-line:nth-child(2) { width: 90px; max-width: 22vw; }
+      .decor-line:nth-child(3) { width: 60px; max-width: 14vw; }
+      .hint-text { font-size: 0.7rem; }
+    }
+    @media (max-width: 380px) {
+      .envelope-body { height: 240px; max-height: 52vw; }
+      .envelope-flap { height: 105px; max-height: 25vw; }
+      .seal { width: 34px; height: 34px; bottom: -17px; }
+      .seal i { font-size: 0.8rem; }
+      .seal::before { width: 22px; height: 22px; }
+      .letter { padding: 14px 12px 14px; font-size: 0.73rem; }
+      .stamp-area { width: 28px; height: 34px; top: 8px; right: 10px; }
+      .stamp-area i { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <i class="fas fa-feather-alt"></i> 渡鸦信使 <i class="fas fa-crow"></i>
+  </div>
+
+  <div class="scene-container">
+    <div class="hint-text" id="hintText">
+      <i class="fas fa-hand-pointer"></i> 轻触封蜡 · 开启信封 <i class="fas fa-hand-pointer"></i>
+    </div>
+
+    <div class="envelope-wrapper" id="envelopeWrapper">
+      <div class="envelope-flap" id="envelopeFlap">
+        <div class="flap-inner"></div>
+        <div class="seal seal-pulse" id="sealBtn" title="点击打开信封">
+          <i class="fas fa-crow"></i>
+        </div>
+      </div>
+
+      <div class="envelope-body">
+        <div class="stamp-area"><i class="fas fa-feather-alt"></i></div>
+        <div class="envelope-decor">
+          <div class="decor-line"></div>
+          <div class="decor-line"></div>
+          <div class="decor-line"></div>
+        </div>
+
+        <!-- 信纸 · 加长内容 + 可滚动 -->
+        <div class="letter" id="letterContent">
+         <div class="letter-header-decor">
+                     <i class="fas fa-diamond"></i>结局二 巧言令色<i class="fas fa-diamond"></i>
+                   </div>
+          <div class="letter-body-text">
+            <p>你好，徐小姐。这次调查已经结束了，我把事情的前因后果都写在这封信里。</p>
+            <p>先说你最关心的那件事：衣服的主人，是你母亲。至于你姥姥和你母亲为什么一直闭口不提，多半是为了你母亲自己。下面我详细说给你听。</p>
+            <p>为方便讲述，后文我会直接使用各人的全名，请别见怪。</p>
+            <p>徐言在离婚之前，其实有过一段很难熬的日子。那段时间她整夜整夜睡不着，白天把自己关在房间里，对着衣柜发呆。赵文舟心疼女儿，又不晓得怎么劝，只能由着她。后来不知从哪天起，徐言开始买一些和她平时穿衣风格完全不同的衣服，颜色鲜艳，款式张扬。她说，穿上这些衣服，就像换了一个人，就不用做那个失败的妻子、焦虑的母亲了。</p>
+            <p>没错，那些衣服就是衣柜里的那一批。这本来没什么，只是一种自己哄自己的办法。但徐言太害怕被别人当成不正常，怕你长大后用异样的眼光看她，所以在你被送到姥姥家之前，她就把那些衣服全收了起来，塞进一个旧衣柜的最深处，再也没打开过。</p>
+            <p>后来徐言重新振作，离了婚，换了工作，日子慢慢走上正轨，所有人都以为那段灰暗的日子早就翻篇了。她自己也绝口不提，好像从没发生过。你姥姥赵文舟呢，既然女儿不愿说，她就帮忙瞒着，这一瞒就是这么多年。</p>
+            <p>后来的事，你应该知道个大概：你姥爷徐静远患上了阿尔兹海默。而你不知道的是，有一天他在家里翻箱倒柜，不知怎么就找到了那个旧衣柜，把里面的衣服翻了出来，还穿在了身上。他自己也不知道为什么穿，大概是忘掉了要遵守的所有规矩，只觉得好看。</p>
+            <p>这件事我能查明的部分，就到这里了。</p>
+            <p>至于你姥姥赵文舟为什么这么多年都不说，我想，大概是两个人都想护着。护着你母亲那段不愿回头的日子，也护着你姥爷最后那点糊涂里的自在。</p>
+            <p>人这一辈子，有些事说不清楚，也没必要说清楚。忘掉的忘了，放下的放下了，最后各得各的安宁，也没什么不好。</p>
+            <p>谢谢你委托我查这件事。祝你好，徐小姐。</p>
+          </div>
+          <div class="letter-signature">
+            — 渡鸦 · 陆
+          </div>
+        </div>
+      </div>
+
+      <!-- 打开后出现的操作按钮 -->
+      <div class="action-buttons" id="actionButtons">
+        <a href="../index.html" class="action-btn primary" id="acceptLink">
+          <i class="fas fa-feather-alt"></i> 寄出信封 完成委托
+        </a>
+        <a href="liaotian.html" class="action-btn outline" id="declineLink">
+          <i class="fas fa-times"></i> 回到选项 重新选择
+        </a>
+        <!-- 提示：修改上方 href 指向实际目标页面 -->
+      </div>
+    </div>
+
+   
+  </div>
+
+  <script>
+    (function() {
+      const envelopeWrapper = document.getElementById('envelopeWrapper');
+      const sealBtn = document.getElementById('sealBtn');
+      const hintText = document.getElementById('hintText');
+      const letterContent = document.getElementById('letterContent');
+      const envelopeFlap = document.getElementById('envelopeFlap');
+      const actionButtons = document.getElementById('actionButtons');
+
+      let isOpen = false;
+      let isAnimating = false;
+
+      function openEnvelope() {
+        if (isAnimating || isOpen) return;
+        isAnimating = true;
+        isOpen = true;
+        envelopeWrapper.classList.add('opened');
+        hintText.classList.add('faded');
+        hintText.innerHTML = '<i class="fas fa-envelope-open"></i> 再次点击封蜡可合上信封 <i class="fas fa-envelope-open"></i>';
+
+        setTimeout(() => {
+          letterContent.style.pointerEvents = 'auto';
+          // 默认滚动到顶部（确保从头阅读）
+          letterContent.scrollTop = 0;
+        }, 350);
+
+        setTimeout(() => {
+          isAnimating = false;
+        }, 650);
+      }
+
+      function closeEnvelope() {
+        if (isAnimating || !isOpen) return;
+        isAnimating = true;
+        isOpen = false;
+        letterContent.style.pointerEvents = 'none';
+        envelopeWrapper.classList.remove('opened');
+        hintText.classList.remove('faded');
+        hintText.innerHTML = '<i class="fas fa-hand-pointer"></i> 轻触封蜡 · 开启信封 <i class="fas fa-hand-pointer"></i>';
+
+        setTimeout(() => {
+          isAnimating = false;
+        }, 650);
+      }
+
+      function toggleEnvelope(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isAnimating) return;
+        if (isOpen) {
+          closeEnvelope();
+        } else {
+          openEnvelope();
+        }
+      }
+
+      sealBtn.addEventListener('click', toggleEnvelope);
+      sealBtn.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleEnvelope(e);
+      });
+
+      envelopeFlap.addEventListener('click', function(e) {
+        if (e.target === sealBtn || sealBtn.contains(e.target)) return;
+        toggleEnvelope(e);
+      });
+
+      const envelopeBody = document.querySelector('.envelope-body');
+      envelopeBody.addEventListener('click', function(e) {
+        if (!isOpen) {
+          if (e.target === letterContent || letterContent.contains(e.target)) return;
+          if (e.target === sealBtn || sealBtn.contains(e.target)) return;
+          if (e.target === envelopeFlap || envelopeFlap.contains(e.target)) return;
+          toggleEnvelope(e);
+        } else {
+          if (!letterContent.contains(e.target) &&
+              e.target !== sealBtn && !sealBtn.contains(e.target) &&
+              e.target !== envelopeFlap && !envelopeFlap.contains(e.target)) {
+            closeEnvelope();
+          }
+        }
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'o' || e.key === 'O') {
+          if (!isOpen && !isAnimating) {
+            e.preventDefault();
+            openEnvelope();
+          }
+        }
+        if ((e.key === 'Escape' || e.key === 'c' || e.key === 'C') && isOpen && !isAnimating) {
+          e.preventDefault();
+          closeEnvelope();
+        }
+      });
+
+      // 按钮链接提示（可自定义）
+      console.log('✉️  渡鸦信使已就绪');
+      console.log('   💡 按 Enter/O 打开 | 按 Esc/C 关闭');
+      console.log('   🔗 接受委托按钮跳转: ./001/window.html (可修改)');
+      console.log('   🔗 无视来信按钮跳转: ./index.html (可修改)');
+    })();
+	
+	
+	// 标记故事二已完成（索引 1 代表第二个故事）
+	let completed = JSON.parse(localStorage.getItem('caseCompleted')) || [false, false];
+	completed[1] = true;
+	localStorage.setItem('caseCompleted', JSON.stringify(completed));
+	
+  </script>
+</body>
+</html>

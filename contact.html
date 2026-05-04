@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>表格 · 渡鸦处置</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #12100e;
+      background-image: 
+        radial-gradient(circle at 80% 20%, rgba(160, 120, 100, 0.03) 0%, transparent 40%),
+        repeating-linear-gradient(45deg, rgba(70, 50, 40, 0.02) 0px, rgba(70, 50, 40, 0.02) 2px, 
+          transparent 2px, transparent 8px);
+      font-family: 'Inter', sans-serif;
+      color: #e4ddd6;
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 0 0 40px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+
+    header {
+      padding: 28px 0 16px;
+      border-bottom: 1px solid rgba(140, 110, 90, 0.25);
+      margin-bottom: 32px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 400;
+      color: #cfc1b8;
+      letter-spacing: 3px;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .logo i {
+      font-size: 1.6rem;
+      color: #b89b89;
+      margin-right: 8px;
+    }
+    .logo .sub-mark {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 300;
+      letter-spacing: 5px;
+      margin-left: 16px;
+      color: #9e8a7c;
+      text-transform: uppercase;
+    }
+
+    .nav-back {
+      font-size: 0.9rem;
+      border: 1px solid #5f4e43;
+      padding: 6px 18px;
+      border-radius: 30px;
+      background: rgba(25, 20, 18, 0.6);
+      backdrop-filter: blur(4px);
+      color: #cfbcb0;
+      font-weight: 300;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+    .nav-back i {
+      margin-right: 6px;
+      color: #b28264;
+    }
+    .nav-back:hover {
+      background: #2a221e;
+      border-color: #a5836e;
+    }
+
+    .page-intro {
+      margin-bottom: 36px;
+    }
+    .intro-quote {
+      font-size: 1.4rem;
+      font-style: italic;
+      color: #baa89c;
+      border-left: 2px solid #7f6453;
+      padding-left: 24px;
+      margin-bottom: 12px;
+    }
+    .intro-note {
+      color: #9e8a7c;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-card {
+      background: rgba(18, 14, 12, 0.75);
+      backdrop-filter: blur(8px);
+      border-radius: 28px;
+      padding: 36px 36px;
+      border: 1px solid #463b34;
+      box-shadow: 0 20px 30px -10px rgba(0,0,0,0.5);
+      margin-bottom: 40px;
+    }
+
+    .form-group {
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #d4c5b9;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+    label i {
+      margin-right: 8px;
+      color: #b28264;
+      width: 20px;
+    }
+    .required {
+      color: #b28264;
+      margin-left: 4px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: #0f0b09;
+      border: 1px solid #5f4e43;
+      border-radius: 20px;
+      padding: 14px 20px;
+      color: #e4ddd6;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.2s;
+      resize: vertical;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #a5836e;
+    }
+    select option {
+      background: #1c1612;
+      color: #e4ddd6;
+    }
+
+    .hint-text {
+      font-size: 0.8rem;
+      color: #8d7869;
+      margin-top: 6px;
+    }
+
+    .file-dummy {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .file-btn {
+      background: #2d231f;
+      border: 1px solid #5f4e43;
+      color: #dacbbc;
+      padding: 10px 22px;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .file-btn i {
+      margin-right: 6px;
+    }
+    .file-btn:hover {
+      background: #3f2e25;
+    }
+    .file-name {
+      color: #9e8a7c;
+    }
+
+    .submit-area {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .btn-submit {
+      background: #573f32;
+      border: 1px solid #846b5a;
+      color: #f2e5dc;
+      padding: 14px 40px;
+      border-radius: 60px;
+      font-weight: 500;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      border: none;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    .btn-submit i {
+      margin-right: 10px;
+    }
+    .btn-submit:hover {
+      background: #6f5241;
+      color: #fff6ef;
+      box-shadow: 0 0 16px #5f403020;
+    }
+    .submit-note {
+      color: #9e8a7c;
+      font-size: 0.85rem;
+    }
+
+    .password-reveal {
+      margin-top: 36px;
+      padding: 28px 24px;
+      background: #1c1511;
+      border-radius: 24px;
+      border: 1px solid #7a5a46;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      display: none;
+      transition: all 0.3s ease;
+      position: relative;
+      backdrop-filter: blur(4px);
+    }
+    .password-reveal::before {
+      content: "📜";
+      position: absolute;
+      font-size: 3rem;
+      opacity: 0.1;
+      bottom: 10px;
+      right: 20px;
+      pointer-events: none;
+    }
+    .reveal-title {
+      font-size: 1.3rem;
+      color: #ddcdc0;
+      margin-bottom: 12px;
+      border-left: 3px solid #b28264;
+      padding-left: 16px;
+    }
+    .reveal-content {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: #e6cdbc;
+      letter-spacing: 2px;
+      word-break: break-all;
+      background: #0d0a08;
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 40px;
+      margin: 8px 0;
+    }
+    .reveal-note {
+      margin-top: 16px;
+      color: #b7a194;
+      font-style: italic;
+      border-top: 1px dashed #5f4e43;
+      padding-top: 16px;
+    }
+
+    footer {
+      margin-top: 40px;
+      padding: 24px 0 16px;
+      border-top: 1px solid #3a2e27;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      color: #8f7b6e;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-card { padding: 24px 20px; }
+      .logo { font-size: 1.8rem; }
+      .intro-quote { font-size: 1.2rem; }
+      .reveal-content { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">
+      <i class="fas fa-crow"></i> 渡鸦·处置
+      <span class="sub-mark">CURATED ENDINGS</span>
+    </div>
+    <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> 返回</a>
+  </header>
+
+  <div class="page-intro">
+    <div class="intro-quote">
+      “你找到了这里。写点有意思的，否则我不会看第二眼。”
+    </div>
+    <div class="intro-note">
+      <i class="fas fa-feather-alt"></i> 所有委托将在72小时内阅读，只回复那些让我失眠的故事。
+    </div>
+  </div>
+
+  <div class="form-card">
+    <form id="commissionForm">
+      <div class="form-group">
+        <label><i class="fas fa-user"></i> 称呼 / 代号</label>
+        <input type="text" id="name" placeholder="如何称呼你（可不填）">
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-envelope"></i> 联络方式 <span class="required">*</span></label>
+        <input type="text" id="contact" placeholder="邮箱 或 Telegram" required>
+        <div class="hint-text">务必准确，我只通过这个渠道回复。</div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-folder-open"></i> 委托类型</label>
+        <select id="commissionType">
+          <option value="residential">住宅遗物整理</option>
+          <option value="sensitive">敏感文件 / 加密介质</option>
+          <option value="collection">特殊藏品处置</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-pen"></i> 情况简述 <span class="required">*</span></label>
+        <textarea id="details" rows="5" placeholder="告诉我发生了什么。细节越离奇，我越感兴趣……" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-paperclip"></i> 附件（可选）</label>
+        <div class="file-dummy">
+          <span class="file-btn" id="fakeUploadBtn"><i class="fas fa-cloud-upload-alt"></i> 选择文件</span>
+          <span class="file-name" id="fileNameDisplay">未选择任何文件</span>
+        </div>
+       
+      </div>
+
+      <div class="submit-area">
+        <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> 投递 · 等待缘分</button>
+        <span class="submit-note"><i class="fas fa-lock"></i> 提交后不可修改</span>
+      </div>
+    </form>
+
+    <div class="password-reveal" id="passwordReveal">
+      <div class="reveal-title">
+        <i class="fas fa-scroll"></i> 陆止安的便签
+      </div>
+      <div class="reveal-content" id="passwordDisplay">
+        CORVUS_1899
+      </div>
+      <div class="reveal-note" id="revealMessage">
+        档案室的通行码<br>
+        <span style="font-size: 0.9rem;">—— 他似乎对你的故事产生了兴趣。</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-left">
+      <i class="fas fa-crow"></i> 投递即视为接受隐私条款  
+      <span style="margin:0 12px">◆</span> 永安街14号后巷
+    </div>
+  </footer>
+</div>
+
+<script>
+  (function(){
+    const form = document.getElementById('commissionForm');
+    const contactInput = document.getElementById('contact');
+    const detailsInput = document.getElementById('details');
+    const passwordReveal = document.getElementById('passwordReveal');
+    const passwordDisplay = document.getElementById('passwordDisplay');
+    const revealMessage = document.getElementById('revealMessage');
+
+    const fakeUploadBtn = document.getElementById('fakeUploadBtn');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    if(fakeUploadBtn) {
+      fakeUploadBtn.addEventListener('click', function() {
+        const mockFiles = ['遗物清单.pdf', '老照片.zip', '日记扫描件.png', '加密文件.dat', '秘密信件.txt'];
+        const randomFile = mockFiles[Math.floor(Math.random() * mockFiles.length)];
+        fileNameDisplay.textContent = randomFile;
+      });
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (!contactInput.value.trim()) {
+        alert('❓ 请填写联络方式（邮箱或Telegram）');
+        contactInput.focus();
+        return;
+      }
+      if (!detailsInput.value.trim()) {
+        alert('✍️ 请简述委托情况，否则渡鸦不会回应');
+        detailsInput.focus();
+        return;
+      }
+
+      passwordDisplay.textContent = 'CORVUS_1899';
+      revealMessage.innerHTML = `档案室的通行码`;
+      
+      if (passwordReveal.style.display === 'none' || getComputedStyle(passwordReveal).display === 'none') {
+        passwordReveal.style.display = 'block';
+        passwordReveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // 弹窗已删除
+      } else {
+        passwordReveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // 弹窗已删除
+      }
+      
+      console.log('✅ 渡鸦便签已弹出 | 通行码: CORVUS_1899');
+    });
+  })();
+</script>
+</body>
+</html>

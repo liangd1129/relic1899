@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>青岚第一高级中学 小组</title>
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-tap-highlight-color: transparent;
+  }
+  a {
+    color: #37a;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  /* 顶部豆瓣导航 */
+  .nav-top {
+    background: #37a64c;
+    height: calc(32px + var(--safe-top));
+    padding-top: var(--safe-top);
+    line-height: 32px;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-top-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav-top-inner > div:first-child {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+  }
+  .nav-menu {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .nav-menu a {
+    color: #fff;
+    margin-left: 18px;
+    font-size: 13px;
+  }
+  .nav-search input {
+    width: 200px;
+    padding: 2px 8px;
+    border: none;
+    border-radius: 2px;
+    font-size: 13px;
+    outline: none;
+    background: #fff;
+    height: 22px;
+  }
+
+  /* 主体容器 */
+  .wrap {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 30px;
+  }
+  .main { flex: 1; min-width: 0; }
+
+  /* 小组头部 */
+  .group-header {
+    background: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+  }
+  .group-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 4px;
+    background: #e8f5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #37a64c;
+    flex-shrink: 0;
+  }
+  .group-info { min-width: 0; flex: 1; }
+  .group-info h1 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #222;
+  }
+  .group-desc {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .group-meta {
+    font-size: 13px;
+    color: #999;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .join-btn {
+    background: #37a64c;
+    color: #fff;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 3px;
+    font-size: 13px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .join-btn:hover {
+    background: #2e8d42;
+  }
+
+  /* 讨论分类标签 */
+  .tab-nav {
+    background: #fff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-nav a {
+    margin-right: 20px;
+    font-size: 14px;
+    color: #666;
+    display: inline-block;
+  }
+  .tab-nav a:last-child { margin-right: 0; }
+  .tab-nav a.active {
+    color: #37a64c;
+    font-weight: bold;
+  }
+
+  /* 帖子列表 */
+  .post-list {
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .post-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .post-item:last-child { border-bottom: none; }
+  .post-title {
+    flex: 1;
+    font-size: 14px;
+    min-width: 0;
+  }
+  .post-title a {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .post-meta {
+    font-size: 12px;
+    color: #999;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .post-meta span {
+    margin-left: 10px;
+  }
+
+  /* 侧边栏 */
+  .side {
+    width: 260px;
+    flex-shrink: 0;
+  }
+  .side-card {
+    background: #fff;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .side-title {
+    padding: 10px 15px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+    color: #666;
+    font-weight: bold;
+  }
+  .side-body {
+    padding: 12px 15px;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.8;
+  }
+  .tag-list span {
+    display: inline-block;
+    background: #f0f7f1;
+    color: #37a64c;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin: 0 4px 4px 0;
+  }
+  .member-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .member-item {
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    background: #e8f5e9;
+    text-align: center;
+    line-height: 24px;
+    font-size: 12px;
+    color: #37a64c;
+  }
+
+  /* 页脚 */
+  .footer {
+    text-align: center;
+    color: #999;
+    font-size: 12px;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    margin-top: 20px;
+  }
+
+  /* 右下角页码 */
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    right: 16px;
+    background: #ffffff;
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: .5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    z-index: 2147483000;
+    user-select: none;
+    pointer-events: none;
+  }
+  .page-indicator b {
+    color: #1d1d1f;
+    font-weight: 600;
+  }
+
+  /* 左下角返回按钮 —— 桌面端隐藏，仅手机端显示 */
+  .back-link {
+    display: none;
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 16px;
+    background: #ffffff;
+    color: #1d1d1f;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    text-decoration: none;
+    align-items: center;
+    gap: 6px;
+    z-index: 2147483000;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-link:hover { background: #f5f5f7; }
+
+  /* =========================================================
+     手机端适配（≤ 600px）
+     ========================================================= */
+  @media (max-width: 600px) {
+
+    /* ---------- 顶栏：精简 ---------- */
+    .nav-top-inner {
+      padding: 0 14px;
+      gap: 10px;
+    }
+    .nav-logo { font-size: 16px; }
+    .nav-top-inner > div:first-child span {
+      margin-left: 12px !important;
+      font-size: 12px !important;
+    }
+    /* 菜单项只保留前 4 个，其余隐藏 —— 用 nth-child 控制 */
+    .nav-menu a { margin-left: 12px; font-size: 12px; }
+    .nav-menu a:nth-child(n+5) { display: none; }
+    .nav-search { flex: 1; min-width: 0; display: flex; justify-content: flex-end; }
+    .nav-search input {
+      width: 100%;
+      max-width: 140px;
+      font-size: 16px; /* 防 iOS 自动放大 */
+      height: 24px;
+      line-height: 24px;
+    }
+
+    /* ---------- 主体：单列 ---------- */
+    .wrap {
+      flex-direction: column;
+      margin: 12px auto;
+      padding: 0 12px;
+      gap: 14px;
+    }
+    .main { width: 100%; }
+    .side { width: 100%; }
+
+    /* ---------- 小组头部 ---------- */
+    .group-header {
+      padding: 16px;
+      border-radius: 8px;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .group-avatar {
+      width: 56px;
+      height: 56px;
+      font-size: 24px;
+      border-radius: 6px;
+    }
+    .group-info h1 { font-size: 17px; margin-bottom: 6px; }
+    .group-desc { font-size: 12.5px; margin-bottom: 8px; }
+    .group-meta { font-size: 12px; gap: 10px; }
+    .join-btn { padding: 5px 12px; font-size: 12.5px; }
+
+    /* ---------- 分类标签 ---------- */
+    .tab-nav {
+      padding: 8px 14px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .tab-nav a {
+      margin-right: 16px;
+      font-size: 13px;
+    }
+
+    /* ---------- 帖子列表 ---------- */
+    .post-list { border-radius: 8px; }
+    .post-item {
+      padding: 12px 14px;
+      /* 手机上改为纵向堆叠，标题在上、meta 在下 */
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+    .post-title { font-size: 14px; }
+    .post-title a {
+      /* 手机上允许两行展示 */
+      white-space: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      line-height: 1.5;
+    }
+    .post-meta {
+      font-size: 11.5px;
+      text-align: left;
+      margin-left: 0;
+    }
+    .post-meta span { margin-left: 0; margin-right: 10px; }
+
+    /* ---------- 侧栏卡片 ---------- */
+    .side-card {
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .side-title { padding: 9px 14px; font-size: 13px; }
+    .side-body { padding: 12px 14px; font-size: 13px; }
+
+    /* ---------- 页脚 ---------- */
+    .footer {
+      padding: 18px 14px calc(18px + var(--safe-bottom));
+      font-size: 12px;
+    }
+
+    /* ---------- 返回按钮：手机端显示 ---------- */
+    .back-link {
+      display: inline-flex;
+      bottom: calc(12px + var(--safe-bottom));
+      left: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+
+  /* =========================================================
+     底部页码微调（≤ 640px）—— 与其他页面保持一致
+     ========================================================= */
+  @media (max-width: 640px) {
+    .page-indicator {
+      bottom: calc(12px + var(--safe-bottom));
+      right: 10px;
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+  }
+
+  /* 超窄屏（≤ 360px） */
+  @media (max-width: 360px) {
+    .nav-logo { font-size: 15px; }
+    .nav-menu a:nth-child(n+4) { display: none; }
+    .nav-search input { max-width: 110px; }
+    .group-info h1 { font-size: 16px; }
+    .tab-nav a { margin-right: 14px; font-size: 12.5px; }
+    .post-title { font-size: 13.5px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 右下角页码 -->
+<div class="page-indicator"><b>10</b> / 27</div>
+
+<!-- 左下角返回（仅手机端显示） -->
+<a href="searchqinglan.html" class="back-link">← 返回搜索结果</a>
+
+<!-- 顶部导航 -->
+<div class="nav-top">
+  <div class="nav-top-inner">
+    <div>
+      <a href="#" class="nav-logo">豆瓣酱</a>
+      <span style="margin-left:20px;font-size:13px;">小组</span>
+    </div>
+    <div class="nav-menu">
+      <a href="#">读书</a>
+      <a href="#">电影</a>
+      <a href="#">音乐</a>
+      <a href="#">小组</a>
+      <a href="#">同城</a>
+      <a href="#">九点</a>
+    </div>
+    <div class="nav-search">
+      <input type="text" placeholder="搜索小组、话题">
+    </div>
+  </div>
+</div>
+
+<!-- 主体内容 -->
+<div class="wrap">
+  <div class="main">
+    <!-- 小组头部 -->
+    <div class="group-header">
+      <div class="group-avatar">🏫</div>
+      <div class="group-info">
+        <h1>青岚第一高级中学</h1>
+        <p class="group-desc">在校生闲聊互助小组，毕业校友偶尔回来看看。</p>
+        <div class="group-meta">
+          <span>成员：218人</span>
+          <span>组长：风眠晚渡</span>
+          <button class="join-btn">加入小组</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分类标签 -->
+    <div class="tab-nav">
+      <a href="#" class="active">全部</a>
+      <a href="#">精华</a>
+      <a href="#">同学互助</a>
+      <a href="#">学校八卦</a>
+      <a href="#">树洞吐槽</a>
+    </div>
+
+    <!-- 帖子列表 -->
+    <div class="post-list">
+      <div class="post-item">
+        <div class="post-title">
+          <a href="#">【置顶】高三一轮复习资料汇总帖（持续更新）</a>
+        </div>
+        <div class="post-meta">
+          <span>风眠晚渡</span>
+          <span>23回应</span>
+          <span>2023-11-12 14:32</span>
+        </div>
+      </div>
+
+      <div class="post-item">
+        <div class="post-title">
+          <a href="#">【置顶】开一个同学们对各个老师的评价楼，大家多留言支持</a>
+        </div>
+        <div class="post-meta">
+          <span>风眠晚渡</span>
+          <span>44回应</span>
+          <span>2024-02-24 14:32</span>
+        </div>
+      </div>
+
+      <div class="post-item">
+        <div class="post-title">
+          <a href="#">【置顶】青岚一高校园生存指南｜食堂/澡堂/自习室全攻略</a>
+        </div>
+        <div class="post-meta">
+          <span>半糖去冰</span>
+          <span>17回应</span>
+          <span>09-05 09:12</span>
+        </div>
+      </div>
+
+      <div class="post-item">
+        <div class="post-title">
+          <a href="#">刚开学就天天小测，快喘不过气了…</a>
+        </div>
+        <div class="post-meta">
+          <span>匿名用户</span>
+          <span>6回应</span>
+          <span>09-14 23:10</span>
+        </div>
+      </div>
+
+      <div class="post-item">
+        <div class="post-title">
+          <a href="#">感觉暑假之后学校管得突然好严，到底为啥啊</a>
+        </div>
+        <div class="post-meta">
+          <span>匿名用户</span>
+          <span>3回应</span>
+          <span>09-09 21:07</span>
+        </div>
+      </div>
+
+      <div class="post-item">
+        <div class="post-title">
+          <a href="#">高三暑假真的要补课了？我朋友说她姐天天去，还是强制性的</a>
+        </div>
+        <div class="post-meta">
+          <span>momo</span>
+          <span>8回应</span>
+          <span>07-14 22:18</span>
+        </div>
+      </div>
+
+      <div class="post-item">
+        <div class="post-title">
+          <a href="#">求2401班上周的数学周测卷，可换其他科资料</a>
+        </div>
+        <div class="post-meta">
+          <span>校底坐穿</span>
+          <span>2回应</span>
+          <span>09-13 11:20</span>
+        </div>
+      </div>
+
+      <div class="post-item">
+        <div class="post-title">
+          <a href="#">7班那事儿是真的吗？之前听初中同学提了一句</a>
+        </div>
+        <div class="post-meta">
+          <span>雾里看灯</span>
+          <span>0回应</span>
+          <span>08-08 23:41</span>
+        </div>
+      </div>
+
+      <div class="post-item">
+        <div class="post-title">
+          <a href="#">想问下怎么预约孙浔老师的心理咨询？要走班主任流程吗？</a>
+        </div>
+        <div class="post-meta">
+          <span>介绍介绍你谁啊</span>
+          <span>3回应</span>
+          <span>07-21 16:47</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 侧边栏 -->
+  <div class="side">
+    <div class="side-card">
+      <div class="side-title">小组信息</div>
+      <div class="side-body">
+        <p>创建于 2023-09-01</p>
+        <p>最新加入：09-15</p>
+      </div>
+    </div>
+
+    <div class="side-card">
+      <div class="side-title">小组标签</div>
+      <div class="side-body tag-list">
+        <span>青岚一高</span>
+        <span>高中生活</span>
+        <span>学习互助</span>
+        <span>校园八卦</span>
+      </div>
+    </div>
+
+    <div class="side-card">
+      <div class="side-title">友情小组</div>
+      <div class="side-body">
+        <p><a href="#">市第二中学闲聊组</a></p>
+        <p><a href="#">实验高中校友圈</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 页脚 -->
+<div class="footer">
+  <p>© 2005-2026 douban.com 都可以读到 更多</p>
+</div>
+
+</body>
+</html>

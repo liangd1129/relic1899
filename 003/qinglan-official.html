@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>青岚第一高级中学 官方网站</title>
+<style>
+  html { scroll-behavior: smooth; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f5f6f8;
+    color: #333;
+    line-height: 1.6;
+  }
+  .close-btn {
+    position: fixed;
+    top: 14px;
+    right: 16px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  /* 顶部导航 */
+  .header {
+    background: #0056b3;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .nav {
+    display: flex;
+    gap: 32px;
+  }
+  .nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 24px 0;
+    position: relative;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .nav a:hover,
+  .nav a.active {
+    color: #ffd700;
+  }
+  .nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: #ffd700;
+    transition: width 0.2s;
+  }
+  .nav a:hover::after,
+  .nav a.active::after {
+    width: 100%;
+  }
+  /* Banner */
+  .banner {
+    height: 320px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner-mask {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0, 61, 122, 0.55), rgba(0, 102, 204, 0.35));
+    z-index: 0;
+  }
+  .banner-content {
+    position: relative;
+    z-index: 1;
+  }
+  .banner h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: 4px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  }
+  .banner p {
+    font-size: 20px;
+    opacity: 0.95;
+    letter-spacing: 8px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  }
+  /* 主体容器 */
+  .main {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 30px;
+  }
+  .main-col { flex: 1; }
+  .side-col { width: 300px; flex-shrink: 0; }
+  /* 单页切换：默认隐藏，激活时显示 */
+  .page-pane {
+    display: none;
+  }
+  .page-pane.active {
+    display: flex;
+    gap: 30px;
+    width: 100%;
+  }
+  /* 通用板块 */
+  .section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0056b3;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e6eef8;
+  }
+  .page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #0056b3;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e6eef8;
+  }
+  /* 学校概况 */
+  .overview-text {
+    font-size: 15px;
+    color: #444;
+    line-height: 1.9;
+    text-indent: 2em;
+    margin-bottom: 12px;
+  }
+  .overview-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .stat-item {
+    padding: 16px 8px;
+    background: #f5f9ff;
+    border-radius: 6px;
+  }
+  .stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0056b3;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: #666;
+  }
+  /* 新闻列表 */
+  .news-list {
+    list-style: none;
+  }
+  .news-list li {
+    padding: 14px 0;
+    border-bottom: 1px dashed #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .news-list li:last-child { border-bottom: none; }
+  .news-list a {
+    color: #333;
+    text-decoration: none;
+    font-size: 15px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 16px;
+  }
+  .news-list a:hover {
+    color: #0056b3;
+  }
+  /* 新增：干扰新闻（无互动效果） */
+  .news-list .news-plain {
+    color: #333;
+    font-size: 15px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 16px;
+    cursor: default;
+  }
+  .news-date {
+    font-size: 13px;
+    color: #999;
+    flex-shrink: 0;
+  }
+  /* 侧边卡片 */
+  .side-card {
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+  .side-card-title {
+    background: #0056b3;
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  .side-card-body {
+    padding: 16px 20px;
+  }
+  .side-card-body p {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+  .side-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    background: #f0f5ff;
+    color: #0056b3;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+  .side-btn:hover {
+    background: #0056b3;
+    color: #fff;
+  }
+  .quick-entry {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .quick-entry a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 8px;
+    background: #f5f9ff;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #333;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .quick-entry a:hover {
+    background: #0056b3;
+    color: #fff;
+  }
+  .quick-entry .icon {
+    font-size: 22px;
+  }
+
+  /* 新增：站内搜索框样式 */
+  .search-box {
+    display: flex;
+    gap: 8px;
+  }
+  .search-box input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #dce6f2;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    background: #f8fafc;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .search-box input::placeholder {
+    color: #99aabb;
+  }
+  .search-box button {
+    padding: 0 16px;
+    background: #0056b3;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+
+  /* 新增：校友登录表单样式 */
+  .login-form {
+    max-width: 380px;
+    margin: 20px auto 0;
+  }
+  .form-item {
+    margin-bottom: 20px;
+  }
+  .form-item label {
+    display: block;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 8px;
+  }
+  .form-item input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #dce6f2;
+    border-radius: 6px;
+    font-size: 15px;
+    outline: none;
+    background: #f8fafc;
+  }
+  .form-item input:focus {
+    border-color: #0056b3;
+    background: #fff;
+  }
+  .login-btn {
+    width: 100%;
+    padding: 12px;
+    background: #0056b3;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 16px;
+  }
+  .login-tips {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #666;
+  }
+  .login-tips a {
+    color: #0056b3;
+    text-decoration: none;
+  }
+
+  /* 底部 */
+  .footer {
+    background: #2c3e50;
+    color: #bdc3c7;
+    padding: 30px 20px;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .footer-info p {
+    margin-bottom: 6px;
+  }
+  .footer-copyright {
+    text-align: center;
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #3d566e;
+    font-size: 13px;
+    color: #95a5a6;
+  }
+
+  /* 新增：搜索提示样式 */
+  .search-suggest {
+    display: none;
+    margin-top: 8px;
+    border: 1px solid #dce6f2;
+    border-radius: 6px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .search-suggest.show {
+    display: block;
+  }
+  .suggest-item {
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .suggest-item:hover {
+    background: #f0f5ff;
+    color: #0056b3;
+  }
+  .suggest-empty {
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #999;
+  }
+  /* 新增：防止“搜索”两个字竖排 */
+  .search-box button {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* 新增：点击 2407 后的红色 + 抖动效果 */
+  @keyframes searchShake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+    20%, 40%, 60%, 80% { transform: translateX(6px); }
+  }
+  .side-card.search-card-danger {
+    animation: searchShake 0.75s ease-in-out 2; /* 0.75 × 2 = 1.5s */
+  }
+  .side-card.search-card-danger .side-card-title {
+    background: #d32f2f;
+  }
+  .side-card.search-card-danger .search-box input {
+    border-color: #d32f2f;
+    background: #ffebee;
+  }
+  .side-card.search-card-danger .search-box button {
+    background: #d32f2f;
+  }
+  .suggest-item.sealed {
+    color: #d32f2f;
+    font-weight: 700;
+  }
+  .suggest-item.sealed:hover {
+    background: #fff;
+    color: #d32f2f;
+  }
+
+  /* 新增：校园楼宇样式 */
+  .building-item {
+    border-bottom: 1px dashed #eee;
+  }
+  .building-item:last-child { border-bottom: none; }
+  .building-name {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 6px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .building-name:hover {
+    background: #f0f5ff;
+    color: #0056b3;
+  }
+  .building-name .arrow {
+    font-size: 11px;
+    color: #99aabb;
+    transition: transform 0.2s;
+  }
+  .building-item.open > .building-name {
+    color: #0056b3;
+    font-weight: 600;
+  }
+  .building-item.open > .building-name .arrow {
+    transform: rotate(90deg);
+    color: #0056b3;
+  }
+  .building-floors {
+    display: none;
+    padding-left: 6px;
+    padding-bottom: 8px;
+  }
+  .building-item.open > .building-floors {
+    display: block;
+  }
+  .floor-name {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: #666;
+    background: #f8fafc;
+    border-radius: 4px;
+    margin: 4px 0;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .floor-name:hover {
+    background: #e6eef8;
+    color: #0056b3;
+  }
+  .floor-item.open > .floor-name {
+    background: #e6eef8;
+    color: #0056b3;
+    font-weight: 600;
+  }
+  .floor-rooms {
+    display: none;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 4px 4px 8px;
+  }
+  .floor-item.open > .floor-rooms {
+    display: grid;
+  }
+  .room {
+    text-align: center;
+    padding: 5px 2px;
+    font-size: 12px;
+    color: #555;
+    background: #f5f6f8;
+    border-radius: 4px;
+    cursor: default;
+    transition: background 0.2s, color 0.2s;
+  }
+  .room:hover {
+    background: #dce6f2;
+    color: #0056b3;
+  }
+  .room.special {
+    cursor: pointer;
+  }
+
+  /* 新增：教室名称输入弹窗（蓝白风） */
+  .room-modal-mask {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 30, 60, 0.35);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+  }
+  .room-modal-mask.show {
+    display: flex;
+  }
+  .room-modal {
+    background: #fff;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 380px;
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(0, 40, 90, 0.25);
+    animation: roomModalIn 0.22s ease-out;
+  }
+  @keyframes roomModalIn {
+    from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .room-modal-header {
+    background: #0056b3;
+    color: #fff;
+    padding: 14px 22px;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .room-modal-close {
+    cursor: pointer;
+    font-size: 16px;
+    opacity: 0.85;
+    line-height: 1;
+  }
+  .room-modal-close:hover {
+    opacity: 1;
+  }
+  .room-modal-body {
+    padding: 22px;
+  }
+  .room-modal-label {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 10px;
+  }
+  .room-modal-body input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid #dce6f2;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    background: #f8fafc;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .room-modal-body input:focus {
+    border-color: #0056b3;
+    background: #fff;
+  }
+  .room-modal-error {
+    display: none;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #d32f2f;
+  }
+  .room-modal-error.show {
+    display: block;
+  }
+  .room-modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding: 0 22px 22px;
+  }
+  .room-modal-footer button {
+    min-width: 76px;
+    padding: 9px 0;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .room-modal-btn-cancel {
+    background: #f0f5ff;
+    color: #0056b3;
+  }
+  .room-modal-btn-cancel:hover {
+    background: #dce6f2;
+  }
+  .room-modal-btn-ok {
+    background: #0056b3;
+    color: #fff;
+  }
+  .room-modal-btn-ok:hover {
+    background: #004a99;
+  }
+
+  /* 新增：教工通道登录提示样式 */
+  .login-msg {
+    display: none;
+    font-size: 13px;
+    color: #d32f2f;
+    margin-top: -6px;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+  .login-msg.show {
+    display: block;
+  }
+  .forgot-hint {
+    display: none;
+    font-size: 13px;
+    color: #888;
+    margin-top: 6px;
+    text-align: left;
+  }
+  .forgot-hint.show {
+    display: block;
+  }
+  
+  /* 新增：密码框小眼睛（SVG 图标） */
+  .pwd-wrap {
+    position: relative;
+  }
+  .pwd-wrap input {
+    width: 100%;
+    padding-right: 42px;
+  }
+  .pwd-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #99aabb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+    transition: color .2s;
+  }
+  .pwd-eye:hover {
+    color: #0056b3;
+  }
+  .pwd-eye svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+  
+  /* 右下角页码（方案C：白底细灰边小标签） */
+  		.page-indicator {
+  		    position: fixed;
+  		    bottom: 16px;
+  		    right: 16px;
+  		    background: #ffffff;
+  		    color: #86868b;
+  		    font-size: 12px;
+  		    font-weight: 400;
+  		    letter-spacing: .5px;
+  		    padding: 5px 12px;
+  		    border-radius: 8px;
+  		    border: 1px solid #e2e5ea;
+  		    z-index: 2147483000;
+  		    user-select: none;
+  		}
+  		.page-indicator b {
+  		    color: #1d1d1f;
+  		    font-weight: 600;
+  		}
+  		
+  		/* 左下角返回按钮（与C同款） */
+  		.back-link {
+  		    position: fixed;
+  		    bottom: 16px;
+  		    left: 16px;
+  		    background: #ffffff;
+  		    color: #1d1d1f;
+  		    font-size: 13px;
+  		    padding: 8px 14px;
+  		    border-radius: 8px;
+  		    border: 1px solid #e2e5ea;
+  		    text-decoration: none;
+  		    display: inline-flex;
+  		    align-items: center;
+  		    gap: 6px;
+  		    z-index: 2147483000;
+  		    transition: background 0.15s;
+  		    -webkit-tap-highlight-color: transparent;
+  		}
+  		.back-link:hover { background: #f5f5f7; }
+  		
+  		/* 手机端适配 */
+  		@media (max-width: 640px) {
+  		    .page-indicator { bottom: 12px; right: 10px; padding: 4px 10px; font-size: 11px; }
+  		    .back-link      { bottom: 12px; left: 10px; padding: 8px 12px; font-size: 12px; }
+  		}
+		
+</style>
+</head>
+<body>
+
+<!-- 右下角页码 -->
+<div class="page-indicator"><b>9</b> / 27</div>
+
+
+<!-- 顶部导航 -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo" onclick="switchPage('home')">青岚第一高级中学</div>
+    <div class="nav">
+      <a class="active" onclick="switchPage('home')">学校概况</a>
+      <a onclick="switchPage('news')">新闻动态</a>
+      <a onclick="switchPage('teach')">教学教研</a>
+      <a onclick="switchPage('moral')">德育园地</a>
+      <a onclick="switchPage('alumni')">教工通道</a>
+    </div>
+  </div>
+</div>
+<!-- Banner -->
+<div class="banner" style="background-image:url('../img/qinglanyigao.png');">
+  <div class="banner-mask"></div>
+  <div class="banner-content">
+    <h1>明德笃学 追求卓越</h1>
+    <p>省级示范性普通高中</p>
+  </div>
+</div>
+<!-- 主体内容：所有页面都在这里，通过JS切换显示 -->
+<div class="main">
+  <!-- 1. 首页视图 -->
+  <div class="page-pane active" id="page-home">
+    <div class="main-col">
+      <!-- 学校概况 -->
+      <div class="section">
+        <div class="section-title">学校概况</div>
+        <p class="overview-text">
+          青岚第一高级中学始建于1998年，是省重点公办高中、省级示范性普通高中。学校秉承“明德笃学”的校训，坚持“以人为本、全面发展”的办学理念，以立德树人为根本任务，致力于培养品德高尚、学业扎实、体魄强健、具有创新精神和社会责任感的优秀学子。
+        </p>
+        <p class="overview-text">
+          学校现有教学班48个，在校学生2400余人，教职工192人，其中高级教师68人，一级教师87人，省市级骨干教师、学科带头人32人，硕士及以上学历教师占比超30%。校园占地面积120亩，建筑面积4.2万平方米，建有高标准教学楼、实验楼、图书馆、体育馆、学生公寓、师生食堂等完善的教学生活设施，校园环境优雅，书香氛围浓厚。
+        </p>
+        <div class="overview-stats">
+          <div class="stat-item">
+            <div class="stat-num">48</div>
+            <div class="stat-label">教学班</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">2400+</div>
+            <div class="stat-label">在校学生</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">192</div>
+            <div class="stat-label">教职工</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">28</div>
+            <div class="stat-label">办学历史(年)</div>
+          </div>
+        </div>
+      </div>
+      <!-- 新闻动态（首页只展示4条） -->
+      <div class="section">
+        <div class="section-title">新闻动态</div>
+        <ul class="news-list">
+          <li>
+            <span class="news-plain">我校隆重举行2026年秋季开学典礼暨教师节表彰大会</span>
+            <span class="news-date">2026-09-01</span>
+          </li>
+          <li>
+            <span class="news-plain">市教育局领导莅临我校检查2026年秋季开学工作</span>
+            <span class="news-date">2026-08-30</span>
+          </li>
+          <li>
+            <span class="news-plain">我校高三年级召开一轮复习动员暨备考策略研讨会</span>
+            <span class="news-date">2026-08-15</span>
+          </li>
+        </ul>
+      </div>
+      <!-- 教学教研（首页只展示2条） -->
+      <div class="section">
+        <div class="section-title">教学教研</div>
+        <ul class="news-list">
+          <li>
+            <span class="news-plain">省教科院专家莅临我校指导高三教学备考工作</span>
+            <span class="news-date">2026-08-20</span>
+          </li>
+          <li>
+            <span class="news-plain">我校多名教师在市级优质课评比中斩获一等奖</span>
+            <span class="news-date">2026-07-05</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="side-col">
+      <!-- 站内搜索（替换原招生信息板块） -->
+      <div class="side-card">
+        <div class="side-card-title">站内搜索</div>
+        <div class="side-card-body">
+          <div class="search-box">
+            <input type="text" placeholder="搜索教师、班号等">
+            <button>搜索</button>
+          </div>
+        </div>
+      </div>
+      <!-- 德育园地（首页侧边展示3条） -->
+      <div class="side-card">
+        <div class="side-card-title">德育园地</div>
+        <div class="side-card-body">
+          <ul class="news-list">
+            <li>
+              <a href="qinglanmoral.html">我校开展“开学第一课”主题教育活动</a>
+              <span class="news-date">09-01</span>
+            </li>
+            <li>
+              <span class="news-plain">校园志愿服务队开展社区服务</span>
+              <span class="news-date">07-12</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- 校园楼宇（新增） -->
+      <div class="side-card">
+        <div class="side-card-title">校园楼宇</div>
+        <div class="side-card-body">
+          <div class="building-list" id="buildingList"></div>
+        </div>
+      </div>
+      <!-- 快速入口 -->
+      <div class="side-card">
+        
+        
+      </div>
+    </div>
+  </div>
+  <!-- 2. 新闻动态页面视图 -->
+  <div class="page-pane" id="page-news">
+    <div class="main-col">
+      <div class="section">
+        <div class="page-title">新闻动态</div>
+        <ul class="news-list">
+          <li>
+            <span class="news-plain">我校隆重举行2026年秋季开学典礼暨教师节表彰大会</span>
+            <span class="news-date">2026-09-01</span>
+          </li>
+          <li>
+            <span class="news-plain">市教育局领导莅临我校检查2026年秋季开学工作</span>
+            <span class="news-date">2026-08-30</span>
+          </li>
+          <li>
+            <span class="news-plain">我校高三年级召开一轮复习动员暨备考策略研讨会</span>
+            <span class="news-date">2026-08-15</span>
+          </li>
+          
+          <!-- 线索新闻：点击跳转详情页 -->
+          <li>
+            <a href="qinglannews2.html">关于进一步加强暑期学生安全管理与心理健康防护的通知</a>
+            <span class="news-date">2026-07-30</span>
+          </li>
+		  
+		  <li>
+		    <span class="news-plain">我校学子在省中学生学科竞赛中再创佳绩</span>
+		    <span class="news-date">2026-07-18</span>
+		  </li>
+		  
+          <li>
+            <a href="qinglannews1.html">关于2026年暑假新高三年级自主学习答疑活动安排的通知</a>
+            <span class="news-date">2026-07-10</span>
+          </li>
+		  
+        </ul>
+      </div>
+    </div>
+    <div class="side-col">
+      <div class="side-card">
+        <div class="side-card-title">站内搜索</div>
+        <div class="side-card-body">
+          <div class="search-box">
+            <input type="text" placeholder="搜索教师、班号等">
+            <button>搜索</button>
+          </div>
+        </div>
+      </div>
+      <div class="side-card">
+        <div class="side-card-title">热门推荐</div>
+        <div class="side-card-body">
+          <ul class="news-list">
+            <li><span class="news-plain">2026级新生入学须知</span></li>
+            <li><span class="news-plain">秋季学期作息时间表</span></li>
+            <li><span class="news-plain">校园一卡通办理指南</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 3. 教学教研页面视图 -->
+  <div class="page-pane" id="page-teach">
+    <div class="main-col">
+      <div class="section">
+        <div class="page-title">教学教研</div>
+        <ul class="news-list">
+          <li>
+            <span class="news-plain">省教科院专家莅临我校指导高三教学备考工作</span>
+            <span class="news-date">2026-08-20</span>
+          </li>
+          <li>
+            <span class="news-plain">我校多名教师在市级优质课评比中斩获一等奖</span>
+            <span class="news-date">2026-07-05</span>
+          </li>
+          <!-- 线索新闻：点击跳转详情页 -->
+          <li>
+            <a href="qinglanteach.html">关于表彰2024级7班在全市高二教学质量联考中获评优秀抽样班级的通报</a>
+            <span class="news-date">2025-11-08</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="side-col">
+      <div class="side-card">
+        <div class="side-card-title">站内搜索</div>
+        <div class="side-card-body">
+          <div class="search-box">
+            <input type="text" placeholder="搜索教师、班号等">
+            <button>搜索</button>
+          </div>
+        </div>
+      </div>
+      <div class="side-card">
+        <div class="side-card-title">教研资源</div>
+        <div class="side-card-body">
+          <ul class="news-list">
+            <li><span class="news-plain">高三一轮复习资料包</span></li>
+            <li><span class="news-plain">各学科教案课件库</span></li>
+            <li><span class="news-plain">历年高考真题下载</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 4. 德育园地页面视图 -->
+  <div class="page-pane" id="page-moral">
+    <div class="main-col">
+      <div class="section">
+        <div class="page-title">德育园地</div>
+        <ul class="news-list">
+          <li>
+            <a href="qinglanmoral.html">我校开展“开学第一课”主题教育活动</a>
+            <span class="news-date">2026-09-01</span>
+          </li>
+          <li>
+            <span class="news-plain">校园志愿服务队开展社区服务活动</span>
+            <span class="news-date">2026-07-12</span>
+          </li>
+		  
+		  <li>
+		    <span class="news-plain">2025-2026学年校级先进班集体评选结果公示</span>
+		    <span class="news-date">2026-06-14</span>
+		  </li>
+		  
+          <li>
+            <span class="news-plain">高二年级研学实践活动圆满结束</span>
+            <span class="news-date">2026-05-18</span>
+          </li>
+		  
+          
+        </ul>
+      </div>
+    </div>
+    <div class="side-col">
+      <div class="side-card">
+        <div class="side-card-title">站内搜索</div>
+        <div class="side-card-body">
+          <div class="search-box">
+            <input type="text" placeholder="搜索教师、班号等">
+            <button>搜索</button>
+          </div>
+        </div>
+      </div>
+      <div class="side-card">
+        <div class="side-card-title">主题活动</div>
+        <div class="side-card-body">
+          <ul class="news-list">
+            <li><span class="news-plain">爱国主义教育系列活动</span></li>
+            <li><span class="news-plain">心理健康教育月</span></li>
+            <li><span class="news-plain">文明校园创建专栏</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 教工通道登录页面视图 -->
+  <div class="page-pane" id="page-alumni">
+    <div class="main-col">
+      <div class="section">
+        <div class="page-title">教工通道</div>
+        <div class="login-form">
+          <div class="form-item">
+            <label>教工工号</label>
+            <input type="text" id="teacherId" placeholder="请输入您的工号">
+          </div>
+		  
+          <div class="form-item">
+            <label>登录密码</label>
+            <div class="pwd-wrap">
+              <input type="password" id="teacherPwd" placeholder="请输入密码">
+              <span class="pwd-eye" id="pwdEye">
+                <!-- 睁眼图标（默认显示，点击显示密码） -->
+                <svg id="eyeOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <!-- 闭眼图标（密码明文时显示） -->
+                <svg id="eyeClosed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                  <line x1="3" y1="3" x2="21" y2="21"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+		  
+          <button class="login-btn" id="teacherLoginBtn">登录</button>
+          <div class="login-msg" id="teacherLoginMsg"></div>
+          <div class="login-tips">
+            <a href="javascript:void(0)" id="forgotPwdLink">忘记密码？</a>
+          </div>
+          <div class="forgot-hint" id="forgotHint">我最重要的日子</div>
+        </div>
+      </div>
+    </div>
+    
+      
+  </div>
+</div>
+<!-- 底部 -->
+<div class="footer">
+  <div class="footer-inner">
+    <div class="footer-info">
+      <p>地址：青岚区学府路89号</p>
+      <p>电话：0371-12345678</p>
+      <p>邮箱：office@qinglan-high.com</p>
+      <p>邮编：450000</p>
+    </div>
+    <div class="footer-info">
+      <p>办公时间：周一至周五 8:00-17:30</p>
+      <p>招生咨询：0371-12345679</p>
+      <p>校友联络：0371-12345680</p>
+    </div>
+    <div class="footer-copyright">
+      版权所有 © 青岚第一高级中学  |  豫ICP备2020000000号  |  技术支持：学校信息中心
+    </div>
+  </div>
+</div>
+<script>
+  // 单页切换逻辑
+  function switchPage(pageName) {
+    // 1. 切换导航高亮
+    const navItems = document.querySelectorAll('.nav a');
+    navItems.forEach(item => item.classList.remove('active'));
+    // 找到对应导航项并高亮
+    navItems.forEach(item => {
+      if (item.textContent.trim() === getNavName(pageName)) {
+        item.classList.add('active');
+      }
+    });
+    // 2. 切换页面显示
+    const panes = document.querySelectorAll('.page-pane');
+    panes.forEach(pane => pane.classList.remove('active'));
+    document.getElementById('page-' + pageName).classList.add('active');
+    // 3. 切回顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  // 页面名对应导航文字
+  function getNavName(pageName) {
+    const map = {
+      'home': '学校概况',
+      'news': '新闻动态',
+      'teach': '教学教研',
+      'moral': '德育园地',
+      'alumni': '教工通道'
+    };
+    return map[pageName] || '';
+  }
+  
+  // 页面加载时，根据 URL 锚点自动切换到对应板块
+  document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && ['home','news','teach','moral','alumni'].includes(hash)) {
+      switchPage(hash);
+    }
+  });
+  
+  // 监听浏览器前进后退，同步切换板块
+  window.addEventListener('hashchange', function() {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && ['home','news','teach','moral','alumni'].includes(hash)) {
+      switchPage(hash);
+    }
+  });
+</script>
+<script>
+  // 搜索提示逻辑（精确匹配，点击搜索按钮/回车后才出现提示）
+  (function() {
+    // 搜索映射表
+    const searchMap = [
+      {
+        match: ['孙浔'],
+        html: '教师 孙浔',
+        url: 'sunxunsearch.html'
+      },
+	   {
+	          match: ['吴晓'],
+	          html: '教师 吴晓',
+	          url: 'wuxiaosearch.html'
+	        },
+			
+      {
+        match: ['2407', '2407班'],
+        html: '班级 2407班',
+        url: '2407ban.html',
+        seal: true   // 点击后不跳转，触发红色+抖动效果
+      }
+    ];
+
+    // 为每个搜索框添加提示
+    document.querySelectorAll('.search-box').forEach(function(box) {
+      const input = box.querySelector('input');
+      const btn = box.querySelector('button');
+      if (!input || !btn) return;
+
+      // 创建提示容器，插入到搜索框后面
+      const suggest = document.createElement('div');
+      suggest.className = 'search-suggest';
+      box.insertAdjacentElement('afterend', suggest);
+
+      // 执行搜索：显示提示或未找到
+      function doSearch() {
+        const val = input.value.trim();
+        suggest.innerHTML = '';
+        if (!val) {
+          suggest.classList.remove('show');
+          return;
+        }
+
+        let found = null;
+        for (let i = 0; i < searchMap.length; i++) {
+          if (searchMap[i].match.indexOf(val) !== -1) {
+            found = searchMap[i];
+            break;
+          }
+        }
+
+        if (found) {
+          const item = document.createElement('div');
+          item.className = 'suggest-item';
+          item.innerHTML = found.html;
+
+          if (found.seal) {
+            // 封存项：点击后整个搜索卡片 + 关键词变红并抖动 1.5 秒，然后恢复原样
+            item.addEventListener('click', function() {
+              if (item.classList.contains('sealed')) return;
+
+              const card = item.closest('.side-card');
+
+              // 变成红色状态
+              item.classList.add('sealed');
+              item.textContent = '班级 2407班 【档案已封存】';
+              if (card) {
+                card.classList.add('search-card-danger');
+              }
+
+              // 1.5 秒后恢复原样
+              setTimeout(function() {
+                item.classList.remove('sealed');
+                item.textContent = '班级 2407班';
+                if (card) {
+                  card.classList.remove('search-card-danger');
+                }
+              }, 1500);
+            });
+          } else if (found.url) {
+            // 正常跳转
+            item.addEventListener('click', function() {
+              window.open(found.url, '_blank');
+              suggest.classList.remove('show');
+            });
+          }
+
+          suggest.appendChild(item);
+        } else {
+          const empty = document.createElement('div');
+          empty.className = 'suggest-empty';
+          empty.textContent = '未找到相关结果';
+          suggest.appendChild(empty);
+        }
+        suggest.classList.add('show');
+      }
+
+      // 点击搜索按钮才出现提示
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        doSearch();
+      });
+
+      // 回车键等同于点击搜索
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          doSearch();
+        }
+      });
+
+      // 点击外部隐藏提示
+      document.addEventListener('click', function(e) {
+        if (!box.contains(e.target) && !suggest.contains(e.target)) {
+          suggest.classList.remove('show');
+        }
+      });
+    });
+  })();
+</script>
+<script>
+  // 校园楼宇逻辑
+  (function() {
+    const buildingList = document.getElementById('buildingList');
+    if (!buildingList) return;
+
+    // 楼宇数据
+    const buildings = [
+      { name: '明德楼' },
+      { name: '笃学楼' },
+      { name: '腾飞楼' },
+      { name: '求真楼' },
+      { name: '致远楼' },
+      { name: '行政楼' }
+    ];
+
+    // 创建弹窗（只创建一次）
+    let modalMask = document.getElementById('roomModalMask');
+    if (!modalMask) {
+      modalMask = document.createElement('div');
+      modalMask.id = 'roomModalMask';
+      modalMask.className = 'room-modal-mask';
+      modalMask.innerHTML = ''
+        + '<div class="room-modal">'
+        +   '<div class="room-modal-header">'
+        +     '<span>请输入教室名称</span>'
+        +     '<span class="room-modal-close" id="roomModalClose">✕</span>'
+        +   '</div>'
+        +   '<div class="room-modal-body">'
+      
+        +     '<input type="text" id="roomModalInput" placeholder="请输入教室名称">'
+        +     '<div class="room-modal-error" id="roomModalError">教室名称不正确</div>'
+        +   '</div>'
+        +   '<div class="room-modal-footer">'
+        +     '<button class="room-modal-btn-cancel" id="roomModalCancel">取消</button>'
+        +     '<button class="room-modal-btn-ok" id="roomModalOk">确定</button>'
+        +   '</div>'
+        + '</div>';
+      document.body.appendChild(modalMask);
+    }
+
+    const input = document.getElementById('roomModalInput');
+    const errorEl = document.getElementById('roomModalError');
+    const btnOk = document.getElementById('roomModalOk');
+    const btnCancel = document.getElementById('roomModalCancel');
+    const btnClose = document.getElementById('roomModalClose');
+
+    // 打开弹窗
+    function openRoomModal() {
+      input.value = '';
+      errorEl.classList.remove('show');
+      modalMask.classList.add('show');
+      setTimeout(function() { input.focus(); }, 50);
+    }
+
+    // 关闭弹窗
+    function closeRoomModal() {
+      modalMask.classList.remove('show');
+      input.value = '';
+      errorEl.classList.remove('show');
+    }
+
+    // 提交
+    function submitRoom() {
+      const val = input.value.trim();
+      if (val === '心灵驿站') {
+        closeRoomModal();
+        window.open('xinlingyizhan.html', '_blank');
+      } else {
+        errorEl.classList.add('show');
+        input.focus();
+      }
+    }
+
+    // 绑定按钮
+    btnOk.addEventListener('click', submitRoom);
+    btnCancel.addEventListener('click', closeRoomModal);
+    btnClose.addEventListener('click', closeRoomModal);
+
+    // 回车提交，Esc 关闭
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitRoom();
+      } else if (e.key === 'Escape') {
+        closeRoomModal();
+      }
+    });
+
+    // 输入时隐藏错误提示
+    input.addEventListener('input', function() {
+      errorEl.classList.remove('show');
+    });
+
+    // 点击遮罩关闭
+    modalMask.addEventListener('click', function(e) {
+      if (e.target === modalMask) closeRoomModal();
+    });
+
+    // 生成楼宇结构
+    buildings.forEach(function(b) {
+      const bItem = document.createElement('div');
+      bItem.className = 'building-item';
+
+      const bName = document.createElement('div');
+      bName.className = 'building-name';
+      bName.innerHTML = '<span>' + b.name + '</span><span class="arrow">▸</span>';
+
+      const bFloors = document.createElement('div');
+      bFloors.className = 'building-floors';
+
+      for (let f = 1; f <= 3; f++) {
+        const fItem = document.createElement('div');
+        fItem.className = 'floor-item';
+
+        const fName = document.createElement('div');
+        fName.className = 'floor-name';
+        fName.innerHTML = '<span>' + f + 'F</span>';
+
+        const fRooms = document.createElement('div');
+        fRooms.className = 'floor-rooms';
+
+        for (let r = 1; r <= 6; r++) {
+          const roomNum = '' + f + '0' + r;
+          const room = document.createElement('span');
+          room.className = 'room';
+          room.textContent = roomNum;
+
+          // 行政楼 2F 203 室特殊处理
+          if (b.name === '行政楼' && f === 2 && roomNum === '203') {
+            room.classList.add('special');
+            room.addEventListener('click', function(e) {
+              e.stopPropagation();
+              openRoomModal();
+            });
+          }
+
+          fRooms.appendChild(room);
+        }
+
+        // 点击楼层：本楼内互斥
+        fName.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const wasOpen = fItem.classList.contains('open');
+          bFloors.querySelectorAll('.floor-item').forEach(function(el) {
+            el.classList.remove('open');
+          });
+          if (!wasOpen) {
+            fItem.classList.add('open');
+          }
+        });
+
+        fItem.appendChild(fName);
+        fItem.appendChild(fRooms);
+        bFloors.appendChild(fItem);
+      }
+
+      // 点击楼名：楼与楼互斥 + 重置楼层 + toggle
+      bName.addEventListener('click', function() {
+        const wasOpen = bItem.classList.contains('open');
+        buildingList.querySelectorAll('.building-item').forEach(function(el) {
+          el.classList.remove('open');
+          el.querySelectorAll('.floor-item').forEach(function(fl) {
+            fl.classList.remove('open');
+          });
+        });
+        if (!wasOpen) {
+          bItem.classList.add('open');
+        }
+      });
+
+      bItem.appendChild(bName);
+      bItem.appendChild(bFloors);
+      buildingList.appendChild(bItem);
+    });
+  })();
+</script>
+<script>
+  // 教工通道登录逻辑
+  (function() {
+    const btn = document.getElementById('teacherLoginBtn');
+    const idInput = document.getElementById('teacherId');
+    const pwdInput = document.getElementById('teacherPwd');
+    const msg = document.getElementById('teacherLoginMsg');
+    const forgotLink = document.getElementById('forgotPwdLink');
+    const forgotHint = document.getElementById('forgotHint');
+    if (!btn || !idInput || !pwdInput || !msg) return;
+
+    // 密码小眼睛（SVG 切换）
+    const pwdEye = document.getElementById('pwdEye');
+    const eyeOpen = document.getElementById('eyeOpen');
+    const eyeClosed = document.getElementById('eyeClosed');
+    if (pwdEye && pwdInput && eyeOpen && eyeClosed) {
+      pwdEye.addEventListener('click', function() {
+        if (pwdInput.type === 'password') {
+          pwdInput.type = 'text';
+          eyeOpen.style.display = 'none';
+          eyeClosed.style.display = 'block';
+        } else {
+          pwdInput.type = 'password';
+          eyeOpen.style.display = 'block';
+          eyeClosed.style.display = 'none';
+        }
+      });
+    }
+
+    const CORRECT_ID = 'QL2024037';
+    const CORRECT_PWD = '20241227';
+
+    btn.addEventListener('click', function() {
+      const idVal = idInput.value.trim();
+      const pwdVal = pwdInput.value.trim();
+
+      msg.classList.remove('show');
+      msg.textContent = '';
+
+      if (!idVal || !pwdVal) {
+        msg.textContent = '请完整输入工号及密码';
+        msg.classList.add('show');
+        return;
+      }
+      if (idVal !== CORRECT_ID || pwdVal !== CORRECT_PWD) {
+        msg.textContent = '工号或密码不正确，请重新输入';
+        msg.classList.add('show');
+        return;
+      }
+      // 登录成功
+      window.open('sunxunzhuye.html', '_blank');
+    });
+
+    // 忘记密码：工号正确时显示小字
+    forgotLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      const idVal = idInput.value.trim();
+      if (idVal === CORRECT_ID) {
+        forgotHint.classList.add('show');
+      }
+    });
+  })();
+</script>
+</body>
+</html>

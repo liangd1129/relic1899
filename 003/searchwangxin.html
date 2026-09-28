@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>王信_千度搜索</title>
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #fff;
+    color: #222;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .close-btn {
+    position: fixed;
+    top: calc(14px + var(--safe-top));
+    right: 16px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+    z-index: 100;
+  }
+
+  /* 顶部 */
+  .header {
+    padding: calc(18px + var(--safe-top)) 0 0 0;
+    border-bottom: 1px solid #eee;
+  }
+  .header-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 20px;
+  }
+  .baidu-logo {
+    font-size: 30px;
+    font-weight: 700;
+    color: #306eff;
+    letter-spacing: -1px;
+  }
+
+  /* 导航 */
+  .nav {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 28px;
+    margin-top: 14px;
+    font-size: 14px;
+    color: #626675;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav span {
+    padding-bottom: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .nav .active {
+    color: #222;
+    font-weight: 500;
+    border-bottom: 2px solid #4e6ef2;
+  }
+
+  /* 结果区 */
+  .results {
+    max-width: 720px;
+    margin: 20px auto 60px;
+    padding: 0 20px;
+  }
+  .result-count {
+    color: #9195a3;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .result {
+    margin-bottom: 26px;
+  }
+  .result a.title {
+    font-size: 18px;
+    color: #2440b3;
+    text-decoration: none;
+    line-height: 1.4;
+    cursor: pointer;
+    display: block;
+  }
+  .result a.title:hover { text-decoration: underline; }
+  .result .meta {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #9195a3;
+  }
+  .result .meta .source {
+    color: #0f7b0f;
+    margin-right: 8px;
+  }
+  .result .meta .source.official {
+    color: #ba5a00;
+  }
+  .result .snippet {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+  }
+
+  /* 相关搜索 */
+  .related { margin-top: 40px; }
+  .related h4 {
+    font-size: 15px;
+    color: #222;
+    margin-bottom: 14px;
+  }
+  .related .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .related .tags span {
+    background: #f4f6f9;
+    padding: 8px 14px;
+    border-radius: 18px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s;
+  }
+  .related .tags span:active { background: #e8ecf3; }
+
+  /* 新闻详情视图 */
+  .detail-view {
+    display: none;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 20px 0 18px;
+    font-size: 14px;
+    color: #4e6ef2;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .detail-back:hover {
+    text-decoration: underline;
+  }
+  .detail-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #222;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+    color: #9195a3;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 22px;
+  }
+  .detail-meta .source.official {
+    color: #ba5a00;
+  }
+  .detail-body p {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.9;
+    text-indent: 2em;
+    margin-bottom: 14px;
+  }
+  .detail-sign {
+    text-align: right;
+    font-size: 14px;
+    color: #888;
+    margin-top: 24px;
+  }
+
+  /* 右下角页码 */
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    right: 16px;
+    background: #ffffff;
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: .5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    z-index: 2147483000;
+    user-select: none;
+    pointer-events: none;
+  }
+  .page-indicator b {
+    color: #1d1d1f;
+    font-weight: 600;
+  }
+
+  /* 左下角返回按钮 —— 桌面端隐藏，仅手机端显示 */
+  .back-link {
+    display: none;
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 16px;
+    background: #ffffff;
+    color: #1d1d1f;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    text-decoration: none;
+    align-items: center;
+    gap: 6px;
+    z-index: 2147483000;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-link:hover { background: #f5f5f7; }
+
+  /* =========================================================
+     手机端适配（≤ 600px）
+     ========================================================= */
+  @media (max-width: 600px) {
+
+    /* ---------- 关闭按钮 ---------- */
+    .close-btn {
+      top: calc(8px + var(--safe-top));
+      right: 10px;
+      width: 28px; height: 28px;
+      font-size: 14px;
+    }
+
+    /* ---------- 顶部 ---------- */
+    .header { padding-top: calc(12px + var(--safe-top)); }
+    .header-inner {
+      padding: 0 16px;
+      padding-right: 46px; /* 给关闭按钮让位 */
+    }
+    .baidu-logo { font-size: 24px; }
+
+    /* ---------- 导航：横向可滑动 ---------- */
+    .nav {
+      padding: 0 16px;
+      gap: 20px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .nav span { padding-bottom: 8px; }
+
+    /* ---------- 结果区 ---------- */
+    .results {
+      margin: 16px auto 80px;
+      padding: 0 16px;
+    }
+    .result-count {
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+    .result { margin-bottom: 22px; }
+    .result a.title {
+      font-size: 16px;
+      line-height: 1.45;
+    }
+    .result .meta { font-size: 12px; margin-top: 5px; }
+    .result .snippet {
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin-top: 5px;
+    }
+
+    /* ---------- 相关搜索 ---------- */
+    .related { margin-top: 32px; }
+    .related h4 { font-size: 14px; margin-bottom: 12px; }
+    .related .tags { gap: 8px; }
+    .related .tags span {
+      padding: 7px 12px;
+      font-size: 12.5px;
+      border-radius: 16px;
+    }
+
+    /* ---------- 详情页 ---------- */
+    .detail-view { padding: 0 16px calc(80px + var(--safe-bottom)); }
+    .detail-back {
+      margin: 16px 0 14px;
+      font-size: 13px;
+    }
+    .detail-title {
+      font-size: 19px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .detail-meta {
+      gap: 8px 12px;
+      font-size: 12px;
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+    }
+    .detail-body p {
+      font-size: 15px;
+      line-height: 1.85;
+      margin-bottom: 13px;
+    }
+    .detail-sign {
+      font-size: 13px;
+      margin-top: 20px;
+    }
+
+    /* ---------- 返回按钮：手机端显示 ---------- */
+    .back-link {
+      display: inline-flex;
+      bottom: calc(12px + var(--safe-bottom));
+      left: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+
+  /* =========================================================
+     底部页码微调（≤ 640px）—— 与其他页面保持一致
+     ========================================================= */
+  @media (max-width: 640px) {
+    .page-indicator {
+      bottom: calc(12px + var(--safe-bottom));
+      right: 10px;
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+  }
+
+  /* 超窄屏（≤ 360px） */
+  @media (max-width: 360px) {
+    .baidu-logo { font-size: 22px; }
+    .result a.title { font-size: 15px; }
+    .result .snippet { font-size: 13px; }
+    .nav { gap: 16px; }
+    .detail-title { font-size: 17px; }
+    .detail-body p { font-size: 14.5px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 右下角页码 -->
+<div class="page-indicator"><b>16</b> / 27</div>
+
+<!-- 左下角返回（仅手机端显示） -->
+<a href="safari.html" class="back-link">← 返回Safari主页</a>
+
+<!-- 视图 1：搜索结果列表 -->
+<div id="listView">
+  <div class="header">
+    <div class="header-inner">
+      <div class="baidu-logo">千度</div>
+    </div>
+    <div class="nav">
+      <span class="active">网页</span>
+      <span>AI+</span>
+      <span>资讯</span>
+      <span>图片</span>
+      <span>视频</span>
+      <span>贴吧</span>
+      <span>文库</span>
+      <span>更多</span>
+    </div>
+  </div>
+  <div class="results">
+    <div class="result-count">千度为您找到以下结果（共 12,400 条，用时 0.32 秒）</div>
+
+    <!-- 结果 1：书法家王信 -->
+    <div class="result">
+      <a class="title" href="#">王信（书法家）_千度百科</a>
+      <div class="meta">
+        <span class="source">千度百科</span>
+        <span>更新于 2023-11-05</span>
+      </div>
+      <div class="snippet">
+        王信（1923—2008），字子安，号砚农，生前为中国书法家协会会员，擅长行草与隶书，作品曾多次入选全国书法篆刻展。晚年长期从事书法教育工作，著有《砚农书论》。
+      </div>
+    </div>
+
+    <!-- 结果 2：作家王信 -->
+    <div class="result">
+      <a class="title" href="#">王信（作家）_千度百科</a>
+      <div class="meta">
+        <span class="source">千度百科</span>
+        <span>更新于 2024-02-18</span>
+      </div>
+      <div class="snippet">
+        王信，当代作家，生于1968年，代表作有长篇小说《北岸》《九月手记》，曾获省级文学奖。作品多聚焦小城生活与普通人命运，笔触克制，细节扎实。
+      </div>
+    </div>
+
+    <!-- 结果 3：青岚一高校长王信（可点击进入详情） -->
+    <div class="result">
+      <a class="title" onclick="showDetail()">青岚一高校长王信就学校心理咨询室的建成发表意见</a>
+      <div class="meta">
+        <span class="source official">青岚一高官网</span>
+        <span>2024-12-27</span>
+      </div>
+      <div class="snippet">
+        2024年12月27日，青岚第一高级中学心理咨询室正式建成并投入使用。校长王信出席建成仪式并发表讲话，强调学生心理健康是学校育人工作的重要组成部分……
+      </div>
+    </div>
+
+    <!-- 结果 4：贴吧 -->
+    <div class="result">
+      <a class="title" href="#">王信吧-千度贴吧</a>
+      <div class="meta">
+        <span class="source">千度贴吧</span>
+        <span>关注 3200 · 贴子 1.8万</span>
+      </div>
+      <div class="snippet">
+        本吧为书法家王信、作家王信及同名网友的交流贴吧。吧规：请勿混淆不同同名人物，发帖请标明讨论对象。近期热议：王信书法作品拍卖、王信新书发布会。
+      </div>
+    </div>
+
+    <!-- 结果 5：某教育网站 -->
+    <div class="result">
+      <a class="title" href="#">王信 个人简介 - 某某教育人物网</a>
+      <div class="meta">
+        <span class="source">某某教育人物网</span>
+        <span>2024-10-30</span>
+      </div>
+      <div class="snippet">
+        王信，现任青岚第一高级中学校长，中学高级教师，长期从事中学德育与心理健康教育工作，曾主持多项省级课题。任校长期间推动学校心理咨询室建设与心理健康课程常态化。
+      </div>
+    </div>
+
+    <div class="related">
+      <h4>相关搜索</h4>
+      <div class="tags">
+        <span>王信 书法家</span>
+        <span>王信 作家</span>
+        <span>青岚一高 王信</span>
+        <span>王信 心理咨询室</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 视图 2：新闻详情 -->
+<div class="detail-view" id="detailView">
+  <div class="detail-back" onclick="backToList()">‹ 返回搜索结果</div>
+  <h1 class="detail-title">青岚一高校长王信就学校心理咨询室的建成发表意见</h1>
+  <div class="detail-meta">
+    <span class="source official">青岚一高官网</span>
+    <span>2024-12-27</span>
+    <span>来源：学校信息中心</span>
+  </div>
+  <div class="detail-body">
+    <p>2024年12月27日，青岚第一高级中学心理咨询室正式建成并投入使用。校长王信出席建成仪式并发表讲话，学校相关处室负责人、心理健康教研组教师及学生代表参加。</p>
+
+    <p>王信在讲话中指出，学生心理健康是学校育人工作的重要组成部分。近年来，青岚一高始终坚持“以人为本、全面发展”的办学理念，把心理健康教育纳入学校整体育人体系，心理咨询室的建成，是学校在心理健康教育方面迈出的重要一步。</p>
+
+    <p>王信表示，学校不应只在出现问题时才想起心理教育，而应把它融入到日常教学、班级管理与家校沟通中，让求助成为一件平常的事。他希望同学们不要把走进心理咨询室看作一件“特殊的事”，遇到困惑、压力、情绪波动时，可以主动寻求帮助。</p>
+
+    <p>据了解，心理咨询室位于行政楼二层，设有接待区、个体咨询室与放松区，由专职心理健康教师负责日常运行。咨询室面向全校学生免费开放，咨询内容严格保密，学生可通过班主任、心理委员或直接到访等方式预约。</p>
+
+    <p>王信最后强调，学校将继续完善心理健康教育的课程、活动与危机干预机制，让每一位同学都能在青岚一高被看见、被理解、被支持。</p>
+
+    <div class="detail-sign">青岚第一高级中学信息中心<br>2024年12月27日</div>
+  </div>
+</div>
+
+<script>
+  function showDetail() {
+    document.getElementById('listView').style.display = 'none';
+    document.getElementById('detailView').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+  function backToList() {
+    document.getElementById('detailView').style.display = 'none';
+    document.getElementById('listView').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+</script>
+</body>
+</html>

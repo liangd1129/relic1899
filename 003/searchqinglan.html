@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>青岚第一高级中学_千度搜索</title>
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #fff;
+    color: #222;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .close-btn {
+    position: fixed;
+    top: calc(14px + var(--safe-top));
+    right: 16px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+    z-index: 100;
+  }
+
+  /* 顶部 */
+  .header {
+    padding: calc(18px + var(--safe-top)) 0 0 0;
+    border-bottom: 1px solid #eee;
+  }
+  .header-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 20px;
+  }
+  .baidu-logo {
+    font-size: 30px;
+    font-weight: 700;
+    color: #306eff;
+    letter-spacing: -1px;
+  }
+
+  /* 导航 */
+  .nav {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 28px;
+    margin-top: 14px;
+    font-size: 14px;
+    color: #626675;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav span {
+    padding-bottom: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .nav .active {
+    color: #222;
+    font-weight: 500;
+    border-bottom: 2px solid #4e6ef2;
+  }
+
+  /* 结果区 */
+  .results {
+    max-width: 720px;
+    margin: 20px auto 60px;
+    padding: 0 20px;
+  }
+  .result-count {
+    color: #9195a3;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .result {
+    margin-bottom: 26px;
+  }
+  .result a.title {
+    font-size: 18px;
+    color: #2440b3;
+    text-decoration: none;
+    line-height: 1.4;
+    display: block;
+  }
+  .result a.title:hover { text-decoration: underline; }
+  .result .meta {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #9195a3;
+  }
+  .result .meta .source {
+    color: #0f7b0f;
+    margin-right: 8px;
+  }
+  .result .meta .source.official {
+    color: #ba5a00;
+  }
+  .result .snippet {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+  }
+
+  /* 相关搜索 */
+  .related { margin-top: 40px; }
+  .related h4 {
+    font-size: 15px;
+    color: #222;
+    margin-bottom: 14px;
+  }
+  .related .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .related .tags span {
+    background: #f4f6f9;
+    padding: 8px 14px;
+    border-radius: 18px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s;
+  }
+  .related .tags span:active { background: #e8ecf3; }
+
+  /* 右下角页码 */
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    right: 16px;
+    background: #ffffff;
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: .5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    z-index: 2147483000;
+    user-select: none;
+    pointer-events: none;
+  }
+  .page-indicator b {
+    color: #1d1d1f;
+    font-weight: 600;
+  }
+
+  /* 左下角返回按钮 —— 桌面端隐藏，仅手机端显示 */
+  .back-link {
+    display: none;
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 16px;
+    background: #ffffff;
+    color: #1d1d1f;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    text-decoration: none;
+    align-items: center;
+    gap: 6px;
+    z-index: 2147483000;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-link:hover { background: #f5f5f7; }
+
+  /* =========================================================
+     手机端适配（≤ 600px）
+     ========================================================= */
+  @media (max-width: 600px) {
+
+    /* ---------- 关闭按钮 ---------- */
+    .close-btn {
+      top: calc(8px + var(--safe-top));
+      right: 10px;
+      width: 28px; height: 28px;
+      font-size: 14px;
+    }
+
+    /* ---------- 顶部 ---------- */
+    .header { padding-top: calc(12px + var(--safe-top)); }
+    .header-inner {
+      padding: 0 16px;
+      padding-right: 46px; /* 给关闭按钮让位 */
+    }
+    .baidu-logo { font-size: 24px; }
+
+    /* ---------- 导航：横向可滑动 ---------- */
+    .nav {
+      padding: 0 16px;
+      gap: 20px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .nav span { padding-bottom: 8px; }
+
+    /* ---------- 结果区 ---------- */
+    .results {
+      margin: 16px auto 80px;
+      padding: 0 16px;
+    }
+    .result-count {
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+    .result { margin-bottom: 22px; }
+    .result a.title {
+      font-size: 16px;
+      line-height: 1.45;
+    }
+    .result .meta { font-size: 12px; margin-top: 5px; }
+    .result .snippet {
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin-top: 5px;
+    }
+
+    /* ---------- 相关搜索 ---------- */
+    .related { margin-top: 32px; }
+    .related h4 { font-size: 14px; margin-bottom: 12px; }
+    .related .tags { gap: 8px; }
+    .related .tags span {
+      padding: 7px 12px;
+      font-size: 12.5px;
+      border-radius: 16px;
+    }
+
+    /* ---------- 返回按钮：手机端显示 ---------- */
+    .back-link {
+      display: inline-flex;
+      bottom: calc(12px + var(--safe-bottom));
+      left: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+
+  /* =========================================================
+     底部页码微调（≤ 640px）—— 与其他页面保持一致
+     ========================================================= */
+  @media (max-width: 640px) {
+    .page-indicator {
+      bottom: calc(12px + var(--safe-bottom));
+      right: 10px;
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+  }
+
+  /* 超窄屏（≤ 360px） */
+  @media (max-width: 360px) {
+    .baidu-logo { font-size: 22px; }
+    .result a.title { font-size: 15px; }
+    .result .snippet { font-size: 13px; }
+    .nav { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 右下角页码 -->
+<div class="page-indicator"><b>8</b> / 27</div>
+
+<!-- 左下角返回（仅手机端显示） -->
+<a href="safari.html" class="back-link">← 返回Safari主页</a>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="baidu-logo">千度</div>
+  </div>
+  <div class="nav">
+    <span class="active">网页</span>
+    <span>AI+</span>
+    <span>资讯</span>
+    <span>图片</span>
+    <span>视频</span>
+    <span>贴吧</span>
+    <span>文库</span>
+    <span>更多</span>
+  </div>
+</div>
+
+<div class="results">
+  <div class="result-count">千度为您找到以下结果（共 15,700 条，用时 0.38 秒）</div>
+
+  <!-- 结果1：学校官网 -->
+  <div class="result">
+    <a class="title" target="_blank" href="qinglan-official.html">青岚第一高级中学 官方网站</a>
+    <div class="meta">
+      <span class="source official">官方</span>
+      <span>www.qinglan-high.com · 建校于1998年</span>
+    </div>
+    <div class="snippet">
+      青岚第一高级中学是省重点公办高中，省级示范性普通高中。学校秉承“明德笃学”校训，现有教学班48个，在校学生2400余人，教职工192人。首页设有学校概况、新闻动态、教学教研、德育园地、招生信息、校友之家等栏目。
+    </div>
+  </div>
+
+  <!-- 结果3：豆瓣酱小组 -->
+  <div class="result">
+    <a class="title" target="_blank" href="douban-qinglan.html">青岚第一高级中学小组</a>
+    <div class="meta">
+      <span class="source">豆瓣酱</span>
+      <span>成员 218人 · 最新发言 3天前</span>
+    </div>
+    <div class="snippet">
+      青岚一高校友聚集地，讨论校园生活、老师八卦、毕业回忆、高考经验。禁止广告、人身攻击，共建有温度的校友小组。热门话题：高三哪次月考最难、食堂新窗口测评、老校区拆建传闻……
+    </div>
+  </div>
+
+  <!-- 以下为其他相关搜索结果 -->
+  <div class="result">
+    <a class="title" href="#">青岚第一高级中学_千度百科</a>
+    <div class="meta">
+      <span class="source">千度百科</span>
+      <span>更新于 2026-03</span>
+    </div>
+    <div class="snippet">
+      青岚第一高级中学，简称“青岚一高”，位于市青岚区学府路89号，始建于1998年，2006年被评为省级示范性普通高中。学校占地面积120亩，建筑面积4.2万平方米，建有教学楼、实验楼、图书馆、体育馆等设施。
+    </div>
+  </div>
+
+  <div class="result">
+    <a class="title" href="#">青岚第一高级中学吧-千度贴吧</a>
+    <div class="meta">
+      <span class="source">千度贴吧</span>
+      <span>关注 1.2万 · 贴子 8.7万</span>
+    </div>
+    <div class="snippet">
+      本吧为青岚第一高级中学学生自主交流平台，分享校园趣事、吐槽食堂、求作业答案、找校友。吧规：禁止发布违反校规校纪内容，禁止恶意诋毁老师同学。
+    </div>
+  </div>
+
+  <div class="result">
+    <a class="title" href="#">2026年青岚第一高级中学录取分数线_中考频道</a>
+    <div class="meta">
+      <span class="source">中考网</span>
+      <span>2026-06-25</span>
+    </div>
+    <div class="snippet">
+      2026年青岚第一高级中学统招录取分数线为628分，指标生最低控制线592分。相比2025年统招线621分，上涨7分。计划招生800人，其中统招生240人，指标生560人。
+    </div>
+  </div>
+
+  <div class="result">
+    <a class="title" href="#">青岚第一高级中学 地址_电话_公交路线 - 千度地图</a>
+    <div class="meta">
+      <span class="source">千度地图</span>
+      <span>青岚区学府路89号</span>
+    </div>
+    <div class="snippet">
+      可乘坐公交12路、27路、89路至「青岚一高站」下车，步行200米即到。学校正门设有地下通道，高峰期请遵守交通规则，注意安全。
+    </div>
+  </div>
+
+  <div class="result">
+    <a class="title" href="#">青岚第一高级中学2026年公开招聘教师公告</a>
+    <div class="meta">
+      <span class="source">市人社局</span>
+      <span>2026-07-02</span>
+    </div>
+    <div class="snippet">
+      面向社会公开招聘高中教师15名，包括语文3人、数学2人、英语2人、物理2人、化学1人、生物1人、历史1人、地理1人、体育2人。报名时间7月10日-7月18日，采用网上报名方式。
+    </div>
+  </div>
+
+  <div class="related">
+    <h4>相关搜索</h4>
+    <div class="tags">
+      <span>青岚一高录取分数线2026</span>
+      <span>青岚第一高级中学官网</span>
+      <span>青岚一高校服</span>
+      <span>青岚一高中考招生</span>
+      <span>青岚第一高级中学地址</span>
+      <span>青岚一高老师名单</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

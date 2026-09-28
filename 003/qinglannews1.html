@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>关于2026年暑假新高三年级自主学习答疑活动安排的通知 - 青岚第一高级中学</title>
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f5f6f8;
+    color: #333;
+    line-height: 1.8;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .close-btn {
+    position: fixed;
+    top: calc(14px + var(--safe-top));
+    right: 16px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* 顶部导航 与官网统一 */
+  .header {
+    background: #0056b3;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: calc(0px + var(--safe-top)) 20px 0;
+    height: calc(70px + var(--safe-top));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .nav {
+    display: flex;
+    gap: 32px;
+  }
+  .nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 24px 0;
+    position: relative;
+    transition: color 0.2s;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .nav a:hover,
+  .nav a.active {
+    color: #ffd700;
+  }
+  .nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: #ffd700;
+    transition: width 0.2s;
+  }
+  .nav a:hover::after,
+  .nav a.active::after {
+    width: 100%;
+  }
+
+  /* 主体容器 */
+  .main {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 30px;
+  }
+  .main-col { flex: 1; min-width: 0; }
+  .side-col { width: 300px; flex-shrink: 0; }
+
+  /* 文章卡片 */
+  .article-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 40px 50px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 24px;
+  }
+  .article-title {
+    font-size: 26px;
+    font-weight: 600;
+    color: #222;
+    text-align: center;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .article-meta {
+    text-align: center;
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+  }
+  .article-content p {
+    margin-bottom: 16px;
+    text-indent: 2em;
+    font-size: 16px;
+    color: #333;
+  }
+  .article-footer {
+    margin-top: 40px;
+    text-align: right;
+    font-size: 15px;
+    color: #555;
+    line-height: 2;
+  }
+
+  /* 阅读原文链接 */
+  .read-original {
+    display: inline-block;
+    font-size: 14px;
+    color: #0056b3;
+    text-decoration: none;
+    margin-top: 8px;
+  }
+  .read-original:hover {
+    text-decoration: underline;
+  }
+
+  /* 侧边卡片 */
+  .side-card {
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+  .side-card-title {
+    background: #0056b3;
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .side-card-body {
+    padding: 16px 20px;
+  }
+  .side-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    background: #f0f5ff;
+    color: #0056b3;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: background 0.2s;
+    margin-bottom: 16px;
+  }
+  .side-btn:hover {
+    background: #0056b3;
+    color: #fff;
+  }
+  .news-list {
+    list-style: none;
+  }
+  .news-list li {
+    padding: 10px 0;
+    border-bottom: 1px dashed #eee;
+  }
+  .news-list li:last-child { border-bottom: none; }
+  .news-list a {
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .news-list a:hover {
+    color: #0056b3;
+  }
+
+  /* 底部 */
+  .footer {
+    background: #2c3e50;
+    color: #bdc3c7;
+    padding: 30px 20px;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .footer-info p {
+    margin-bottom: 6px;
+  }
+  .footer-copyright {
+    text-align: center;
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #3d566e;
+    font-size: 13px;
+    color: #95a5a6;
+  }
+
+  /* 右下角页码 */
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    right: 16px;
+    background: #ffffff;
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: .5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    z-index: 2147483000;
+    user-select: none;
+    pointer-events: none;
+  }
+  .page-indicator b {
+    color: #1d1d1f;
+    font-weight: 600;
+  }
+
+  /* 左下角返回按钮 —— 桌面端隐藏，仅手机端显示 */
+  .back-link {
+    display: none;
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 16px;
+    background: #ffffff;
+    color: #1d1d1f;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    text-decoration: none;
+    align-items: center;
+    gap: 6px;
+    z-index: 2147483000;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-link:hover { background: #f5f5f7; }
+
+  /* =========================================================
+     手机端适配（≤ 600px）
+     ========================================================= */
+  @media (max-width: 600px) {
+
+    /* ---------- 顶部：两行（logo + 导航滑动） ---------- */
+    .header-inner {
+      padding: calc(10px + var(--safe-top)) 14px 0;
+      padding-right: 46px; /* 给关闭按钮让位 */
+      height: auto;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .logo {
+      font-size: 18px;
+      padding-bottom: 4px;
+    }
+    .nav {
+      gap: 22px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav a {
+      font-size: 14px;
+      padding: 10px 0;
+    }
+
+    /* ---------- 主体：单列 ---------- */
+    .main {
+      flex-direction: column;
+      margin: 14px auto;
+      padding: 0 12px;
+      gap: 0;
+    }
+    .main-col { width: 100%; }
+    .side-col { width: 100%; }
+
+    /* ---------- 文章卡片 ---------- */
+    .article-card {
+      padding: 22px 18px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+    }
+    .article-title {
+      font-size: 19px;
+      margin-bottom: 10px;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .article-meta {
+      text-align: left;
+      font-size: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+    }
+    .article-content p {
+      font-size: 15px;
+      margin-bottom: 14px;
+      line-height: 1.85;
+    }
+    .article-footer {
+      margin-top: 28px;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    /* 阅读原文按钮 */
+    .read-original {
+      font-size: 14px;
+      padding: 6px 0;
+      display: inline-block;
+    }
+
+    /* ---------- 侧栏卡片 ---------- */
+    .side-card {
+      border-radius: 10px;
+      margin-bottom: 14px;
+    }
+    .side-card-title {
+      padding: 10px 16px;
+      font-size: 15px;
+    }
+    .side-card-body { padding: 14px 16px; }
+    .side-btn {
+      padding: 11px;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .news-list li { padding: 9px 0; }
+    .news-list a { font-size: 13.5px; }
+
+    /* ---------- 底部 ---------- */
+    .footer {
+      padding: 22px 14px calc(22px + var(--safe-bottom));
+      font-size: 13px;
+    }
+    .footer-inner {
+      flex-direction: column;
+      gap: 14px;
+    }
+    .footer-info p { font-size: 12.5px; }
+    .footer-copyright { font-size: 12px; }
+
+    /* ---------- 返回按钮：手机端显示 ---------- */
+    .back-link {
+      display: inline-flex;
+      bottom: calc(12px + var(--safe-bottom));
+      left: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+
+  /* =========================================================
+     底部页码微调（≤ 640px）—— 与其他页面保持一致
+     ========================================================= */
+  @media (max-width: 640px) {
+    .page-indicator {
+      bottom: calc(12px + var(--safe-bottom));
+      right: 10px;
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+  }
+
+  /* 超窄屏（≤ 360px） */
+  @media (max-width: 360px) {
+    .logo { font-size: 16px; }
+    .nav { gap: 18px; }
+    .nav a { font-size: 13px; }
+    .article-title { font-size: 17px; }
+    .article-content p { font-size: 14.5px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 右下角页码 -->
+<div class="page-indicator"><b>11</b> / 27</div>
+
+<!-- 左下角返回（仅手机端显示） -->
+<a href="searchqinglan.html" class="back-link">← 返回搜索结果</a>
+
+<!-- 顶部导航 -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo" onclick="location.href='qinglan-official.html'">青岚第一高级中学</div>
+    <div class="nav">
+      <a onclick="location.href='qinglan-official.html#home'">学校概况</a>
+      <a class="active" onclick="location.href='qinglan-official.html#news'">新闻动态</a>
+      <a onclick="location.href='qinglan-official.html#teach'">教学教研</a>
+      <a onclick="location.href='qinglan-official.html#moral'">德育园地</a>
+      <a onclick="location.href='qinglan-official.html#alumni'">教工通道</a>
+    </div>
+  </div>
+</div>
+
+<!-- 主体内容 -->
+<div class="main">
+  <div class="main-col">
+    <div class="article-card">
+      <h1 class="article-title">关于2026年暑假新高三年级自主学习答疑活动安排的通知</h1>
+      <div class="article-meta">发布时间：2026-07-10 　来源：教务处</div>
+
+      <div class="article-content">
+        <p>为做好高三学年衔接备考工作，帮助学生系统梳理学业重难点，提升复习效率，由学校研究决定，定于2026年7月13日起，组织2024级新高三年级开展校内自主学习与教师答疑活动。</p>
+        <p>本次活动坚持学生自愿参与原则，学校安排各科教师在岗值守，为学生提供现场答疑、学习指导等服务，同时开放教室、图书馆、自习室等学习场所与配套学习资源，为学生营造良好的暑期复习环境。</p>
+        <p>请各位同学合理安排作息时间，提前做好学习计划，按需参加活动。往返途中注意交通安全，做好个人防护。</p>
+        <p>特此通知。</p>
+      </div>
+
+      <a href="yuanwen.html" target="_blank" class="read-original">阅读原文</a>
+
+      <div class="article-footer">
+        <p>青岚第一高级中学教务处</p>
+        <p>2026年7月10日</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-col">
+    <div class="side-card">
+      <div class="side-card-title">新闻动态</div>
+      <div class="side-card-body">
+        <a href="qinglan-official.html#news" class="side-btn">返回全部新闻</a>
+        <ul class="news-list">
+          <li><a href="#">我校隆重举行2026年秋季开学典礼暨教师节表彰大会</a></li>
+          <li><a href="#">市教育局领导莅临我校检查2026年秋季开学工作</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="side-card">
+      <div class="side-card-title">相关推荐</div>
+      <div class="side-card-body">
+        <ul class="news-list">
+          <li><a href="#">2025-2026学年高三备考工作方案</a></li>
+          <li><a href="#">高三年级作息时间调整通知</a></li>
+          <li><a href="#">暑期自习室开放安排</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部 -->
+<div class="footer">
+  <div class="footer-inner">
+    <div class="footer-info">
+      <p>地址：青岚区学府路89号</p>
+      <p>电话：0371-12345678</p>
+      <p>邮箱：office@qinglan-high.com</p>
+      <p>邮编：450000</p>
+    </div>
+    <div class="footer-info">
+      <p>办公时间：周一至周五 8:00-17:30</p>
+      <p>招生咨询：0371-12345679</p>
+      <p>校友联络：0371-12345680</p>
+    </div>
+    <div class="footer-copyright">
+      版权所有 © 青岚第一高级中学  |  豫ICP备2020000000号  |  技术支持：学校信息中心
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

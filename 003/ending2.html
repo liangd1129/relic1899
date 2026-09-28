@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>住院记录 | 青岚市中心医院</title>
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f2f6f5;
+    color: #333;
+    line-height: 1.7;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: calc(40px + var(--safe-top)) 20px calc(120px + var(--safe-bottom));
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .container { max-width: 760px; margin: 0 auto; }
+  .page-head { text-align: center; margin-bottom: 26px; }
+  .page-head h1 { font-size: 24px; color: #2d5a4f; letter-spacing: 2px; margin-bottom: 6px; }
+  .page-head p { font-size: 13px; color: #8aa89e; letter-spacing: 1px; }
+
+  .record-card {
+    background: #fff;
+    border: 1px solid #d8e8e3;
+    border-radius: 10px;
+    padding: 32px 38px;
+    box-shadow: 0 4px 16px rgba(74,156,140,0.08);
+  }
+  .record-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed #e0ece8;
+    flex-wrap: wrap;
+  }
+  .record-head .record-tag {
+    background: #e8f2ef;
+    color: #2d5a4f;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 10px;
+  }
+  .record-head .record-title { font-size: 20px; font-weight: 600; color: #2d5a4f; }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    font-size: 14px;
+    table-layout: fixed;
+  }
+  .info-table td {
+    border: 1px solid #e0ece8;
+    padding: 10px 14px;
+    vertical-align: middle;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  .info-table td.lbl {
+    background: #f4f9f7;
+    color: #5a7d73;
+    width: 110px;
+    white-space: nowrap;
+  }
+  .info-table td.val { color: #333; }
+
+  .block { margin-bottom: 22px; }
+  .block:last-child { margin-bottom: 0; }
+  .block-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2d5a4f;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 3px solid #4a9c8c;
+    letter-spacing: 1px;
+  }
+  .block p {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.95;
+    margin-bottom: 8px;
+    text-indent: 2em;
+  }
+  .block p:last-child { margin-bottom: 0; }
+
+  .diagnosis-box {
+    background: #eef7f4;
+    border-left: 3px solid #4a9c8c;
+    border-radius: 4px;
+    padding: 16px 22px;
+    font-size: 15px;
+    color: #2d5a4f;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  .plan-list {
+    list-style: none;
+    counter-reset: plan;
+  }
+  .plan-list li {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.95;
+    padding: 8px 0 8px 32px;
+    position: relative;
+    counter-increment: plan;
+    border-bottom: 1px dashed #e8efec;
+  }
+  .plan-list li:last-child { border-bottom: none; }
+  .plan-list li::before {
+    content: counter(plan) ".";
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    color: #4a9c8c;
+    font-weight: 600;
+  }
+  .plan-list li .plan-tag {
+    display: inline-block;
+    background: #e8f2ef;
+    color: #2d5a4f;
+    font-size: 11px;
+    padding: 1px 8px;
+    border-radius: 8px;
+    margin-right: 6px;
+    vertical-align: 1px;
+  }
+
+  /* 右下角页码 */
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    right: 16px;
+    background: #ffffff;
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: .5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    z-index: 2147483000;
+    user-select: none;
+    pointer-events: none;
+  }
+  .page-indicator b { color: #1d1d1f; font-weight: 600; }
+
+  /* 底部按钮组：完成委托 + 重新选择 */
+  .bottom-actions {
+    position: fixed;
+    bottom: calc(18px + var(--safe-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 2147483001;
+  }
+  .bottom-actions .btn {
+    padding: 10px 28px;
+    border-radius: 24px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    font-family: inherit;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background .15s, transform .15s, box-shadow .15s;
+    white-space: nowrap;
+  }
+  .bottom-actions .btn-complete {
+    background: #4a9c8c;
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 14px rgba(74,156,140,0.35);
+  }
+  .bottom-actions .btn-complete:hover {
+    background: #3a8173;
+    transform: translateY(-2px);
+  }
+  .bottom-actions .btn-reselect {
+    background: #fff;
+    color: #2d5a4f;
+    border: 1px solid #4a9c8c;
+    box-shadow: 0 4px 14px rgba(74,156,140,0.12);
+  }
+  .bottom-actions .btn-reselect:hover {
+    background: #eef7f4;
+    transform: translateY(-2px);
+  }
+
+  /* ===== 开场从全黑渐渐浮现 ===== */
+  .intro-cover {
+    position: fixed;
+    inset: 0;
+    background: #000000;
+    z-index: 2147483600;
+    pointer-events: none;
+    animation: introFade 1.6s ease forwards;
+  }
+  @keyframes introFade {
+    0%   { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .intro-cover { animation-duration: .01s; }
+  }
+
+  /* =========================================================
+     手机端适配（≤ 600px）
+     ========================================================= */
+  @media (max-width: 600px) {
+
+    body {
+      padding: calc(56px + var(--safe-top)) 12px calc(120px + var(--safe-bottom));
+    }
+
+    .page-head { margin-bottom: 18px; }
+    .page-head h1 { font-size: 20px; letter-spacing: 1px; }
+    .page-head p { font-size: 12px; letter-spacing: 0.5px; }
+
+    .record-card { padding: 22px 18px; border-radius: 10px; }
+
+    .record-head {
+      gap: 10px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+    }
+    .record-head .record-tag { font-size: 11px; padding: 3px 10px; }
+    .record-head .record-title { font-size: 17px; }
+
+    .info-table { font-size: 12.5px; margin-bottom: 20px; }
+    .info-table td { padding: 7px 9px; line-height: 1.5; }
+    .info-table td.lbl { width: 74px; font-size: 12px; letter-spacing: 0; }
+
+    .block { margin-bottom: 18px; }
+    .block-title {
+      font-size: 13.5px;
+      margin-bottom: 10px;
+      padding-left: 8px;
+      letter-spacing: 0.5px;
+    }
+    .block p { font-size: 13.5px; line-height: 1.85; margin-bottom: 6px; }
+
+    .diagnosis-box { padding: 12px 16px; font-size: 14px; letter-spacing: 0.5px; }
+
+    .plan-list li {
+      font-size: 13.5px;
+      line-height: 1.85;
+      padding: 7px 0 7px 26px;
+    }
+    .plan-list li::before { left: 6px; top: 7px; }
+    .plan-list li .plan-tag { font-size: 10px; padding: 1px 6px; margin-right: 4px; }
+
+    /* 底部按钮组：手机端更紧凑 */
+    .bottom-actions {
+      bottom: calc(16px + var(--safe-bottom));
+      gap: 10px;
+    }
+    .bottom-actions .btn {
+      padding: 9px 22px;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .page-indicator {
+      bottom: calc(12px + var(--safe-bottom));
+      right: 10px;
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .page-head h1 { font-size: 18px; }
+    .page-head p { font-size: 11.5px; }
+    .record-card { padding: 18px 14px; }
+    .info-table { font-size: 12px; }
+    .info-table td { padding: 6px 8px; }
+    .info-table td.lbl { width: 66px; font-size: 11.5px; }
+    .block p { font-size: 13px; }
+    .plan-list li { font-size: 13px; padding-left: 24px; }
+    .bottom-actions .btn { padding: 8px 18px; font-size: 12.5px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 开场黑幕 -->
+<div class="intro-cover"></div>
+
+<!-- 右下角页码 -->
+<div class="page-indicator"><b>结局二</b></div>
+
+<!-- 底部按钮组：完成委托 + 重新选择 -->
+<div class="bottom-actions">
+  <button class="btn btn-reselect" onclick="reselect()">重新选择</button>
+  <button class="btn btn-complete" onclick="completeQuest()">完成委托</button>
+</div>
+
+<div class="container">
+  <div class="page-head">
+    <h1>住院记录</h1>
+    <p>青岚市中心医院 · 心理科</p>
+  </div>
+
+  <div class="record-card">
+
+    <div class="record-head">
+      <span class="record-tag">住院记录</span>
+      <span class="record-title">朱知</span>
+    </div>
+
+    <table class="info-table">
+      <tr>
+        <td class="lbl">住院号</td>
+        <td class="val" id="admitNo">ZY20260000-028</td>
+        <td class="lbl">入院日期</td>
+        <td class="val" id="admitDate">—</td>
+      </tr>
+      <tr>
+        <td class="lbl">患者姓名</td>
+        <td class="val">朱知</td>
+        <td class="lbl">性别 / 年龄</td>
+        <td class="val">女 / 17 岁</td>
+      </tr>
+      <tr>
+        <td class="lbl">住院科室</td>
+        <td class="val">心理科</td>
+        <td class="lbl">护理等级</td>
+        <td class="val">二级护理</td>
+      </tr>
+      <tr>
+        <td class="lbl">联系电话</td>
+        <td class="val">1678820305</td>
+        <td class="lbl">陪护</td>
+        <td class="val">母亲</td>
+      </tr>
+    </table>
+
+    <div class="block">
+      <div class="block-title">现病史</div>
+      <p>患者近一月无明显诱因出现情绪低落，兴趣减退，夜间入睡困难，早醒，白天精神差，注意力不集中，学习效率明显下降。食欲减退，进食量减少，体重有所下降。患者自述最近常常觉得忘记了一些重要的事，但说不清是什么，也说不出具体时间和经过。</p>
+      <p>家属述患者近期情绪波动较大，偶有突然沉默、发呆，问及原因不愿多谈。无明显自伤、自杀意念。由家属陪同来院就诊，门诊以“情绪障碍”收入院。</p>
+    </div>
+
+    <div class="block">
+      <div class="block-title">既往史</div>
+      <p>既往有脑震荡病史，否认其他重大疾病史，否认药物过敏史，否认精神疾病家族史。</p>
+    </div>
+
+    <div class="block">
+      <div class="block-title">体格检查</div>
+      <p>神志清楚，精神萎靡，面色偏黄，眼周可见色素沉着。形体偏瘦，皮下脂肪层偏薄。心肺腹查体未见明显异常，神经系统查体未见阳性体征。</p>
+    </div>
+
+    <div class="block">
+      <div class="block-title">初步诊断</div>
+      <div class="diagnosis-box">情绪障碍</div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">诊疗计划</div>
+      <ol class="plan-list">
+        <li><span class="plan-tag">入院当日</span>办理入院手续，二级护理，安排床位，评估入院时情绪、睡眠、进食情况。</li>
+        <li><span class="plan-tag">入院当日</span>完善血常规、生化、甲状腺功能、心电图等入院常规检查。</li>
+        <li><span class="plan-tag">入院当日</span>予支持性心理治疗，安抚情绪，嘱家属加强陪护，密切观察情绪变化。</li>
+        <li><span class="plan-tag">入院当日</span>根据情况予情绪稳定药物，剂量由主管医生根据病情调整。</li>
+        <li><span class="plan-tag">后续</span>动态评估情绪及睡眠改善情况，必要时请精神科会诊。</li>
+      </ol>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  (function() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const mo = d.getMonth() + 1;
+    const day = d.getDate();
+
+    const mmdd = String(mo).padStart(2, '0') + String(day).padStart(2, '0');
+
+    const dateStr = y + '-' +
+      String(mo).padStart(2, '0') + '-' +
+      String(day).padStart(2, '0');
+    document.getElementById('admitDate').textContent = dateStr;
+
+    const no = 'ZY' + y + mmdd + '-028';
+    document.getElementById('admitNo').textContent = no;
+  })();
+
+  // ===== 完成委托 =====
+  function completeQuest() {
+    let completed = JSON.parse(localStorage.getItem('caseCompleted')) || [false, false, false];
+    completed[2] = true;
+    localStorage.setItem('caseCompleted', JSON.stringify(completed));
+    window.location.href = '../index.html';
+  }
+
+  // ===== 重新选择：回到编辑短信页面 =====
+  function reselect() {
+    window.location.href = 'ending.html';
+  }
+</script>
+
+</body>
+</html>

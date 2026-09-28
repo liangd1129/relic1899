@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>新建信息</title>
+<style>
+  :root {
+    --menubar-h: 28px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  html, body {
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f5f5f7;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.4s ease;
+    z-index: 9999;
+  }
+  body.fading::after { opacity: 1; }
+  body.fading-white::after { background: #fff; opacity: 1; }
+
+  .menubar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: calc(var(--menubar-h) + var(--safe-top));
+    padding: var(--safe-top) 12px 0;
+    background: rgba(245, 245, 247, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    z-index: 10000;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    user-select: none;
+  }
+  .menubar .apple-logo {
+    width: 18px; height: 18px;
+    margin-right: 16px;
+    fill: #1d1d1f;
+    flex-shrink: 0;
+  }
+  .menubar .menu-item {
+    padding: 0 12px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: #1d1d1f;
+    white-space: nowrap;
+  }
+  .menubar .menu-item.bold { font-weight: 700; }
+  .menubar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #1d1d1f;
+    white-space: nowrap;
+  }
+  .menubar-right svg { width: 18px; height: 18px; fill: #1d1d1f; opacity: 0.9; flex-shrink: 0; }
+
+  .app-container {
+    position: fixed;
+    top: calc(var(--menubar-h) + var(--safe-top));
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    background: #fff;
+  }
+
+  .sidebar {
+    width: 280px;
+    background: rgba(250, 250, 252, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .close-btn {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #ff5f57;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .close-btn:hover { background: #ff3b30; }
+  .min-btn {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #febc2e;
+    border: none;
+    flex-shrink: 0;
+  }
+  .zoom-btn {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #28c840;
+    border: none;
+    flex-shrink: 0;
+  }
+  .conversation-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .conversation {
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    cursor: default;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .conv-info { flex: 1; min-width: 0; }
+  .conv-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .conv-preview {
+    font-size: 12px;
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .conv-time { font-size: 11px; opacity: 0.5; flex-shrink: 0; }
+
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    min-width: 0;
+  }
+
+  .chat-header {
+    position: relative;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    text-align: center;
+    background: rgba(245, 245, 247, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-shrink: 0;
+  }
+  .chat-header-name { font-weight: 600; font-size: 14px; color: #1d1d1f; }
+  .chat-header-status { color: #86868b; margin-top: 2px; font-size: 12px; }
+
+  /* 返回按钮：只在手机端显示，桌面端隐藏（桌面端有侧边栏关闭按钮） */
+  .chat-back {
+    display: none;
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    color: #007aff;
+  }
+  .chat-back:active { background: rgba(0,122,255,0.1); }
+  .chat-back svg {
+    width: 20px; height: 20px;
+    fill: currentColor;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px;
+    background: #f5f5f7;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .chat-hint {
+    margin: auto;
+    color: #c7c7cc;
+    font-size: 13px;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .sent-bubble {
+    align-self: flex-end;
+    max-width: 82%;
+    background: #007aff;
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.9;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    animation: bubbleIn 0.35s ease-out;
+  }
+  @keyframes bubbleIn {
+    from { transform: translateY(24px) scale(0.85); opacity: 0; }
+    60%  { transform: translateY(0) scale(1.02); opacity: 1; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  .sent-bubble p {
+    margin-bottom: 10px;
+  }
+  .sent-bubble p:last-child { margin-bottom: 0; }
+
+  /* 强制覆盖 .blank.filled 的蓝色文字 */
+  .sent-bubble .blank,
+  .sent-bubble .blank.filled {
+    display: inline !important;
+    background: transparent !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    cursor: default !important;
+    font-size: inherit !important;
+  }
+
+  .chat-input-area {
+    padding: 14px 20px calc(18px + var(--safe-bottom));
+    border-top: 1px solid rgba(0,0,0,0.08);
+    background: #fff;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-shrink: 0;
+    position: relative;
+    transition: opacity 0.3s ease;
+  }
+  .chat-input-area.hide {
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .compose-input {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    max-height: 260px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 11px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.15);
+    font-size: 15px;
+    line-height: 1.9;
+    outline: none;
+    background: #f5f5f7;
+    color: #1d1d1f;
+  }
+  .compose-input p {
+    margin-bottom: 10px;
+  }
+  .compose-input p:last-child { margin-bottom: 0; }
+
+  .blank {
+    display: inline-block;
+    min-width: 52px;
+    padding: 2px 8px;
+    margin: 0 2px;
+    border-radius: 6px;
+    background: #e8e8ed;
+    border: 1px dashed #c7c7cc;
+    color: #86868b;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+    vertical-align: 1px;
+  }
+  .blank:hover { background: #dcdce1; }
+  .blank.filled {
+    background: rgba(0,122,255,0.12);
+    color: #007aff;
+    border: 1px solid rgba(0,122,255,0.35);
+    font-weight: 600;
+  }
+
+  .send-arrow {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: #007aff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    border: none;
+    margin-bottom: 5px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .send-arrow:hover { background: #0066d6; }
+  .send-arrow:active { transform: scale(0.92); }
+  .send-arrow svg { width: 18px; height: 18px; fill: #fff; }
+
+  .picker {
+    position: absolute;
+    left: 280px; right: 0; bottom: 0;
+    background: #f5f5f7;
+    border-top: 1px solid #d1d1d6;
+    padding: 16px 20px calc(22px + var(--safe-bottom));
+    transform: translateY(110%);
+    transition: transform 0.25s ease;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+  .picker.show { transform: translateY(0); }
+  .picker-title {
+    font-size: 12px;
+    color: #86868b;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .picker-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .picker-option {
+    padding: 9px 22px;
+    background: #fff;
+    border-radius: 18px;
+    font-size: 14px;
+    color: #007aff;
+    cursor: pointer;
+    border: 1px solid #e5e5ea;
+    transition: all 0.15s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .picker-option:hover {
+    background: #007aff;
+    color: #fff;
+    border-color: #007aff;
+  }
+
+  .toast {
+    position: absolute;
+    left: 50%;
+    bottom: 84px;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(0,0,0,0.78);
+    color: #fff;
+    font-size: 13px;
+    padding: 9px 20px;
+    border-radius: 18px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 200;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* =========================================================
+     手机端适配（≤ 600px）
+     ========================================================= */
+  @media (max-width: 600px) {
+
+    /* ---------- 菜单栏精简 ---------- */
+    .menubar .hide-on-mobile { display: none !important; }
+    .menubar {
+      font-size: 13px;
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+    .menubar .apple-logo { margin-right: 10px; width: 16px; height: 16px; }
+    .menubar .menu-item { padding: 0 8px; }
+    .menubar-right { font-size: 12px; gap: 8px; }
+    .menubar-right svg { width: 16px; height: 16px; }
+
+    /* ---------- 侧边栏隐藏 ---------- */
+    .sidebar { display: none; }
+
+    /* ---------- 返回按钮显示 ---------- */
+    .chat-back { display: inline-flex; }
+
+    /* ---------- 聊天头部：居中标题 + 左侧返回 ---------- */
+    .chat-header { padding: 12px 46px; }
+
+    /* ---------- 聊天消息区 ---------- */
+    .chat-messages {
+      padding: 16px 14px;
+      gap: 10px;
+    }
+    .chat-hint { font-size: 12.5px; }
+
+    .sent-bubble {
+      max-width: 84%;
+      font-size: 14.5px;
+      padding: 11px 14px;
+      line-height: 1.85;
+    }
+
+    /* ---------- 输入区：底部加安全区 ---------- */
+    .chat-input-area {
+      padding: 10px 14px calc(12px + var(--safe-bottom));
+      gap: 8px;
+    }
+    .compose-input {
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 16px; /* 防 iOS 聚焦自动放大 */
+      line-height: 1.85;
+      max-height: 40vh;
+    }
+
+    /* ---------- 填空按钮：手机上触控区域更大 ---------- */
+    .blank {
+      min-width: 48px;
+      padding: 3px 10px;
+      font-size: 14px;
+      margin: 0 3px;
+    }
+
+    /* ---------- 发送按钮 ---------- */
+    .send-arrow {
+      width: 36px; height: 36px;
+      margin-bottom: 2px;
+    }
+    .send-arrow svg { width: 17px; height: 17px; }
+
+    /* ---------- Picker：铺满底部 + 安全区 ---------- */
+    .picker {
+      left: 0;
+      padding: 16px 16px calc(20px + var(--safe-bottom));
+    }
+    .picker-title { font-size: 12px; margin-bottom: 10px; }
+    .picker-options { gap: 8px; }
+    .picker-option {
+      padding: 10px 18px;
+      font-size: 14px;
+      border-radius: 20px;
+    }
+
+    /* ---------- Toast：位置抬高，避开输入区 ---------- */
+    .toast {
+      bottom: calc(84px + var(--safe-bottom));
+      font-size: 12.5px;
+      padding: 8px 18px;
+    }
+  }
+
+  /* =========================================================
+     超窄屏（≤ 360px）
+     ========================================================= */
+  @media (max-width: 360px) {
+    .menubar { font-size: 12px; padding-left: 10px; padding-right: 10px; }
+    .menubar .menu-item { padding: 0 6px; }
+    .chat-header { padding: 10px 42px; }
+    .chat-messages { padding: 14px 12px; }
+    .sent-bubble { font-size: 14px; padding: 10px 13px; }
+    .compose-input { padding: 9px 12px; }
+    .blank { min-width: 42px; padding: 3px 8px; font-size: 13.5px; }
+    .picker-option { padding: 9px 14px; font-size: 13.5px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="menubar">
+    <svg class="apple-logo" viewBox="0 0 24 24">
+      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+    </svg>
+    <span class="menu-item bold">信息</span>
+    <span class="menu-item hide-on-mobile">文件</span>
+    <span class="menu-item hide-on-mobile">编辑</span>
+    <span class="menu-item hide-on-mobile">对话</span>
+    <span class="menu-item hide-on-mobile">窗口</span>
+    <span class="menu-item hide-on-mobile">帮助</span>
+    <div class="menubar-right">
+      <svg class="hide-on-mobile" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      <svg class="hide-on-mobile" viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <span id="menutime"></span>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <button class="close-btn" onclick="location.href='zhuomian.html'" title="关闭"></button>
+        <button class="min-btn"></button>
+        <button class="zoom-btn"></button>
+      </div>
+      <div class="conversation-list">
+        <div class="conversation active">
+          <div class="avatar" style="background: linear-gradient(135deg,#FF6B6B,#ee5a24);">未</div>
+          <div class="conv-info">
+            <div class="conv-name">未知用户</div>
+            <div class="conv-preview" id="convPreview">正在编辑...</div>
+          </div>
+          <div class="conv-time" id="convTime">上午</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-area">
+      <div class="chat-header">
+        <button class="chat-back" onclick="location.href='zhuomian.html'" aria-label="返回">
+          <svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <div class="chat-header-name">未知用户</div>
+        <div class="chat-header-status">1673994233</div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-hint" id="chatHint">在下方输入框里编辑短信</div>
+      </div>
+
+      <div class="chat-input-area" id="inputArea">
+        <div class="compose-input" id="composeInput">
+          <p>你好，朱知女士。</p>
+          <p>就你之前给我的委托，现在结果已经出来了。抱歉让你等了这么久——有些事情，我需要反复确认，才敢告诉你。</p>
+          <p>合照中消失的她，真实存在。她的名字是 <span class="blank" data-q="q1">填写</span>，她和你的关系是 <span class="blank" data-q="q2">填写</span>。</p>
+          <p>至于她是否去世的问题，我会在下面说清楚。接下来的内容具有一定冲击力。出于被委托人的角度，我希望你做好了准备。</p>
+          <p>你在学校问了那么多同学，为什么一开始没人愿意告诉你？因为他们被叮嘱过，不要告诉你真相。</p>
+          <p>那天是 <span class="blank" data-q="q3">填写</span>，她由于成绩下滑与对自己较为严厉导致学业压力过大，难以承受决定一死了之。她前往无人的教学楼楼顶，而你也跟了上去。再之后我不知道现场发生了什么，但她选择一跃而下，而你选择 <span class="blank" data-q="q4">填写</span>，最后你们双双坠楼。</p>
+          <p>她经抢救无效身亡，而你忘记了这一切。</p>
+        </div>
+        <button class="send-arrow" onclick="sendMessage()" title="发送">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+
+        <div class="toast" id="toast">请编辑完成短信</div>
+      </div>
+    </div>
+
+    <div class="picker" id="picker">
+      <div class="picker-title" id="pickerTitle">请选择</div>
+      <div class="picker-options" id="pickerOptions"></div>
+    </div>
+  </div>
+
+<script>
+  const correctAnswers = {
+    q1: '袁蝶',
+    q2: '最好的朋友',
+    q3: '7月28日',
+    q4: '拉住她'
+  };
+
+  const optionMap = {
+    q1: ['孙浔', '袁蝶', '吴晓', '王信'],
+    q2: ['最好的朋友', '同班同学', '只是路人'],
+    q3: ['7月27日', '7月28日', '8月27日', '9月28日'],
+    q4: ['拉住她', '喊人', '跑开']
+  };
+
+  const userAnswers = { q1: '', q2: '', q3: '', q4: '' };
+
+  const picker = document.getElementById('picker');
+  const pickerTitle = document.getElementById('pickerTitle');
+  const pickerOptions = document.getElementById('pickerOptions');
+  const toast = document.getElementById('toast');
+
+  document.querySelectorAll('.blank').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      showPicker(el.dataset.q, el);
+    });
+  });
+
+  picker.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+
+  document.addEventListener('click', function() {
+    hidePicker();
+  });
+
+  function showPicker(q, el) {
+    const opts = optionMap[q];
+    pickerTitle.textContent = '请选择';
+    pickerOptions.innerHTML = '';
+    opts.forEach(function(opt) {
+      const btn = document.createElement('div');
+      btn.className = 'picker-option';
+      btn.textContent = opt;
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        userAnswers[q] = opt;
+        el.textContent = opt;
+        el.classList.add('filled');
+        hidePicker();
+      });
+      pickerOptions.appendChild(btn);
+    });
+    picker.classList.add('show');
+  }
+
+  function hidePicker() {
+    picker.classList.remove('show');
+  }
+
+  let toastTimer = null;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() {
+      toast.classList.remove('show');
+    }, 1800);
+  }
+
+  function sendMessage() {
+    for (var k in userAnswers) {
+      if (!userAnswers[k]) {
+        showToast('请编辑完成短信');
+        return;
+      }
+    }
+
+    hidePicker();
+
+    var correctCount = 0;
+    for (var k in correctAnswers) {
+      if (userAnswers[k] === correctAnswers[k]) correctCount++;
+    }
+
+    var isAllCorrect = (correctCount === 4);
+    var target = isAllCorrect ? 'ending1.html' : 'ending2.html';
+
+    playSendAnimation(target, isAllCorrect);
+  }
+
+  function playSendAnimation(target, isAllCorrect) {
+    var chatMessages = document.getElementById('chatMessages');
+    var chatHint = document.getElementById('chatHint');
+    var inputArea = document.getElementById('inputArea');
+    var composeInput = document.getElementById('composeInput');
+    var convPreview = document.getElementById('convPreview');
+    var convTime = document.getElementById('convTime');
+
+    inputArea.classList.add('hide');
+    if (chatHint) chatHint.style.display = 'none';
+
+    // 复制前先把填空文字显式刷新
+    composeInput.querySelectorAll('.blank').forEach(function(el) {
+      var q = el.dataset.q;
+      if (userAnswers[q]) {
+        el.textContent = userAnswers[q];
+      }
+    });
+
+    var bubble = document.createElement('div');
+    bubble.className = 'sent-bubble';
+    bubble.innerHTML = composeInput.innerHTML;
+    chatMessages.appendChild(bubble);
+
+    if (convPreview) convPreview.textContent = '你好，朱知女士。就你之前给我的委托...';
+    if (convTime) convTime.textContent = '刚刚';
+
+    setTimeout(function() {
+      if (isAllCorrect) {
+        document.body.classList.add('fading-white');
+      } else {
+        document.body.classList.add('fading');
+      }
+    }, 900);
+
+    setTimeout(function() {
+      location.href = target;
+    }, 2500);
+  }
+
+  function updateTime() {
+    const now = new Date();
+    const days = ['周日','周一','周二','周三','周四','周五','周六'];
+    const day = days[now.getDay()];
+    const h = now.getHours();
+    const m = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('menutime').textContent = `${day} ${h}:${m}`;
+  }
+  updateTime();
+  setInterval(updateTime, 1000);
+</script>
+
+</body>
+</html>

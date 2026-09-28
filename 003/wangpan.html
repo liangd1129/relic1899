@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>千度网盘 - 我的文件</title>
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f4f6f9;
+    min-height: 100vh;
+    min-height: 100dvh;
+    color: #1f2d3d;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .close-btn {
+    position: fixed;
+    top: calc(18px + var(--safe-top));
+    right: 20px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+    z-index: 100;
+  }
+  .close-btn:hover { background: rgba(0,0,0,0.15); }
+
+  .top-bar {
+    background: #fff;
+    padding: calc(18px + var(--safe-top)) 40px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eef0f3;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #4e6ef2 0%, #6a5af9 100%);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 20px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .logo-text { font-size: 22px; font-weight: 600; color: #1f2d3d; }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 28px 40px 60px;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #5e6d82;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .breadcrumb .crumb-link {
+    color: #4e6ef2;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .breadcrumb .crumb-link:hover { text-decoration: underline; }
+  .breadcrumb .crumb-sep { color: #c0c6d0; }
+  .breadcrumb .crumb-current { color: #1f2d3d; }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 4px;
+    gap: 10px;
+  }
+  .toolbar-title { font-size: 16px; font-weight: 600; color: #1f2d3d; }
+  .toolbar-count { font-size: 13px; color: #8a94a6; }
+
+  .file-list {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #eef0f3;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(31,45,61,0.04);
+  }
+  .file-list-header {
+    display: flex;
+    padding: 14px 22px;
+    background: #fafbfc;
+    font-size: 13px;
+    color: #8a94a6;
+    border-bottom: 1px solid #eef0f3;
+  }
+  .file-list-header .col-name { flex: 1; }
+  .file-list-header .col-date { width: 150px; text-align: right; padding-right: 40px; }
+  .file-list-header .col-type { width: 110px; }
+  .file-list-header .col-size { width: 110px; text-align: right; }
+
+  .file-row {
+    display: flex;
+    align-items: center;
+    padding: 16px 22px;
+    border-bottom: 1px solid #f2f4f8;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .file-row:last-child { border-bottom: none; }
+  .file-row:hover { background: #fafbfc; }
+  .file-row .col-name {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #1f2d3d;
+    min-width: 0;
+  }
+  .file-row .col-name > span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .file-row .col-date {
+    width: 150px;
+    text-align: right;
+    color: #8a94a6;
+    font-size: 13px;
+    padding-right: 40px;
+    flex-shrink: 0;
+  }
+  .file-row .col-type { width: 110px; color: #8a94a6; font-size: 13px; flex-shrink: 0; }
+  .file-row .col-size { width: 110px; text-align: right; color: #8a94a6; font-size: 13px; flex-shrink: 0; }
+
+  .folder-icon {
+    width: 32px; height: 26px;
+    background: linear-gradient(160deg, #f7c96b, #e8a93c);
+    border-radius: 4px;
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(232,169,60,0.25);
+  }
+  .folder-icon::before {
+    content: '';
+    position: absolute;
+    top: -4px; left: 3px;
+    width: 14px; height: 6px;
+    background: linear-gradient(160deg, #f7c96b, #e8a93c);
+    border-radius: 3px 3px 0 0;
+  }
+
+  .file-icon {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .file-icon.img { background: #e8f0fe; color: #4e6ef2; }
+  .file-icon.txt { background: #f0f4f9; color: #5e6d82; }
+
+  .empty-tip {
+    padding: 70px 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #aab2c0;
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #eef0f3;
+    box-shadow: 0 4px 24px rgba(31,45,61,0.04);
+  }
+
+  .preview-mask {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 20, 35, 0.82);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .preview-mask.show { display: flex; }
+
+  .preview-close {
+    position: fixed;
+    top: calc(18px + var(--safe-top));
+    right: 20px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 17px;
+    color: #333;
+    z-index: 2100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    transition: background .2s;
+  }
+  .preview-close:hover { background: #fff; }
+
+  .preview-box {
+    background: transparent;
+    border-radius: 0;
+    max-width: 96vw;
+    width: auto;
+    max-height: 96vh;
+    overflow: visible;
+    position: relative;
+    padding: 0;
+    box-shadow: none;
+  }
+  .preview-title { display: none; }
+
+  .flip-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    gap: 0;
+  }
+  .flip-card {
+    width: 360px;
+    height: 480px;
+    perspective: 1200px;
+    cursor: pointer;
+    position: relative;
+    transition: width 0.15s ease, height 0.15s ease;
+  }
+  .flip-inner {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.9s cubic-bezier(0.4, 0.0, 0.2, 1);
+    position: relative;
+  }
+  .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip-front, .flip-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .flip-front {
+    background: #f0ede6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .flip-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .flip-front-placeholder {
+    font-size: 13px;
+    color: #aab2c0;
+    text-align: center;
+    line-height: 2;
+    padding: 20px;
+  }
+  .flip-back {
+    background: #fdfaf2;
+    transform: rotateY(180deg);
+    padding: 30px 34px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 18px;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 27px,
+        rgba(200, 180, 140, 0.15) 27px,
+        rgba(200, 180, 140, 0.15) 28px
+      );
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .handwriting { line-height: 1.9; font-size: 16px; }
+  .handwriting-zhu {
+    font-family: "楷体", "KaiTi", "STKaiti", "华文楷体", serif;
+    color: #2a2a2a;
+    transform: rotate(-1.2deg);
+    padding-left: 6px;
+  }
+  .handwriting-zhu .sig {
+    display: block;
+    text-align: right;
+    margin-top: 6px;
+    font-size: 14px;
+    color: #4a4a4a;
+  }
+  .handwriting-yuan {
+    font-family: "华文行楷", "STXingkai", "楷体", "KaiTi", cursive;
+    color: #5a3a7a;
+    transform: rotate(1.5deg);
+    padding-right: 6px;
+  }
+  .handwriting-yuan .sig {
+    display: block;
+    text-align: right;
+    margin-top: 6px;
+    font-size: 15px;
+    color: #6a4a8a;
+  }
+
+  /* 右下角页码 */
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    right: 16px;
+    background: #ffffff;
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: .5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    z-index: 2147483000;
+    user-select: none;
+    pointer-events: none;
+  }
+  .page-indicator b { color: #1d1d1f; font-weight: 600; }
+
+  /* 左下角返回按钮 */
+  .back-link {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 16px;
+    background: #ffffff;
+    color: #1d1d1f;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 2147483000;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-link:hover { background: #f5f5f7; }
+
+  /* =========================================================
+     手机端适配（≤ 600px）
+     ========================================================= */
+  @media (max-width: 600px) {
+
+    /* ---------- 关闭按钮 ---------- */
+    .close-btn {
+      top: calc(8px + var(--safe-top));
+      right: 10px;
+      width: 28px; height: 28px;
+      font-size: 14px;
+    }
+
+    /* ---------- 顶栏 ---------- */
+    .top-bar {
+      padding: calc(12px + var(--safe-top)) 16px 12px;
+      padding-right: 46px; /* 给关闭按钮让位 */
+    }
+    .logo-icon { width: 30px; height: 30px; font-size: 17px; border-radius: 8px; }
+    .logo-text { font-size: 17px; }
+
+    /* ---------- 容器 ---------- */
+    .container {
+      padding: 16px 12px calc(80px + var(--safe-bottom));
+    }
+
+    /* ---------- 面包屑 ---------- */
+    .breadcrumb {
+      font-size: 13px;
+      margin-bottom: 14px;
+      gap: 6px;
+    }
+
+    /* ---------- 工具栏 ---------- */
+    .toolbar {
+      margin-bottom: 12px;
+      padding: 0 2px;
+    }
+    .toolbar-title { font-size: 15px; }
+    .toolbar-count { font-size: 12px; }
+
+    /* ---------- 文件列表 ---------- */
+    .file-list {
+      border-radius: 12px;
+    }
+    .file-list-header {
+      padding: 12px 16px;
+      font-size: 12px;
+    }
+    /* 手机上隐藏日期、类型、大小列，只保留名称 */
+    .file-list-header .col-date,
+    .file-list-header .col-type,
+    .file-list-header .col-size,
+    .file-row .col-date,
+    .file-row .col-type,
+    .file-row .col-size {
+      display: none;
+    }
+    .file-row {
+      padding: 14px 16px;
+      font-size: 14px;
+    }
+    .file-row .col-name { gap: 10px; }
+    .folder-icon { width: 28px; height: 22px; }
+    .folder-icon::before { width: 12px; height: 5px; }
+    .file-icon { width: 28px; height: 28px; font-size: 14px; }
+
+    .empty-tip {
+      padding: 50px 16px;
+      font-size: 13px;
+      border-radius: 12px;
+    }
+
+    /* ---------- 预览弹窗 ---------- */
+    .preview-mask {
+      padding: 60px 14px calc(30px + var(--safe-bottom));
+    }
+    .preview-close {
+      top: calc(10px + var(--safe-top));
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      font-size: 16px;
+    }
+    .preview-box { max-width: 100vw; }
+
+    /* 翻转卡片手机端默认尺寸（会被 JS fitFlipCard 覆盖为图片实际比例） */
+    .flip-card {
+      width: 260px;
+      height: 360px;
+    }
+    .flip-back {
+      padding: 20px 20px;
+      gap: 14px;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 25px,
+          rgba(200, 180, 140, 0.15) 25px,
+          rgba(200, 180, 140, 0.15) 26px
+        );
+    }
+    .handwriting {
+      font-size: 14px;
+      line-height: 1.85;
+    }
+    .handwriting-zhu .sig { font-size: 13px; }
+    .handwriting-yuan .sig { font-size: 13.5px; }
+
+    /* ---------- 返回按钮 ---------- */
+    .back-link {
+      bottom: calc(12px + var(--safe-bottom));
+      left: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+
+  /* =========================================================
+     底部页码微调（≤ 640px）—— 与其他页面保持一致
+     ========================================================= */
+  @media (max-width: 640px) {
+    .page-indicator {
+      bottom: calc(12px + var(--safe-bottom));
+      right: 10px;
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+  }
+
+  /* 超窄屏（≤ 360px） */
+  @media (max-width: 360px) {
+    .logo-text { font-size: 15px; }
+    .logo-icon { width: 26px; height: 26px; font-size: 15px; }
+    .toolbar-title { font-size: 14px; }
+    .file-row { padding: 12px 14px; font-size: 13.5px; }
+    .flip-card { width: 240px; height: 330px; }
+    .flip-back { padding: 16px 16px; gap: 12px; }
+    .handwriting { font-size: 13px; line-height: 1.8; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 右下角页码 -->
+<div class="page-indicator"><b>21</b> / 27</div>
+
+<!-- 左下角返回按钮 -->
+<a href="qiandu.html" class="back-link">← 返回登录页</a>
+
+<div class="top-bar">
+  <div class="logo">
+    <div class="logo-icon">千</div>
+    <div class="logo-text">千度网盘</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="breadcrumb" id="breadcrumb">
+    <span class="crumb-link" onclick="goRoot()">全部文件</span>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-title" id="toolbarTitle">全部文件</div>
+    <div class="toolbar-count" id="toolbarCount"></div>
+  </div>
+
+  <div id="viewRoot">
+    <div class="file-list">
+      <div class="file-list-header">
+        <div class="col-name">名称</div>
+        <div class="col-date">创建时间</div>
+        <div class="col-type">类型</div>
+        <div class="col-size">大小</div>
+      </div>
+
+      <div class="file-row" onclick="openFolder('shared')">
+        <div class="col-name">
+          <span class="folder-icon"></span>
+          <span>我们的树洞</span>
+        </div>
+        <div class="col-date">2026-06-25</div>
+        <div class="col-type">文件夹</div>
+        <div class="col-size">8 MB</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="viewFolder" style="display:none;">
+    <div id="folderContent"></div>
+  </div>
+</div>
+
+<div class="preview-mask" id="previewMask">
+  <div class="preview-close" onclick="closePreview()">✕</div>
+  <div class="preview-box">
+    <div class="preview-title" id="previewTitle"></div>
+    <div id="previewContent"></div>
+  </div>
+</div>
+
+<script>
+  const folders = {
+    shared: {
+      name: '我们的树洞',
+      files: [
+        {
+          name: '在天台看星星.png',
+          type: 'flip',
+          size: '1.3 MB',
+          date: '2026-06-26',
+          src: '../img/tiantai.png',
+          backZhu: {
+            text: '都怪我哭的声音太大，导致我们被宿管发现了，还被通报批评了。对不起，还有谢谢你小蝶。'
+          },
+          backYuan: {
+            text: '哈哈这样说也怪我，我哭的声音也不小。小蜘，我真心觉得这并不是负担，一份烦恼两个人知道就是半份烦恼，一份快乐两个人分享就是两份快乐，所以下次一定要告诉我你的心事好吗？'
+          }
+        },
+        {
+          name: '拍毕业照之前.png',
+          type: 'flip',
+          size: '1.5 MB',
+          date: '2026-07-10',
+          src: '../img/qianshou.png',
+          backYuan: {
+            text: '嘿嘿看我拍的怎么样？等合照出来了，也存到这里吧。以后我们毕业了再看说不定还会怀念呢。'
+          },
+          backZhu: {
+            text: '拍的真好，我今天预约了孙老师的心理咨询，我要给他看这张照片，和他讲我们的故事。还有，小蝶你有什么烦恼也可以告诉我，我们一起分担！'
+          }
+        },
+        {
+          name: '又要上学了.png',
+          type: 'flip',
+          size: '2.5 MB',
+          date: '2026-07-13',
+          src: '../img/zixi.png',
+          messages: [
+            { who: 'yuan', text: '又开学了，说什么自愿。如果不来的话，老师到时候一定会说，自愿辅导的时候讲过啦巴拉巴拉' },
+            { who: 'zhu',  text: '感觉老师也不容易，我昨天刷到了我们班主任的空间了，她看着也有点崩溃。' },
+            { who: 'yuan', text: 'qq吗？我记得我也加了她的好友，哎呦我怎么没刷到。' },
+            { who: 'zhu',  text: '貌似是她的小号，3755543241。你如果感兴趣到学校我讲给你听。' }
+          ]
+        },
+        {
+          name: '笔记.png',
+          type: 'flip',
+          size: '1.6 MB',
+          date: '2026-07-18',
+          src: '../img/bijiben.png',
+          messages: [
+            { who: 'zhu',  text: '怎么样了小蝶，其实一两次周测成绩不算什么，而且数学老师总喜欢夸大事实，不要在意他的话。' },
+            { who: 'yuan', text: '没什么事，医生说是压力大加低血糖导致的昏厥，我明天就让妈妈送我去学校。' },
+            { who: 'zhu',  text: '要不要再休息两天？我把今天的笔记放到你床上了。我们一起加油。' },
+            { who: 'yuan', text: '我可以的，我的成绩不能再下滑了。' }
+          ]
+        },
+        {
+          name: '哎.png',
+          type: 'flip',
+          size: '1.9 MB',
+          date: '2026-07-25',
+          src: '../img/close.png',
+          messages: [
+            { who: 'zhu',  text: '现在是补课，这里可能不开放，没关系小蝶，你还可以像之前那样讲给我听呀。' },
+            { who: 'yuan', text: '谢谢。我总是控制不了自己的情绪，有时候还会凶你，我害怕自己会伤害到你。' },
+            { who: 'zhu',  text: '你只是生病了，我知道你不是故意的。' }
+          ]
+        }
+      ]
+    }
+  };
+
+  let currentFolder = null;
+
+  function goRoot() {
+    currentFolder = null;
+    document.getElementById('viewRoot').style.display = 'block';
+    document.getElementById('viewFolder').style.display = 'none';
+    document.getElementById('breadcrumb').innerHTML =
+      '<span class="crumb-link" onclick="goRoot()">全部文件</span>';
+    document.getElementById('toolbarTitle').textContent = '全部文件';
+    document.getElementById('toolbarCount').textContent = '1 个文件夹';
+  }
+
+  function openFolder(key) {
+    const folder = folders[key];
+    if (!folder) return;
+    renderFolder(key);
+  }
+
+  function renderFolder(key) {
+    const folder = folders[key];
+    currentFolder = key;
+
+    document.getElementById('viewRoot').style.display = 'none';
+    document.getElementById('viewFolder').style.display = 'block';
+
+    document.getElementById('breadcrumb').innerHTML =
+      '<span class="crumb-link" onclick="goRoot()">全部文件</span>'
+      + '<span class="crumb-sep">/</span>'
+      + '<span class="crumb-current">' + folder.name + '</span>';
+
+    document.getElementById('toolbarTitle').textContent = folder.name;
+    document.getElementById('toolbarCount').textContent = folder.files.length + ' 个文件';
+
+    const box = document.getElementById('folderContent');
+
+    if (folder.files.length === 0) {
+      box.innerHTML = '<div class="empty-tip">此文件夹为空</div>';
+      return;
+    }
+
+    let html = ''
+      + '<div class="file-list">'
+      +   '<div class="file-list-header">'
+      +     '<div class="col-name">名称</div>'
+      +     '<div class="col-date">创建时间</div>'
+      +     '<div class="col-type">类型</div>'
+      +     '<div class="col-size">大小</div>'
+      +   '</div>';
+
+    folder.files.forEach(function(f, idx) {
+      let iconCls = 'img';
+      let iconTxt = '🖼';
+      let typeText = 'PNG 图片';
+      html += ''
+        + '<div class="file-row" onclick="openFile(\'' + key + '\',' + idx + ')">'
+        +   '<div class="col-name">'
+        +     '<span class="file-icon ' + iconCls + '">' + iconTxt + '</span>'
+        +     '<span>' + f.name + '</span>'
+        +   '</div>'
+        +   '<div class="col-date">' + f.date + '</div>'
+        +   '<div class="col-type">' + typeText + '</div>'
+        +   '<div class="col-size">' + f.size + '</div>'
+        + '</div>';
+    });
+
+    html += '</div>';
+    box.innerHTML = html;
+  }
+
+  function openFile(folderKey, idx) {
+    const folder = folders[folderKey];
+    const file = folder.files[idx];
+    if (!file) return;
+    showPreviewFlip(file);
+  }
+
+  function fitFlipCard(img) {
+    const card = img.closest('.flip-card');
+    if (!card) return;
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    if (!w || !h) return;
+
+    const maxW = Math.min(window.innerWidth * 0.92, 800);
+    const maxH = Math.min(window.innerHeight * 0.82, 800);
+
+    let dispW, dispH;
+    const ratio = w / h;
+
+    if (w / maxW > h / maxH) {
+      dispW = maxW;
+      dispH = maxW / ratio;
+    } else {
+      dispH = maxH;
+      dispW = maxH * ratio;
+    }
+
+    if (w <= dispW && h <= dispH) {
+      dispW = w;
+      dispH = h;
+    }
+
+    card.style.width = dispW + 'px';
+    card.style.height = dispH + 'px';
+  }
+
+  function showPreviewFlip(file) {
+    document.getElementById('previewTitle').textContent = file.name;
+
+    function makeBlock(who, text, sign) {
+      const textHTML = (text || '').replace(/\n/g, '<br>');
+      const signHTML = sign ? '<span class="sig">' + sign + '</span>' : '';
+      if (who === 'zhu') {
+        return '<div class="handwriting handwriting-zhu">' + textHTML + signHTML + '</div>';
+      }
+      return '<div class="handwriting handwriting-yuan">' + textHTML + signHTML + '</div>';
+    }
+
+    let backContent = '';
+
+    if (file.messages && Array.isArray(file.messages)) {
+      file.messages.forEach(function(m) {
+        backContent += makeBlock(m.who, m.text, m.sign);
+      });
+    } else {
+      Object.keys(file).forEach(function(k) {
+        if (k === 'backZhu') {
+          backContent += makeBlock('zhu', file.backZhu.text, file.backZhu.sign);
+        }
+        if (k === 'backYuan') {
+          backContent += makeBlock('yuan', file.backYuan.text, file.backYuan.sign);
+        }
+      });
+    }
+
+    const frontHTML = '<div class="flip-front">'
+      +   '<img src="' + file.src + '" alt="' + file.name + '" '
+      +        'onload="fitFlipCard(this)" '
+      +        'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" draggable="false">'
+      +   '<div class="flip-front-placeholder" style="display:none;">'
+      +     (file.frontPlaceholder || '') + '<br>'
+      +     '（把图片放到 ' + file.src + '）'
+      +   '</div>'
+      + '</div>';
+
+    const html = ''
+      + '<div class="flip-area">'
+      +   '<div class="flip-card" id="flipCard" onclick="this.classList.toggle(\'flipped\')">'
+      +     '<div class="flip-inner">'
+      +       frontHTML
+      +       '<div class="flip-back">'
+      +         backContent
+      +       '</div>'
+      +     '</div>'
+      +   '</div>'
+      + '</div>';
+
+    document.getElementById('previewContent').innerHTML = html;
+    document.getElementById('previewMask').classList.add('show');
+  }
+
+  function closePreview() {
+    document.getElementById('previewMask').classList.remove('show');
+  }
+
+  document.getElementById('previewMask').addEventListener('click', function(e) {
+    if (e.target === this) closePreview();
+  });
+
+  goRoot();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>教师工作台 | 青岚第一高级中学</title>
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f5f6f8;
+    color: #333;
+    line-height: 1.6;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 顶部栏 */
+  .topbar {
+    height: calc(60px + var(--safe-top));
+    padding-top: var(--safe-top);
+    background: #0056b3;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 24px;
+    padding-right: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+  .topbar-logo {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .topbar-sub {
+    font-size: 13px;
+    opacity: 0.85;
+    padding-left: 14px;
+    border-left: 1px solid rgba(255,255,255,0.3);
+    white-space: nowrap;
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .topbar-date {
+    opacity: 0.9;
+    font-size: 13px;
+  }
+  .topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .user-avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .user-name {
+    font-size: 14px;
+  }
+  .logout-btn {
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 4px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .logout-btn:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.7);
+  }
+
+  /* 布局 */
+  .layout {
+    display: flex;
+    min-height: calc(100vh - 60px);
+    min-height: calc(100dvh - 60px);
+  }
+  .sidebar {
+    width: 200px;
+    background: #fff;
+    border-right: 1px solid #e6eef8;
+    padding: 20px 0;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    display: block;
+    padding: 12px 24px;
+    font-size: 14px;
+    color: #555;
+    text-decoration: none;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .nav-item:hover {
+    background: #f0f5ff;
+    color: #0056b3;
+  }
+  .nav-item.active {
+    color: #0056b3;
+    font-weight: 600;
+    background: #f0f5ff;
+    border-left-color: #0056b3;
+  }
+
+  /* 内容区 */
+  .content {
+    flex: 1;
+    padding: 28px 32px;
+    max-width: calc(100% - 200px);
+    min-width: 0;
+  }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .page-heading {
+    font-size: 22px;
+    font-weight: 600;
+    color: #0056b3;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e6eef8;
+  }
+  .welcome {
+    font-size: 15px;
+    color: #444;
+    margin-bottom: 24px;
+  }
+
+  .section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0056b3;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e6eef8;
+  }
+
+  /* 概览统计 */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .overview-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .overview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,86,179,0.08);
+  }
+  .overview-num {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0056b3;
+    margin-bottom: 4px;
+  }
+  .overview-label {
+    font-size: 13px;
+    color: #666;
+  }
+
+  /* 待办 */
+  .todo-list { list-style: none; }
+  .todo-list li {
+    padding: 10px 0;
+    font-size: 14px;
+    color: #444;
+    display: flex;
+    gap: 14px;
+    border-bottom: 1px dashed #eee;
+  }
+  .todo-list li:last-child { border-bottom: none; }
+  .todo-time {
+    color: #0056b3;
+    font-weight: 600;
+    flex-shrink: 0;
+    width: 52px;
+  }
+
+  /* 最近公告列表 */
+  .notice-list { list-style: none; }
+  .notice-list li {
+    padding: 10px 0;
+    font-size: 14px;
+    color: #444;
+    display: flex;
+    gap: 14px;
+    border-bottom: 1px dashed #eee;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .notice-list li:last-child { border-bottom: none; }
+  .notice-list li:hover { color: #0056b3; }
+  .notice-date {
+    color: #999;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  /* 快捷入口 */
+  .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .quick-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 8px;
+    background: #f5f9ff;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quick-item:hover {
+    background: #0056b3;
+    color: #fff;
+  }
+  .quick-item .icon {
+    font-size: 22px;
+  }
+
+  /* 最近记录简表 */
+  .recent-list { list-style: none; }
+  .recent-list li {
+    padding: 10px 0;
+    font-size: 14px;
+    color: #444;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    border-bottom: 1px dashed #eee;
+  }
+  .recent-list li:last-child { border-bottom: none; }
+  .recent-list .recent-date {
+    color: #0056b3;
+    font-size: 13px;
+    flex-shrink: 0;
+    width: 90px;
+  }
+  .recent-list .recent-tag {
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    flex-shrink: 0;
+  }
+  .recent-list .recent-tag.watch { background: #fff3e0; color: #e65100; }
+
+  /* 公告详情 */
+  .notice-item {
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .notice-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .notice-meta {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+  }
+  .notice-body p {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.9;
+    text-indent: 2em;
+    margin-bottom: 10px;
+  }
+  .notice-sign {
+    text-align: right;
+    text-indent: 0 !important;
+    margin-top: 16px;
+    font-size: 14px;
+    color: #444;
+  }
+
+  /* 心理档案 */
+  .archive-note {
+    background: #fff7e6;
+    border-left: 3px solid #f0a020;
+    padding: 12px 18px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #8a5a00;
+    margin-bottom: 20px;
+    line-height: 1.7;
+  }
+  .archive-search {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    max-width: 520px;
+  }
+  .archive-search input {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 16px;
+    border: 1px solid #dce6f2;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .archive-search input:focus {
+    border-color: #0056b3;
+  }
+  .archive-search button {
+    padding: 0 22px;
+    background: #0056b3;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .archive-search button:hover {
+    background: #004a99;
+  }
+  .archive-hint {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 20px;
+  }
+
+  .archive-list {
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    min-height: 60px;
+  }
+  .archive-empty {
+    padding: 24px 20px;
+    text-align: center;
+    font-size: 13px;
+    color: #999;
+  }
+  .archive-item {
+    padding: 12px 16px;
+    border-bottom: 1px dashed #eee;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .archive-item:last-child { border-bottom: none; }
+  .archive-item:hover { background: #f8fafc; }
+
+  .archive-item-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 14px;
+  }
+  .archive-initial {
+    font-weight: 700;
+    color: #0056b3;
+    min-width: 32px;
+    font-size: 15px;
+  }
+  .archive-code {
+    color: #666;
+    min-width: 110px;
+    font-family: Consolas, Monaco, monospace;
+  }
+  .archive-status {
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+  .archive-status.normal { background: #e8f5e9; color: #2e7d32; }
+  .archive-status.watch { background: #fff3e0; color: #e65100; }
+  .archive-status.key { background: #ffebee; color: #c62828; }
+
+  /* 模糊样式（保护隐私） */
+  .blurred {
+    filter: blur(5px);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* 档案详情 */
+  .archive-detail {
+    margin-top: 14px;
+    background: #f8fafc;
+    border-radius: 6px;
+    padding: 16px 18px;
+  }
+  .detail-row {
+    display: flex;
+    gap: 14px;
+    padding: 6px 0;
+    font-size: 13px;
+    border-bottom: 1px dashed #e8eef8;
+  }
+  .detail-row:last-of-type { border-bottom: none; }
+  .detail-label {
+    color: #888;
+    width: 80px;
+    flex-shrink: 0;
+  }
+  .detail-value {
+    color: #333;
+    font-weight: 500;
+  }
+  .detail-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0056b3;
+    margin-top: 14px;
+    margin-bottom: 8px;
+    padding-top: 12px;
+    border-top: 2px solid #e6eef8;
+  }
+  .record-item {
+    padding: 10px 0;
+    border-bottom: 1px dashed #e8eef8;
+  }
+  .record-item:last-child { border-bottom: none; }
+  .record-date {
+    font-size: 12px;
+    color: #0056b3;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .record-text {
+    font-size: 13px;
+    color: #444;
+    line-height: 1.8;
+    text-indent: 2em;
+  }
+
+  /* 右下角页码 */
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    right: 16px;
+    background: #ffffff;
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: .5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    z-index: 2147483000;
+    user-select: none;
+    pointer-events: none;
+  }
+  .page-indicator b {
+    color: #1d1d1f;
+    font-weight: 600;
+  }
+
+  /* 左下角返回按钮 —— 桌面端隐藏，仅手机端显示 */
+  .back-link {
+    display: none;
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 16px;
+    background: #ffffff;
+    color: #1d1d1f;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    text-decoration: none;
+    align-items: center;
+    gap: 6px;
+    z-index: 2147483000;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-link:hover { background: #f5f5f7; }
+
+  /* =========================================================
+     手机端适配（≤ 600px）
+     ========================================================= */
+  @media (max-width: 600px) {
+
+    /* ---------- 顶栏精简 ---------- */
+    .topbar {
+      height: auto;
+      padding: calc(10px + var(--safe-top)) 14px 10px;
+      gap: 10px;
+    }
+    .topbar-logo { font-size: 15px; }
+    .topbar-sub {
+      font-size: 12px;
+      padding-left: 10px;
+    }
+    .topbar-right { gap: 10px; font-size: 13px; }
+    .topbar-date { display: none; }  /* 手机上隐藏日期，节省空间 */
+    .user-name { display: none; }     /* 只显示头像 */
+    .user-avatar { width: 28px; height: 28px; font-size: 13px; }
+    .logout-btn {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    /* ---------- 布局：侧栏变成顶部横向标签栏 ---------- */
+    .layout {
+      flex-direction: column;
+      min-height: auto;
+    }
+    .sidebar {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      padding: 0;
+      border-right: none;
+      border-bottom: 1px solid #e6eef8;
+      overflow-x: auto;
+      scrollbar-width: none;
+      position: sticky;
+      top: calc(60px + var(--safe-top));  /* 吸在顶栏下方 */
+      z-index: 50;
+      background: #fff;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+    .nav-item {
+      flex: 1 0 auto;
+      padding: 12px 16px;
+      font-size: 14px;
+      text-align: center;
+      border-left: none;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      min-width: 88px;
+    }
+    .nav-item.active {
+      border-left-color: transparent;
+      border-bottom-color: #0056b3;
+    }
+
+    /* ---------- 内容区 ---------- */
+    .content {
+      padding: 16px 12px calc(80px + var(--safe-bottom));
+      max-width: 100%;
+    }
+    .page-heading {
+      font-size: 18px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+    }
+    .welcome {
+      font-size: 13.5px;
+      margin-bottom: 16px;
+    }
+    .section {
+      padding: 16px 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    /* ---------- 概览：4 列 → 2 列 ---------- */
+    .overview-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .overview-card {
+      padding: 14px 14px;
+      border-radius: 10px;
+    }
+    .overview-num { font-size: 22px; }
+    .overview-label { font-size: 12px; }
+
+    /* ---------- 待办 / 公告列表 ---------- */
+    .todo-list li,
+    .notice-list li {
+      font-size: 13.5px;
+      padding: 10px 0;
+      gap: 10px;
+    }
+    .todo-time { width: 46px; font-size: 13px; }
+    .notice-date { font-size: 12px; }
+
+    /* ---------- 快捷入口：4 列 → 2 列 ---------- */
+    .quick-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .quick-item {
+      padding: 14px 8px;
+      font-size: 12.5px;
+    }
+    .quick-item .icon { font-size: 20px; }
+
+    /* ---------- 公告详情 ---------- */
+    .notice-item {
+      padding: 18px 16px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+    }
+    .notice-title { font-size: 15.5px; }
+    .notice-meta { font-size: 12px; margin-bottom: 14px; padding-bottom: 10px; }
+    .notice-body p {
+      font-size: 14px;
+      line-height: 1.85;
+    }
+    .notice-sign { font-size: 13px; }
+
+    /* ---------- 心理档案 ---------- */
+    .archive-note {
+      padding: 11px 14px;
+      font-size: 12.5px;
+      margin-bottom: 14px;
+    }
+    .archive-search {
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .archive-search input {
+      font-size: 16px; /* 防 iOS 自动放大 */
+      padding: 10px 14px;
+    }
+    .archive-search button {
+      padding: 0 16px;
+      font-size: 14px;
+    }
+    .archive-hint { font-size: 11.5px; margin-bottom: 14px; }
+
+    .archive-list {
+      padding: 6px 2px;
+      border-radius: 10px;
+    }
+    .archive-item { padding: 12px 12px; }
+    .archive-item-head {
+      gap: 10px;
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+    .archive-initial { min-width: 26px; font-size: 14px; }
+    .archive-code { min-width: 0; font-size: 12.5px; }
+    .archive-status { font-size: 11.5px; padding: 2px 8px; }
+
+    /* 档案详情 */
+    .archive-detail { padding: 14px 14px; margin-top: 12px; }
+    .detail-row {
+      gap: 10px;
+      font-size: 12.5px;
+      padding: 5px 0;
+    }
+    .detail-label { width: 66px; font-size: 12px; }
+    .detail-section-title { font-size: 13px; margin-top: 12px; }
+    .record-date { font-size: 11.5px; }
+    .record-text { font-size: 12.5px; line-height: 1.75; }
+
+    /* ---------- 返回按钮：手机端显示 ---------- */
+    .back-link {
+      display: inline-flex;
+      bottom: calc(12px + var(--safe-bottom));
+      left: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+
+  /* =========================================================
+     底部页码微调（≤ 640px）—— 与其他页面保持一致
+     ========================================================= */
+  @media (max-width: 640px) {
+    .page-indicator {
+      bottom: calc(12px + var(--safe-bottom));
+      right: 10px;
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+  }
+
+  /* 超窄屏（≤ 360px） */
+  @media (max-width: 360px) {
+    .topbar-logo { font-size: 14px; }
+    .topbar-sub { font-size: 11px; padding-left: 8px; }
+    .logout-btn { padding: 4px 8px; font-size: 11px; }
+    .page-heading { font-size: 17px; }
+    .overview-num { font-size: 20px; }
+    .overview-label { font-size: 11.5px; }
+    .quick-item { font-size: 12px; }
+    .notice-title { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 右下角页码 -->
+<div class="page-indicator"><b>18</b> / 27</div>
+
+<!-- 左下角返回（仅手机端显示） -->
+<a href="qinglan-official.html" class="back-link">← 返回上一页</a>
+
+<!-- 顶部栏 -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">青岚第一高级中学</span>
+    <span class="topbar-sub">教师工作台</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-date" id="topbarDate"></span>
+    <div class="topbar-user">
+      <span class="user-avatar">孙</span>
+      <span class="user-name">孙浔</span>
+    </div>
+    <a class="logout-btn" href="qinglan-official.html">退出登录</a>
+  </div>
+</div>
+
+<!-- 布局 -->
+<div class="layout">
+  <!-- 左侧导航（手机端变为顶部横向标签栏） -->
+  <aside class="sidebar">
+    <a class="nav-item active" data-page="dashboard">工作台</a>
+    <a class="nav-item" data-page="notice">通知公告</a>
+    <a class="nav-item" data-page="archive">心理档案</a>
+  </aside>
+
+  <!-- 内容区 -->
+  <main class="content">
+
+    <!-- 工作台 -->
+    <div class="page active" id="page-dashboard">
+      <h2 class="page-heading">工作台</h2>
+      <p class="welcome">您好，孙浔老师。欢迎回到教师工作台。</p>
+
+      <!-- 概览 -->
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="overview-num">12</div>
+          <div class="overview-label">本周咨询预约</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-num">3</div>
+          <div class="overview-label">待整理咨询记录</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-num">6</div>
+          <div class="overview-label">重点关注档案</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-num">48</div>
+          <div class="overview-label">累计咨询人次（近三月）</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">今日安排</div>
+        <ul class="todo-list">
+          <li>
+            <span class="todo-time">09:00</span>
+            <span>整理本周学生咨询记录，归档至心理档案系统</span>
+          </li>
+          <li>
+            <span class="todo-time">14:00</span>
+            <span>心理咨询室值班（行政楼 2 楼 203 室 心灵驿站）</span>
+          </li>
+          <li>
+            <span class="todo-time">16:30</span>
+            <span>参加心理健康教研组例会，讨论新学期课程安排</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-title">最近公告</div>
+        <ul class="notice-list">
+          <li data-goto="notice">
+            <span class="notice-date">2026-08-15</span>
+            <span>关于学校领导班子分工调整的通知</span>
+          </li>
+          <li data-goto="notice">
+            <span class="notice-date">2026-07-28</span>
+            <span>关于进一步加强学生心理关怀与校园安全工作的通知</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-title">快捷入口</div>
+        <div class="quick-grid">
+          <div class="quick-item" data-goto="archive">
+            <span class="icon">📁</span>
+            <span>心理档案</span>
+          </div>
+          <div class="quick-item" data-goto="notice">
+            <span class="icon">📢</span>
+            <span>通知公告</span>
+          </div>
+          <div class="quick-item" data-goto="dashboard">
+            <span class="icon">📝</span>
+            <span>咨询记录</span>
+          </div>
+          <div class="quick-item" data-goto="dashboard">
+            <span class="icon">📅</span>
+            <span>值班安排</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通知公告 -->
+    <div class="page" id="page-notice">
+      <h2 class="page-heading">通知公告</h2>
+
+      <div class="notice-item">
+        <div class="notice-title">关于学校领导班子分工调整的通知</div>
+        <div class="notice-meta">2026-08-15 · 学校办公室</div>
+        <div class="notice-body">
+          <p>因工作需要，经上级主管部门研究决定，王信同志不再担任青岚第一高级中学校长职务，另行安排。即日起，学校日常工作由王自来副校长主持。</p>
+          <p>特此通知。</p>
+          <p class="notice-sign">青岚第一高级中学<br>2026 年 8 月 15 日</p>
+        </div>
+      </div>
+
+      <div class="notice-item">
+        <div class="notice-title">关于进一步加强学生心理关怀与校园安全工作的通知</div>
+        <div class="notice-meta">2026-07-28 · 学校办公室</div>
+        <div class="notice-body">
+          <p>近期，我校发生一起令人痛心的事件。学校对此高度重视，已第一时间启动相关工作。为切实保障学生身心健康，维护正常教育教学秩序，现将有关事项通知如下：</p>
+          <p>一、全体教职工应密切关注学生情绪状态，发现异常及时与班主任、心理健康教师联系。</p>
+          <p>二、请勿在公开场合讨论、传播未经证实的信息，避免对学生及家属造成二次伤害。</p>
+          <p>三、心理咨询室正常开放，有需要的学生可随时前往。</p>
+          <p>四、各部门按职责做好本职工作，保持学校各项工作平稳有序。</p>
+          <p class="notice-sign">青岚第一高级中学<br>2026 年 7 月 28 日</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 心理档案 -->
+    <div class="page" id="page-archive">
+      <h2 class="page-heading">心理档案</h2>
+
+      <div class="archive-note">
+        档案内容涉及学生隐私，未搜索时以模糊方式显示，仅限授权人员按首字母精确查询。
+      </div>
+
+      <div class="archive-search">
+        <input type="text" id="archiveSearch" placeholder="请输入学生姓名首字母" autocomplete="off">
+        <button id="archiveSearchBtn">搜索</button>
+      </div>
+      <div class="archive-hint">输入姓名首字母后点击搜索，系统将匹配对应档案。</div>
+
+      <div class="archive-list" id="archiveList"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // 顶部日期
+  (function() {
+    const d = new Date();
+    const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const el = document.getElementById('topbarDate');
+    if (el) {
+      el.textContent = d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + days[d.getDay()];
+    }
+  })();
+
+  // 导航切换
+  (function() {
+    const items = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page');
+
+    function go(pageName) {
+      items.forEach(function(i) {
+        if (i.dataset.page === pageName) i.classList.add('active');
+        else i.classList.remove('active');
+      });
+      pages.forEach(function(p) { p.classList.remove('active'); });
+      const pageEl = document.getElementById('page-' + pageName);
+      if (pageEl) pageEl.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    items.forEach(function(item) {
+      item.addEventListener('click', function() {
+        if (this.dataset.page) go(this.dataset.page);
+      });
+    });
+
+    // 工作台里的跳转元素
+    document.querySelectorAll('[data-goto]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        go(this.dataset.goto);
+      });
+    });
+  })();
+
+  // 心理档案
+  (function() {
+    const list = document.getElementById('archiveList');
+    const search = document.getElementById('archiveSearch');
+    const searchBtn = document.getElementById('archiveSearchBtn');
+    if (!list || !search || !searchBtn) return;
+
+    // 档案数据
+    const archives = [
+      {
+        code: 'A-2024-017',
+        initial: 'zz',
+        grade: '2024 级 7 班',
+        status: 'normal',
+        statusText: '常规',
+        first: '2026-06-03',
+        last: '2026-07-10',
+        count: '3',
+        records: [
+          { date: '2026-07-10', text: '第三次来访，状态明显好转。' },
+          { date: '2026-06-19', text: '第二次来访，情绪比上次平稳一些。' },
+          { date: '2026-06-03', text: '首次来访，自述学业压力大，晚上睡不好。' }
+        ]
+      },
+      {
+        code: 'A-2024-031',
+        initial: 'lh',
+        grade: '2024 级 3 班',
+        status: 'normal',
+        statusText: '常规',
+        first: '2026-04-08',
+        last: '2026-06-20',
+        count: '3',
+        records: [
+          { date: '2026-06-20', text: '考试前紧张，做放松训练后有所缓解。' },
+          { date: '2026-05-10', text: '与同学关系融洽，主要倾诉家庭沟通问题。' },
+          { date: '2026-04-08', text: '首次来访，情绪平稳。' }
+        ]
+      },
+      {
+        code: 'A-2024-045',
+        initial: 'wj',
+        grade: '2025 级 2 班',
+        status: 'normal',
+        statusText: '常规',
+        first: '2026-05-06',
+        last: '2026-06-28',
+        count: '2',
+        records: [
+          { date: '2026-06-28', text: '学业压力咨询，情绪稳定。' },
+          { date: '2026-05-06', text: '首次来访，适应高中生活问题。' }
+        ]
+      },
+      {
+        code: 'A-2024-052',
+        initial: 'zy',
+        grade: '2024 级 5 班',
+        status: 'watch',
+        statusText: '关注',
+        first: '2026-03-20',
+        last: '2026-07-10',
+        count: '4',
+        records: [
+          { date: '2026-07-10', text: '情绪波动较大，已建议班主任多加关注。' },
+          { date: '2026-06-15', text: '与同学冲突后情绪低落。' },
+          { date: '2026-05-02', text: '家庭变故后的情绪调整。' },
+          { date: '2026-03-20', text: '首次来访，倾诉人际关系问题。' }
+        ]
+      },
+      {
+        code: 'A-2024-063',
+        initial: 'cx',
+        grade: '2025 级 6 班',
+        status: 'normal',
+        statusText: '常规',
+        first: '2026-05-12',
+        last: '2026-05-12',
+        count: '1',
+        records: [
+          { date: '2026-05-12', text: '首次来访，考前情绪疏导。' }
+        ]
+      }
+    ];
+
+    // 渲染模糊的档案列表（未搜索状态）
+    function renderBlurred() {
+      list.innerHTML = '';
+      archives.forEach(function(a) {
+        const item = document.createElement('div');
+        item.className = 'archive-item';
+        const head = document.createElement('div');
+        head.className = 'archive-item-head blurred';
+        head.innerHTML = ''
+          + '<span class="archive-initial">' + a.initial + '</span>'
+          + '<span class="archive-code">' + a.code + '</span>'
+          + '<span class="archive-status ' + a.status + '">' + a.statusText + '</span>';
+        item.appendChild(head);
+        list.appendChild(item);
+      });
+    }
+
+    // 渲染搜索结果（清晰 + 详情）
+    function renderResults(val) {
+      list.innerHTML = '';
+      if (!val) {
+        renderBlurred();
+        return;
+      }
+
+      if (val !== 'zz') {
+        const empty = document.createElement('div');
+        empty.className = 'archive-empty';
+        empty.textContent = '未找到匹配的档案。';
+        list.appendChild(empty);
+        return;
+      }
+
+      const matched = archives.filter(function(a) {
+        return a.initial === val;
+      });
+
+      if (matched.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'archive-empty';
+        empty.textContent = '未找到匹配的档案。';
+        list.appendChild(empty);
+        return;
+      }
+
+      matched.forEach(function(a) {
+        const item = document.createElement('div');
+        item.className = 'archive-item';
+
+        const head = document.createElement('div');
+        head.className = 'archive-item-head';
+        head.innerHTML = ''
+          + '<span class="archive-initial">' + a.initial + '</span>'
+          + '<span class="archive-code">' + a.code + '</span>'
+          + '<span class="archive-status ' + a.status + '">' + a.statusText + '</span>';
+        item.appendChild(head);
+
+        const detail = document.createElement('div');
+        detail.className = 'archive-detail';
+        let html = ''
+          + '<div class="detail-row"><span class="detail-label">档案编号</span><span class="detail-value">' + a.code + '</span></div>'
+          + '<div class="detail-row"><span class="detail-label">姓名首字母</span><span class="detail-value">' + a.initial + '</span></div>'
+          + '<div class="detail-row"><span class="detail-label">年级班级</span><span class="detail-value">' + a.grade + '</span></div>'
+          + '<div class="detail-row"><span class="detail-label">当前状态</span><span class="detail-value">' + a.statusText + '</span></div>'
+          + '<div class="detail-row"><span class="detail-label">首次咨询</span><span class="detail-value">' + a.first + '</span></div>'
+          + '<div class="detail-row"><span class="detail-label">最近咨询</span><span class="detail-value">' + a.last + '</span></div>'
+          + '<div class="detail-row"><span class="detail-label">咨询次数</span><span class="detail-value">' + a.count + ' 次</span></div>'
+          + '<div class="detail-section-title">咨询记录</div>';
+        a.records.forEach(function(r) {
+          html += ''
+            + '<div class="record-item">'
+            +   '<div class="record-date">' + r.date + '</div>'
+            +   '<div class="record-text">' + r.text + '</div>'
+            + '</div>';
+        });
+        detail.innerHTML = html;
+        item.appendChild(detail);
+        list.appendChild(item);
+      });
+    }
+
+    // 初始状态：显示模糊列表
+    renderBlurred();
+
+    // 点击搜索按钮
+    searchBtn.addEventListener('click', function() {
+      const val = search.value.trim().toLowerCase();
+      renderResults(val);
+    });
+
+    // 回车搜索
+    search.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = search.value.trim().toLowerCase();
+        renderResults(val);
+      }
+    });
+  })();
+</script>
+</body>
+</html>

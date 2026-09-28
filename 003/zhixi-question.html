@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>在青岚一高读高三是什么感受？ - 知兮</title>
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f6f6f6;
+    color: #1a1a1a;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .close-btn {
+    position: fixed;
+    top: calc(14px + var(--safe-top));
+    right: 16px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+    z-index: 100;
+  }
+
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid #ebebeb;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topbar-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: calc(12px + var(--safe-top)) 20px 12px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .zhihu-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: #056de8;
+    flex-shrink: 0;
+  }
+  .topbar-search {
+    flex: 1;
+    max-width: 560px;
+    display: flex;
+    border: 1px solid #ebebeb;
+    border-radius: 20px;
+    background: #f6f6f6;
+    padding: 7px 16px;
+  }
+  .topbar-search input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+  }
+  .topbar-search button {
+    background: #056de8;
+    color: #fff;
+    border: none;
+    padding: 4px 16px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    color: #444;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .topbar-right .login {
+    color: #056de8;
+    cursor: pointer;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 24px;
+  }
+  .main-col { flex: 1; min-width: 0; }
+  .side-col { width: 280px; flex-shrink: 0; }
+
+  .question-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 28px 32px;
+  }
+  .question-title {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+  .question-detail {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+  .question-meta {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #8590a6;
+  }
+  .question-actions {
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+  }
+  .btn {
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid #056de8;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-primary { background: #056de8; color: #fff; }
+  .btn-ghost { background: #fff; color: #056de8; }
+
+  .answers-header {
+    margin: 24px 0 12px;
+    font-size: 16px;
+  }
+  .answer {
+    background: #fff;
+    border-radius: 8px;
+    padding: 22px 32px;
+    margin-bottom: 16px;
+  }
+  .answer-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .avatar.blue { background: linear-gradient(135deg,#a8c5ff,#056de8); }
+  .avatar.green { background: linear-gradient(135deg,#7ed9a7,#2ea36b); }
+  .avatar.orange { background: linear-gradient(135deg,#ffd3a5,#fd6585); }
+  .author-info .name { font-size: 15px; font-weight: 500; }
+  .author-info .bio { font-size: 12px; color: #8590a6; }
+  .answer-content {
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .answer-content p { margin-bottom: 10px; }
+  .answer-foot {
+    margin-top: 14px;
+    font-size: 13px;
+    color: #8590a6;
+  }
+  .upvote { color: #056de8; cursor: pointer; margin-right: 16px; }
+
+  .side-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+  .side-card h4 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  .side-card ul { list-style: none; }
+  .side-card li {
+    padding: 7px 0;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    line-height: 1.5;
+  }
+  .side-card li:hover { color: #056de8; }
+  .author-card .big-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#ffd3a5,#fd6585);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .author-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .author-link:hover .name { color: #056de8; }
+
+  /* 右下角页码 */
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    right: 16px;
+    background: #ffffff;
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: .5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    z-index: 2147483000;
+    user-select: none;
+    pointer-events: none;
+  }
+  .page-indicator b {
+    color: #1d1d1f;
+    font-weight: 600;
+  }
+
+  /* 左下角返回按钮 —— 桌面端隐藏，仅手机端显示 */
+  .back-link {
+    display: none;
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 16px;
+    background: #ffffff;
+    color: #1d1d1f;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    text-decoration: none;
+    align-items: center;
+    gap: 6px;
+    z-index: 2147483000;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-link:hover { background: #f5f5f7; }
+
+  /* =========================================================
+     手机端适配（≤ 600px）
+     ========================================================= */
+  @media (max-width: 600px) {
+
+    /* ---------- 关闭按钮 ---------- */
+    .close-btn {
+      top: calc(8px + var(--safe-top));
+      right: 10px;
+      width: 28px; height: 28px;
+      font-size: 14px;
+    }
+
+    /* ---------- 顶栏：精简 ---------- */
+    .topbar-inner {
+      padding: calc(10px + var(--safe-top)) 14px 10px;
+      padding-right: 46px; /* 给关闭按钮让位 */
+      gap: 10px;
+    }
+    .zhihu-logo { font-size: 20px; }
+    .topbar-search { display: none; }   /* 手机上顶栏搜索框隐藏，节省空间 */
+    .topbar-right { gap: 14px; font-size: 13px; }
+
+    /* ---------- 容器：改为单列 ---------- */
+    .container {
+      flex-direction: column;
+      margin: 14px auto;
+      padding: 0 12px;
+      gap: 14px;
+    }
+    .main-col { width: 100%; }
+    /* 侧栏在手机端移到主内容下方，宽度 100% */
+    .side-col {
+      width: 100%;
+      flex-shrink: 1;
+    }
+
+    /* ---------- 问题卡片 ---------- */
+    .question-card {
+      padding: 20px 18px;
+      border-radius: 10px;
+    }
+    .question-title { font-size: 18px; margin-bottom: 12px; }
+    .question-detail { font-size: 14.5px; line-height: 1.75; }
+    .question-meta { font-size: 12px; margin-top: 12px; }
+
+    .question-actions {
+      margin-top: 14px;
+      gap: 10px;
+    }
+    .btn { padding: 8px 16px; font-size: 14px; }
+
+    /* ---------- 回答列表 ---------- */
+    .answers-header { margin: 20px 0 10px; font-size: 15px; }
+    .answer {
+      padding: 18px 18px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .answer-content { font-size: 14.5px; line-height: 1.75; }
+    .answer-foot { font-size: 12px; margin-top: 12px; }
+
+    /* ---------- 侧栏卡片 ---------- */
+    .side-card {
+      padding: 16px 18px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .side-card h4 { font-size: 14px; margin-bottom: 10px; }
+    .side-card li { font-size: 13.5px; padding: 8px 0; }
+
+    /* ---------- 返回按钮：手机端显示 ---------- */
+    .back-link {
+      display: inline-flex;
+      bottom: calc(12px + var(--safe-bottom));
+      left: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+
+  /* =========================================================
+     底部页码微调（≤ 640px）—— 与其他页面保持一致
+     ========================================================= */
+  @media (max-width: 640px) {
+    .page-indicator {
+      bottom: calc(12px + var(--safe-bottom));
+      right: 10px;
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+  }
+
+  /* 超窄屏（≤ 360px） */
+  @media (max-width: 360px) {
+    .zhihu-logo { font-size: 18px; }
+    .question-title { font-size: 17px; }
+    .question-detail { font-size: 14px; }
+    .answer-content { font-size: 14px; }
+    .topbar-right { gap: 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 右下角页码 -->
+<div class="page-indicator"><b>6</b> / 27</div>
+
+<!-- 左下角返回（仅手机端显示） -->
+<a href="searchzzjuly28.html" class="back-link">← 返回搜索结果</a>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="zhihu-logo">知兮</div>
+    <div class="topbar-search">
+      <input type="text" placeholder="搜索你感兴趣的内容">
+      <button>搜索</button>
+    </div>
+    <div class="topbar-right">
+      <span>首页</span>
+      <span>消息</span>
+      <span class="login">登录/注册</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="main-col">
+    <div class="question-card">
+      <div class="question-title">在青岚一高读高三是什么感受？</div>
+      <div class="question-detail">马上就要升高三了，心里特别慌。想问问青岚一高的学长学姐们，真实的高三生活是什么样的？听说作业根本写不完，每天坐得屁股痛，还会便秘，甚至三个星期放两天假……真的假的？现在已经开始焦虑了，有没有人来安慰一下。</div>
+      <div class="question-meta">2026-08-20 提问 · 16 人关注 · 3 个回答</div>
+      <div class="question-actions">
+        <button class="btn btn-primary">关注问题</button>
+        <button class="btn btn-ghost">写回答</button>
+      </div>
+    </div>
+
+    <div class="answers-header">全部回答 8</div>
+
+    <div class="answer">
+      <div class="answer-author">
+        <div class="avatar blue">并</div>
+        <div class="author-info">
+          <div class="name">并不是外星人</div>
+          <div class="bio">人在火星，刚下飞船。</div>
+        </div>
+      </div>
+      <div class="answer-content">
+        <p>谢邀。刚从青岚毕业一年，趁还记得的时候答一下。</p>
+        <p>作业确实写不完，刚开始老师发现作业没完成还会说两句，到后面老师也能理解了。便秘是真的，下课十分钟全在排队接水，大课间在厕所也要排很久。</p>
+        <p>三个星期放两天？这个是假的。只有一次高三校区发生了点事儿，学校为了封锁消息那个星期没放假。平常是两星期放两天，还行吧。</p>
+        <p>别焦虑，大家都这样过来的。</p>
+      </div>
+      <div class="answer-foot">
+        <span class="upvote">▲ 11赞同</span>
+        <span>⋅ 2026-08-21</span>
+      </div>
+    </div>
+
+    <div class="answer">
+      <div class="answer-author">
+        <div class="avatar green">匿</div>
+        <div class="author-info">
+          <div class="name">匿名用户</div>
+          <div class="bio">这个人很神秘，什么都没有写~</div>
+        </div>
+      </div>
+      <div class="answer-content">
+        <p>青岚这两年比以前严多了。校长换了之后那个姓王的之后，手机查得特别紧，晚自习也加了一节。但最近他是不是出事了？还是降职了？</p>
+        <p>不知道是好事还是坏事。反正习惯就好。</p>
+      </div>
+      <div class="answer-foot">
+        <span class="upvote">▲ 6 赞同</span>
+        <span>⋅ 2026-08-22</span>
+      </div>
+    </div>
+
+    <div class="answer">
+      <div class="answer-author">
+        <div class="avatar orange">路</div>
+        <div class="author-info">
+          <div class="name">路过的大学生</div>
+          <div class="bio">路人路过大路中</div>
+        </div>
+      </div>
+      <div class="answer-content">
+        <p>每个高中高三都这样，别自己吓自己。等你上了大学就会发现，高三是你这辈子最纯粹的时光。</p>
+      </div>
+      <div class="answer-foot">
+        <span class="upvote">▲ 3 赞同</span>
+        <span>⋅ 2026-08-23</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-col">
+    <div class="side-card author-card">
+      <a class="author-link" href="zhixi.html">
+        <div class="big-avatar">zz</div>
+        <div style="font-size:15px;font-weight:600;">zzjuly28</div>
+      </a>
+      <div style="font-size:13px;color:#8590a6;margin-top:4px;">
+        回答 0 · 提问 1 · 关注者 3
+      </div>
+    </div>
+    <div class="side-card">
+      <h4>相关问题</h4>
+      <ul>
+        <li>高三压力大到崩溃怎么办？</li>
+        <li>高中学校强制一个月放一次假合法吗？</li>
+        <li>如何调整高三开学前的焦虑？</li>
+        <li>青岚一高升学率怎么样？</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

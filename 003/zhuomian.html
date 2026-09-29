@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mac 桌面</title>
+<style>
+:root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== 壁纸 ===== */
+.desktop-bg {
+    position: absolute;
+    inset: 0;
+    background: url('../img/003beijing.jpg') center/cover no-repeat;
+    z-index: 0;
+}
+
+/* ===== 顶部菜单栏 ===== */
+.menubar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: calc(28px + var(--safe-top));
+    padding: var(--safe-top) 14px 0;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #fff;
+    z-index: 1000;
+}
+.menu-left { display: flex; align-items: center; gap: 18px; }
+.apple-logo { width: 14px; height: 14px; fill: #fff; flex-shrink: 0; }
+.menu-item { cursor: default; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+.menu-item.active { font-weight: 700; }
+.menu-item:hover { background: rgba(255,255,255,0.2); }
+.menu-right { display: flex; align-items: center; gap: 12px; font-size: 12px; white-space: nowrap; }
+.menu-icon { width: 18px; height: 18px; opacity: 0.95; cursor: pointer; flex-shrink: 0; }
+.menu-icon:hover { opacity: 1; }
+
+/* ===== 苹果菜单 ===== */
+.apple-menu-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.apple-menu-wrap:hover { background: rgba(255,255,255,0.2); }
+.apple-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: -6px;
+    min-width: 200px;
+    background: rgba(40,40,40,0.88);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+    z-index: 2000;
+    font-size: 13px;
+    color: #fff;
+}
+.apple-dropdown.show { display: block; }
+.apple-menu-item {
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: default;
+    white-space: nowrap;
+}
+.apple-menu-item:hover { background: #0a84ff; }
+.apple-menu-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.12);
+    margin: 5px 8px;
+}
+
+/* ===== 桌面图标区 ===== */
+.desktop-icons {
+    position: absolute;
+    top: calc(40px + var(--safe-top));
+    right: 20px;
+    display: flex; flex-direction: column; gap: 16px;
+    z-index: 5;
+}
+.desktop-icon {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; padding: 6px; border-radius: 6px;
+    width: 80px;
+}
+.desktop-icon:hover { background: rgba(255,255,255,0.15); }
+.desktop-icon-img { width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+.desktop-icon-label {
+    font-size: 12px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    text-align: center; line-height: 1.2;
+}
+
+/* ===== Dock 栏 ===== */
+.dock {
+    position: fixed;
+    bottom: calc(8px + var(--safe-bottom));
+    left: 50%; transform: translateX(-50%);
+    height: 72px;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(30px) saturate(200%);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 18px;
+    display: flex;
+    align-items: flex-end;
+    padding: 6px 10px;
+    gap: 8px;
+    z-index: 999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.dock-item {
+    position: relative;
+    width: 58px; height: 58px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: bottom center;
+}
+.dock-icon {
+    width: 100%; height: 100%;
+    border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+.dock-icon-messages { background: linear-gradient(145deg, #5ef574 0%, #2db84b 100%); }
+.dock-icon-safari { background: #fff; }
+.compass-svg { width: 50px; height: 50px; }
+.dock-item:hover { transform: scale(1.25) translateY(-8px); }
+
+/* 右下角页码 */
+.page-indicator {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    right: 16px;
+    background: #ffffff;
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: .5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    z-index: 2147483000;
+    user-select: none;
+    pointer-events: none;
+}
+.page-indicator b {
+    color: #1d1d1f;
+    font-weight: 600;
+}
+
+/* 左下角返回按钮 */
+.back-link {
+    display: none;
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 16px;
+    background: #ffffff;
+    color: #1d1d1f;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e5ea;
+    text-decoration: none;
+    align-items: center;
+    gap: 6px;
+    z-index: 2147483000;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+.back-link:hover { background: #f5f5f7; }
+
+/* ===== 关机确认框 ===== */
+.shutdown-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.shutdown-modal.show { display: flex; }
+.shutdown-dialog {
+    background: rgba(50,50,50,0.95);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 24px 28px 20px;
+    width: 100%;
+    max-width: 320px;
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.55);
+}
+.shutdown-dialog h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.shutdown-dialog p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 22px;
+    line-height: 1.5;
+}
+.shutdown-dialog-btns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.shutdown-btn {
+    flex: 1;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+.shutdown-btn:hover { background: rgba(255,255,255,0.2); }
+.shutdown-btn.primary {
+    background: #0a84ff;
+    border-color: #0a84ff;
+}
+.shutdown-btn.primary:hover { background: #0a74e0; }
+
+/* ===== 关机黑屏 ===== */
+.shutdown-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 10000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.shutdown-screen.show {
+    display: flex;
+    opacity: 1;
+}
+.shutdown-screen .apple-big {
+    width: 56px;
+    height: 56px;
+    fill: #fff;
+    margin-bottom: 22px;
+}
+.shutdown-screen .shutdown-text {
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 26px;
+    letter-spacing: 2px;
+}
+.shutdown-progress {
+    width: 200px;
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.shutdown-progress-bar {
+    height: 100%;
+    width: 0;
+    background: #fff;
+    border-radius: 2px;
+    transition: width 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =========================================================
+   手机端适配（≤ 600px）
+   ========================================================= */
+@media (max-width: 600px) {
+
+    .menubar .hide-on-mobile { display: none !important; }
+    .menubar { font-size: 12px; padding-left: 10px; padding-right: 10px; }
+    .menu-left { gap: 8px; }
+    .apple-logo { width: 13px; height: 13px; }
+    .menu-item { padding: 2px 6px; }
+    .menu-right { gap: 8px; font-size: 11px; }
+    .menu-icon { width: 16px; height: 16px; }
+
+    .desktop-icons {
+        top: calc(36px + var(--safe-top));
+        right: 10px;
+        gap: 10px;
+    }
+    .desktop-icon { width: 66px; padding: 4px; }
+    .desktop-icon-img { width: 42px; height: 42px; }
+    .desktop-icon-label { font-size: 11px; }
+
+    .dock {
+        height: 60px;
+        border-radius: 14px;
+        padding: 5px 8px;
+        gap: 6px;
+        bottom: calc(8px + var(--safe-bottom));
+    }
+    .dock-item { width: 48px; height: 48px; }
+    .dock-icon { border-radius: 10px; font-size: 26px; }
+    .compass-svg { width: 40px; height: 40px; }
+    .dock-item:hover { transform: none; }
+
+    .back-link {
+        display: inline-flex;
+        bottom: calc(12px + var(--safe-bottom));
+        left: 10px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .page-indicator {
+        bottom: calc(80px + var(--safe-bottom));
+    }
+
+    /* 苹果菜单移动端微调 */
+    .apple-dropdown {
+        left: -10px;
+        min-width: 180px;
+    }
+}
+
+@media (max-width: 640px) {
+    .page-indicator {
+        right: 10px;
+        padding: 4px 10px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 360px) {
+    .dock { height: 56px; padding: 4px 6px; gap: 4px; }
+    .dock-item { width: 44px; height: 44px; }
+    .compass-svg { width: 36px; height: 36px; }
+}
+</style>
+</head>
+<body>
+
+<!-- 右下角页码 -->
+<div class="page-indicator"><b>2</b> / 27</div>
+
+<div class="desktop-bg"></div>
+
+<!-- 顶部菜单栏 -->
+<div class="menubar">
+    <div class="menu-left">
+        <div class="apple-menu-wrap" id="appleMenuWrap">
+            <svg class="apple-logo" viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+
+            <!-- 苹果下拉菜单 -->
+            <div class="apple-dropdown" id="appleDropdown">
+                <div class="apple-menu-item">关于本机</div>
+                <div class="apple-menu-divider"></div>
+                <div class="apple-menu-item">系统设置…</div>
+                <div class="apple-menu-divider"></div>
+                <div class="apple-menu-item" id="shutdownBtn">关机…</div>
+            </div>
+        </div>
+
+        <span class="menu-item active">访达</span>
+        <span class="menu-item hide-on-mobile">文件</span>
+        <span class="menu-item hide-on-mobile">编辑</span>
+        <span class="menu-item hide-on-mobile">显示</span>
+        <span class="menu-item hide-on-mobile">前往</span>
+        <span class="menu-item hide-on-mobile">窗口</span>
+        <span class="menu-item hide-on-mobile">帮助</span>
+    </div>
+    <div class="menu-right">
+        <svg class="menu-icon hide-on-mobile" viewBox="0 0 18 18" fill="#fff"><path d="M4 11.5a5 5 0 0110 0h-1.5a3.5 3.5 0 10-7 0H4z"/><path d="M2 14a7 7 0 0114 0h-1.5a5.5 5.5 0 00-11 0H2z"/><path d="M6 14.5a3 3 0 016 0"/></svg>
+        <svg class="menu-icon" viewBox="0 0 24 14" fill="none"><rect x="1" y="1" width="20" height="12" rx="2.5" stroke="#fff" stroke-width="1.5"/><rect x="22" y="4" width="1.5" height="6" rx=".75" fill="#fff"/><rect x="3" y="3" width="15" height="8" rx="1" fill="#fff"/></svg>
+        <svg class="menu-icon" viewBox="0 0 18 18" fill="#fff"><circle cx="8" cy="8" r="5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M12 12l4 4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        <span id="menu-time"></span>
+    </div>
+</div>
+
+<!-- 桌面图标 -->
+<div class="desktop-icons">
+    <div class="desktop-icon">
+        <div class="desktop-icon-img" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;">
+            <svg width="48" height="48" viewBox="0 0 64 64"><rect x="8" y="6" width="48" height="32" rx="3" fill="#e6e6e6" stroke="#999" stroke-width="1"/><rect x="10" y="8" width="44" height="28" fill="#4a90d9"/><rect x="18" y="40" width="28" height="3" fill="#ccc"/><rect x="24" y="43" width="16" height="6" rx="1" fill="#ccc"/></svg>
+        </div>
+        <span class="desktop-icon-label">Macintosh HD</span>
+    </div>
+</div>
+
+<!-- Dock 栏 -->
+<div class="dock">
+    <div class="dock-item" data-app="duanxin">
+        <div class="dock-icon dock-icon-messages">
+            <svg width="40" height="40" viewBox="0 0 40 40"><path d="M8 20C8 13.4 13.4 8 20 8s12 5.4 12 12-5.4 12-12 12c-2.2 0-4.2-.6-6-1.6L8 32l1.6-5.4C8.6 24.8 8 22.5 8 20z" fill="#fff" opacity="0.3"/><ellipse cx="15" cy="18" rx="2" ry="2.5" fill="#fff"/><ellipse cx="25" cy="18" rx="2" ry="2.5" fill="#fff"/><ellipse cx="20" cy="24" rx="3" ry="2.5" fill="#fff"/></svg>
+        </div>
+    </div>
+    <div class="dock-item" data-app="safari">
+        <div class="dock-icon dock-icon-safari">
+            <svg class="compass-svg" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="28" fill="#fff" stroke="#ddd" stroke-width="1"/>
+                <circle cx="32" cy="32" r="24" fill="url(#safari-bg)"/>
+                <polygon points="32,10 36,32 32,54 28,32" fill="#e74c3c"/>
+                <polygon points="10,32 32,28 54,32 32,36" fill="#fff"/>
+                <circle cx="32" cy="32" r="3" fill="#333"/>
+                <defs><radialGradient id="safari-bg"><stop offset="0%" stop-color="#5dade2"/><stop offset="100%" stop-color="#1a5276"/></radialGradient></defs>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<!-- 关机确认框 -->
+<div class="shutdown-modal" id="shutdownModal">
+    <div class="shutdown-dialog">
+        <h3>您确定要关闭电脑吗？</h3>
+        <p>如果现在关机，所有未保存的更改都会丢失。</p>
+        <div class="shutdown-dialog-btns">
+            <button class="shutdown-btn" id="shutdownCancelBtn">取消</button>
+            <button class="shutdown-btn primary" id="shutdownConfirmBtn">关机</button>
+        </div>
+    </div>
+</div>
+
+<!-- 关机黑屏 -->
+<div class="shutdown-screen" id="shutdownScreen">
+    <svg class="apple-big" viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+    <div class="shutdown-text">正在关机…</div>
+    <div class="shutdown-progress">
+        <div class="shutdown-progress-bar" id="shutdownProgressBar"></div>
+    </div>
+</div>
+
+<script>
+// 时间更新
+function updateTime() {
+    const now = new Date();
+    const days = ['周日','周一','周二','周三','周四','周五','周六'];
+    const mon = now.getMonth() + 1;
+    const day = now.getDate();
+    const week = days[now.getDay()];
+    let h = now.getHours(), m = now.getMinutes();
+    const hh = h < 10 ? '0'+h : h;
+    const mm = m < 10 ? '0'+m : m;
+    document.getElementById('menu-time').textContent = `${mon}月${day}日 ${week} ${hh}:${mm}`;
+}
+updateTime();
+setInterval(updateTime, 1000);
+
+// Dock 点击打开新窗口
+document.querySelectorAll('.dock-item').forEach(item => {
+    item.addEventListener('click', () => {
+        const app = item.dataset.app;
+        window.open(app + '.html', '_blank');
+    });
+});
+
+// Dock 放大效果 —— 只在有真实鼠标的设备上启用
+const isTouchOnly = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+if (!isTouchOnly) {
+    const dockItems = document.querySelectorAll('.dock-item');
+    dockItems.forEach(item => {
+        item.addEventListener('mousemove', (e) => {
+            const rect = item.getBoundingClientRect();
+            const offset = (e.clientX - rect.left) / rect.width - 0.5;
+            item.style.transform = `scale(1.25) translateY(-8px) translateX(${offset * 6}px)`;
+            const prev = item.previousElementSibling;
+            const next = item.nextElementSibling;
+            if (prev) prev.style.transform = `scale(1.1) translateY(-4px) translateX(-3px)`;
+            if (next) next.style.transform = `scale(1.1) translateY(-4px) translateX(3px)`;
+        });
+        item.addEventListener('mouseleave', () => {
+            dockItems.forEach(i => i.style.transform = '');
+        });
+    });
+}
+
+/* ===== 苹果菜单 + 关机逻辑 ===== */
+(function() {
+    const appleMenuWrap = document.getElementById('appleMenuWrap');
+    const appleDropdown = document.getElementById('appleDropdown');
+    const shutdownBtn = document.getElementById('shutdownBtn');
+    const shutdownModal = document.getElementById('shutdownModal');
+    const shutdownCancelBtn = document.getElementById('shutdownCancelBtn');
+    const shutdownConfirmBtn = document.getElementById('shutdownConfirmBtn');
+    const shutdownScreen = document.getElementById('shutdownScreen');
+    const shutdownProgressBar = document.getElementById('shutdownProgressBar');
+
+    // 打开 / 收起苹果菜单
+    appleMenuWrap.addEventListener('click', (e) => {
+        e.stopPropagation();
+        appleDropdown.classList.toggle('show');
+    });
+
+    // 点击下拉菜单本身，不关闭
+    appleDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // 点击其他地方关闭菜单
+    document.addEventListener('click', () => {
+        appleDropdown.classList.remove('show');
+    });
+
+    // 点击「关机…」
+    shutdownBtn.addEventListener('click', () => {
+        appleDropdown.classList.remove('show');
+        shutdownModal.classList.add('show');
+    });
+
+    // 取消关机
+    shutdownCancelBtn.addEventListener('click', () => {
+        shutdownModal.classList.remove('show');
+    });
+
+    // 点击弹窗外部也能取消
+    shutdownModal.addEventListener('click', (e) => {
+        if (e.target === shutdownModal) {
+            shutdownModal.classList.remove('show');
+        }
+    });
+
+    // 确认关机 → 黑屏动画 → 跳转 index.html
+    shutdownConfirmBtn.addEventListener('click', () => {
+        shutdownModal.classList.remove('show');
+
+        // 显示黑屏
+        shutdownScreen.style.display = 'flex';
+        // 强制 reflow，让过渡生效
+        void shutdownScreen.offsetWidth;
+        shutdownScreen.classList.add('show');
+
+        // 进度条动画
+        setTimeout(() => {
+            shutdownProgressBar.style.width = '100%';
+        }, 80);
+
+        // 约 2 秒后跳转
+        setTimeout(() => {
+            window.location.href = '../index.html';
+        }, 2000);
+    });
+})();
+</script>
+</body>
+</html>
